@@ -1,0 +1,62 @@
+.botones-flotantes {
+    position: absolute;
+    top: -60px;  /* Coloca los botones encima de la tabla */
+    right: 10px; /* Mueve los botones hacia la izquierda */
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    z-index: 100; /* Asegura que estén sobre la tabla */
+}
+/*
+.mt-6 {
+    position: relative; 
+    padding-top: 70px; 
+ 
+
+mat-form-field {
+    width: 100%;
+    font-size: 14px;
+}
+
+
+.mat-form-field-wrapper {
+    padding-bottom: 4px !important;
+}
+
+
+.mat-select-trigger {
+    height: 36px !important;
+    font-size: 14px !important;
+}
+
+input.mat-input-element {
+    height: 30px !important;
+    padding: 4px 8px !important;
+}
+
+
+mat-form-field {
+    margin-bottom:-5% !important; 
+}
+.bg-card {
+    max-height: 100vh;  
+    overflow-y: auto;   
+  }
+  
+  .bg-card {
+    max-height: 100vh;  
+    overflow: hidden;   
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .table-container {
+    overflow-y: auto;
+    max-height: 30vh;
+  }
+  
+  mat-form-field {
+    width: 100%;
+    max-width: 300px;
+  }
+  */

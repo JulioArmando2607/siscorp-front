@@ -1,0 +1,154 @@
+<div class="prose prose-sm max-w-4xl overflow-y-auto max-h-screen">
+ 
+ 
+   <!-- Header sin franja morada, con botón a la izquierda y título centrado -->
+<div class="flex h-16 flex-0 items-center justify-between border-b px-4">
+
+
+  <!-- Título centrado -->
+  <div class="flex-1 text-center text-lg font-medium">{{title}}</div>
+
+    <!-- Botón de cerrar a la izquierda -->
+    <button mat-icon-button (click)="matDialogRef.close()" [tabIndex]="-1">
+      <mat-icon class="text-gray-500" [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+  </button>
+
+  <!-- Espacio vacío para mantener el título centrado -->
+  <div class="w-10"></div>
+</div>
+
+  <form class="flex w-full flex-col" [formGroup]="FormRegistro" (ngSubmit)="save()">
+    <!-- Checkbox para selección masiva -->
+    <div *ngIf="!isEdit" class="flex items-center gap-4 px-8 pb-4">
+      <mat-checkbox formControlName="masivo" (change)="isMasivoSelect()">
+        Agregar Masivo
+      </mat-checkbox>
+    </div>
+
+    <!-- Botón para adjuntar archivo (solo si es masivo) -->
+    <div *ngIf="isMasivo" class="flex items-center gap-4 px-8 pb-4">
+      <button class="ml-0.5" mat-icon-button (click)="fileInput.click()">
+        <mat-icon [svgIcon]="'heroicons_outline:paper-clip'"></mat-icon>
+      </button>
+
+      <!-- Input de archivo oculto -->
+      <input #fileInput type="file" (change)="onFileSelected($event)" hidden />
+
+      <!-- Mostrar el nombre del archivo si se selecciona -->
+      <div *ngIf="selectedFile" class="flex items-center gap-2">
+        <span>{{ selectedFile.name }}</span>
+        <button mat-icon-button (click)="removeFile()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-col p-8" *ngIf="!isMasivo">
+      <div class="grid grid-cols-3 gap-5">
+
+        <!-- CUI -->
+        <mat-form-field appearance="fill" class="w-[250px]">
+          <mat-label>CUI</mat-label>
+          <input matInput formControlName="cui" />
+        </mat-form-field>
+
+        <!-- Ubigeo CP -->
+        <mat-form-field class="w-full">
+          <mat-label>Ubigeo CP</mat-label>
+          <input matInput type="text" formControlName="ubigeoCp" (input)="onBuscar($event)" (paste)="onBuscar($event)" (blur)="onBuscar($event)">
+        </mat-form-field>
+
+        <!-- Ubigeo Distrito -->
+      <!--  <div class="flex">
+          <mat-form-field class="w-full">
+            <mat-label>Ubigeo Distrito</mat-label>
+            <input matInput formControlName="ubigeo_distrito" />
+          </mat-form-field>
+        </div>-->
+
+        <!-- Departamento -->
+        <mat-form-field class="w-full">
+          <mat-label>Departamento</mat-label>
+          <mat-select formControlName="departamento" (selectionChange)="onDepartamentoChange($event)">
+            <mat-option *ngFor="let item of departamentos" [value]="item.departamentoUbigeo">{{ item.departamentoNombre
+              }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Provincia -->
+        <mat-form-field class="w-full">
+          <mat-label>Provincia</mat-label>
+          <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange($event)">
+            <mat-option *ngFor="let item of provincias" [value]="item.provinciaUbigeo">{{ item.provinciaDescripcion
+              }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Distrito -->
+        <mat-form-field class="w-full">
+          <mat-label>Distrito</mat-label>
+          <mat-select formControlName="distrito" (selectionChange)="onDistritoChange($event)">
+            <mat-option *ngFor="let item of distritos" [value]="item.distritoUbigeo">{{ item.distritoDescripcion
+              }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Centro Poblado -->
+        <mat-form-field class="w-full">
+          <mat-label>Centro Poblado</mat-label>
+          <mat-select formControlName="centroPoblado">
+            <mat-option *ngFor="let item of centrosPoblados" [value]="item.centroPobladoUbigeo">{{
+              item.centroPobladoDescripcion }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Tambo -->
+        <mat-form-field class="w-full">
+          <mat-label>Tambo</mat-label>
+          <input matInput formControlName="tambo" />
+        </mat-form-field>
+
+        <!-- N° de Convenio -->
+        <mat-form-field class="w-full">
+          <mat-label>N° de Convenio</mat-label>
+          <input matInput formControlName="convenio" />
+        </mat-form-field>
+
+        <!-- Estado -->
+        <mat-form-field class="w-full">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="estado">
+            <mat-option *ngFor="let est of estados" [value]="est.idCodigo">
+              {{ est.cidNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+         
+        <mat-form-field class="w-full">
+          <mat-label>Longitud</mat-label>
+          <input matInput formControlName="longX" />
+        </mat-form-field>
+
+          <mat-form-field class="w-full">
+            <mat-label>Latitud</mat-label>
+            <input matInput formControlName="latY" />
+          </mat-form-field>
+         
+      </div>
+    </div>
+
+    <!-- Botón de enviar -->
+    <div class="flex w-full items-center justify-end px-8 py-4">
+      <button mat-flat-button color="primary" type="submit" [disabled]="FormRegistro.invalid">
+        Guardar
+      </button>
+
+    <button mat-flat-button color="warn" type="button" (click)="cancelar()">
+    Cancelar
+  </button>
+
+      
+    </div>
+  </form>
+</div>
