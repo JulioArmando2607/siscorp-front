@@ -27,7 +27,7 @@
 
     <!-- Botón para adjuntar archivo (solo si es masivo) -->
     <div *ngIf="isMasivo" class="flex items-center gap-4 px-8 pb-4">
-      <button class="ml-0.5" mat-icon-button (click)="fileInput.click()">
+      <button class="ml-0.5" mat-icon-button (click)="fileInput.click()" type="button">
         <mat-icon [svgIcon]="'heroicons_outline:paper-clip'"></mat-icon>
       </button>
 
@@ -140,15 +140,12 @@
 
     <!-- Botón de enviar -->
     <div class="flex w-full items-center justify-end px-8 py-4">
+      <button mat-flat-button color="warn" type="button" (click)="cancelar()">
+        Cancelar
+      </button>
       <button mat-flat-button color="primary" type="submit" [disabled]="FormRegistro.invalid">
         Guardar
-      </button>
-
-    <button mat-flat-button color="warn" type="button" (click)="cancelar()">
-    Cancelar
-  </button>
-
-      
+      </button>      
     </div>
   </form>
 </div>

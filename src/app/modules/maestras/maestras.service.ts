@@ -32,14 +32,26 @@ export class MaestrasService {
     return this.http.get(`${this.getUrlMaestras()}centros-poblados/${distritoUbigeo}`, { headers: Headers() });
   }
 
-  getFiltrarProyectos(rawValue): Observable<any> {
-    return this.http.post(`${this.getUrlPlataforma()}plataformas?page=0&size=10&sort=idPlataforma,desc`,rawValue, { headers: Headers() });
+  getFiltrarProyectos(rawValue, pageIndex , pageSize): Observable<any> {
+    return this.http.post(`${this.getUrlPlataforma()}plataformas?page=${pageIndex}&size=${pageSize}&sort=idPlataforma,desc`,rawValue, { headers: Headers() });
   }
 
   getCrearPlataformas(rawValue): Observable<any> {
-    return this.http.post(`${this.getUrlPlataforma()}crearPlataformas`,rawValue, { headers: Headers() });
+    return this.http.post(`${this.getUrlPlataforma()}crearProyecto`,rawValue, { headers: Headers() });
   }
-  
+
+  getEditaPlataformas(rawValue): Observable<any> {
+    return this.http.post(`${this.getUrlPlataforma()}editarProyecto`,rawValue, { headers: Headers() });
+  }
+
+  getEliminar(idProyecto): Observable<any> {
+    return this.http.get(`${this.getUrlPlataforma()}eliminar-proyecto/${idProyecto}`, { headers: Headers() });
+  }
+
+  getLerrExcel(formData : FormData): Observable<any> {
+    return this.http.post(`${this.getUrlPlataforma()}leer`,formData, { headers: Headers(false) });
+  }
+
   getDetalleCentrosPoblados(ubigeo): Observable<any> {
     return this.http.get(`${this.getUrlMaestras()}detalle-cpp/${ubigeo}`, { headers: Headers() });
   }
@@ -47,6 +59,7 @@ export class MaestrasService {
   getEstados(): Observable<any> {
     return this.http.get(`${this.getUrlMaestras()}estado-plataforma`, { headers: Headers() });
   }
+ 
 }
 
 export function Headers(isJson = true): HttpHeaders {

@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 
 // Importar módulos de Angular Material necesarios
@@ -19,8 +19,9 @@ import { cloneDeep } from 'lodash';
 import { RegistroComponent } from './registro/registro.component';
 import { lastValueFrom } from 'rxjs';
 import { MaestrasService } from '../maestras/maestras.service';
-import { FormBuilder, ReactiveFormsModule, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Platform } from '@angular/cdk/platform';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
 
 @Component({
   selector: 'gestion-plataformas',
@@ -56,11 +57,15 @@ export class GestionPlataformasComponent implements OnInit {
   provincias: any[]
   departamentos: any[] = []
   proyectos: any[]
-  constructor(
+  configForm: UntypedFormGroup;
 
+  constructor(
+    private _fuseConfirmationService: FuseConfirmationService,
     private _matDialog: MatDialog,
     private maestraService: MaestrasService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private _formBuilder: UntypedFormBuilder,
+    
     //private _notesService: NotesService
   ) {
     this.filterForm = this.fb.group({
@@ -91,29 +96,95 @@ export class GestionPlataformasComponent implements OnInit {
 
   editar(proyecto: any) {
     console.log('Ver detalles de:', proyecto);
-    this._matDialog.open(RegistroComponent, {
+    const dialogRef = this._matDialog.open(RegistroComponent, {
       autoFocus: false,
       data: {
-        note: cloneDeep(proyecto),
+        proyecto: cloneDeep(proyecto),
         title:"EDITAR PROYECTO",
         type:'edit'
       },
+         
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log("Diálogo cerrado con resultado:", result);
+
+      // Aquí puedes hacer lo que necesites después del cierre
+      if (result === 'success') {
+        this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
+      }
     });
   }
 
-  eliminarProyecto(proyecto: any) {
-    console.log('Eliminar proyecto:', proyecto);
+  async eliminarProyecto(proyecto: any) {
+    const confirmado = await this.dataModal(522, 'Eliminar proyecto', 'Deseas eliminar este proyecto?');
+    
+    if (confirmado) {
+        console.log('Eliminando proyecto:', proyecto);
+        const oRespL = await lastValueFrom(this.maestraService.getEliminar(proyecto.idProyecto));
+
+        if (oRespL) {
+            this.getFiltrarProyectos();
+        }
+    } else {
+        console.log('Eliminación cancelada.');
+    }
+}
+
+dataModal(codigo, title, message): Promise<boolean> {
+    return new Promise((resolve) => {
+        const actions = {
+            cancel: this._formBuilder.group({
+                show: true,
+                label: 'Cancelar',
+            }),
+            confirm: this._formBuilder.group({
+                show: true,
+                label: 'Eliminar',
+                color: 'warn',
+            }),
+        };
+
+        this.configForm = this._formBuilder.group({
+            title: title,
+            message: message,
+            icon: this._formBuilder.group({
+                show: true,
+                name: codigo === 200 ? 'heroicons_outline:check-circle' : 'heroicons_outline:exclamation-triangle',
+                color: codigo === 200 ? 'primary' : 'warn',
+            }),
+            actions: this._formBuilder.group(actions),
+            dismissible: true,
+        });
+
+        // Abrir el diálogo y esperar la respuesta del usuario
+        const dialogRef = this._fuseConfirmationService.open(this.configForm.value);
+
+        dialogRef.afterClosed().subscribe((result) => {
+            resolve(result === 'confirmed'); // Si el usuario confirma, retorna true; si cancela, retorna false
+        });
+    });
   }
-  agregarProyecto(note) {
-    this._matDialog.open(RegistroComponent, {
+
+  agregarProyecto(note) {   
+    const dialogRef = this._matDialog.open(RegistroComponent, {
       autoFocus: false,
+      disableClose: false,
       data: {
         note: cloneDeep(note),
-        title: "REGISTRAR PROYECTO",
+          title: "REGISTRAR PROYECTO",
         type:'create'
       },
     });
+    // Acción cuando se cierra el modal
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log("Diálogo cerrado con resultado:", result);
+      // Aquí puedes hacer lo que necesites después del cierre
+      if (result === 'success') {
+        this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
+      }
+    });
   }
+  
   descargarProyectos() { }
 
   /*  openNoteDialog(note): void {
@@ -133,6 +204,7 @@ export class GestionPlataformasComponent implements OnInit {
   openNoteDialog(note): void {
     const dialogRef = this._matDialog.open(RegistroComponent, {
       autoFocus: false,
+      disableClose: false,
       data: {
         note: cloneDeep(note),
       },
@@ -216,21 +288,35 @@ export class GestionPlataformasComponent implements OnInit {
     this.getCentrosPoblados(distritoSeleccionado);
   }
 
+  // Variables de paginación
+totalElements = 0;
+pageSize = 10;
+pageIndex = 0; // Página actual
   async getFiltrarProyectos() {
     const filtros = this.filterForm.getRawValue();
+
+
     console.log("Filtros enviados:", filtros);
 
     try {
-        const oRespL = await lastValueFrom(this.maestraService.getFiltrarProyectos(filtros));
-
+        const oRespL = await lastValueFrom(this.maestraService.getFiltrarProyectos(filtros, this.pageIndex , this.pageSize ));
+        this.totalElements = oRespL.data.totalElements;
         if (oRespL && oRespL.data && oRespL.data.content) {
             this.proyectos = oRespL.data.content;
+           
             console.log("Datos recibidos:", this.proyectos);
 
-            this.dataSource = new MatTableDataSource(this.proyectos);
-            this.dataSource.paginator = this.paginator;
-            this.dataSource.sort = this.sort;
 
+             // 🔥 Total de elementos en la API
+        //    this.pageIndex = oRespL.data.pageable.pageNumber; // 🔥 Total de elementos en la API
+           // this.pageSize =  oRespL.data.pageable.pageSize; // 🔥 Total de elementos en la API
+
+
+
+            this.dataSource = new MatTableDataSource(this.proyectos);
+          //  this.dataSource.paginator = this.paginator;
+          //  this.dataSource.sort = this.sort;
+ 
             this.dataSource._updateChangeSubscription(); // 🔥 Forzar actualización
         } else {
             console.warn("No se encontraron proyectos.");
@@ -239,7 +325,7 @@ export class GestionPlataformasComponent implements OnInit {
         }
 
         console.log("DataSource después de asignar:", this.dataSource);
-
+      console.log( this.totalElements)
     } catch (error) {
         console.error('Error al obtener proyectos:', error);
         this.dataSource = new MatTableDataSource([]);
@@ -248,12 +334,25 @@ export class GestionPlataformasComponent implements OnInit {
 }
 
 
+onPaginateChange(event: PageEvent) {
+console.log( event.pageIndex)
+  this.pageIndex = event.pageIndex +1;  // Actualizar página actual
+  this.pageSize = event.pageSize;    // Actualizar tamaño de página
+   this.getFiltrarProyectos();        // Recargar datos con nueva paginación
+}
+
+openConfirmationDialog(codigo): void {
+  // Open the dialog and save the reference of it
+  const dialogRef = this._fuseConfirmationService.open(
+      this.configForm.value
+  );
+  if (codigo == 200) {
+      setTimeout(() => {
+          dialogRef.close();
+      }, 1000);
+  }
 }
 
 
-
-// Datos de prueba
-const PROYECTOS = [
-  { cui: '123456', departamento: 'Lima', provincia: 'Lima', distrito: 'Miraflores', centroPoblado: 'CP1', estado: 'Aprobado' },
-  { cui: '789012', departamento: 'Cusco', provincia: 'Urubamba', distrito: 'Ollantaytambo', centroPoblado: 'CP2', estado: 'Pendiente' }
-];
+}
+ 
