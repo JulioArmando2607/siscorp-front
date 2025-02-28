@@ -30,8 +30,8 @@ import { Subject, takeUntil } from 'rxjs';
         FuseVerticalNavigationComponent,
         MatButtonModule,
         MatIconModule,
-        LanguagesComponent,
-        FuseFullscreenComponent,
+       /* LanguagesComponent,
+        FuseFullscreenComponent,*/
         SearchComponent,
         ShortcutsComponent,
         MessagesComponent,

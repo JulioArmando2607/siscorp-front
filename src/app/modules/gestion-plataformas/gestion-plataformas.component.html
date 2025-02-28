@@ -3,7 +3,7 @@
 
   <!-- Título -->
   <div class="text-center text-2xl font-bold mb-4">
-    BANDEJA PROYECTOS REGISTRADOS
+    BANDEJA PROYECTOS DEL TAMBO REGISTRADOS
   </div>
 
   <form [formGroup]="filterForm">
@@ -93,7 +93,7 @@
 
         <!-- Actions -->
         <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
-          <button mat-flat-button color="accent" (click)="getFiltrarProyectos()">
+          <button mat-flat-button color="accent" (click)="getFiltrarProyectos(true)">
             <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:funnel'"></mat-icon>
             <span class="ml-2">Filtrar</span>
           </button>
@@ -124,12 +124,17 @@
       </button>
     </div>
     <mat-table [dataSource]="dataSource" matSort class="w-full">
+      <!-- item Column -->
+      <ng-container matColumnDef="item">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> ITEM </mat-header-cell>
+        <mat-cell *matCellDef="let row"> {{ row.item }} </mat-cell>
+      </ng-container>
       <!-- CUI Column -->
       <ng-container matColumnDef="cui">
         <mat-header-cell *matHeaderCellDef mat-sort-header> CUI </mat-header-cell>
         <mat-cell *matCellDef="let row"> {{ row.cui }} </mat-cell>
       </ng-container>
-
+      
        <!-- CUI Column -->
        <ng-container matColumnDef="ubigeoCp">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Ubigeo Cp </mat-header-cell>

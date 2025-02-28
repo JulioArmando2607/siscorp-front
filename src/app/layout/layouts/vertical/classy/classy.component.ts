@@ -33,13 +33,13 @@ import { Subject, takeUntil } from 'rxjs';
         UserComponent,
         MatIconModule,
         MatButtonModule,
-        LanguagesComponent,
+       /// LanguagesComponent,
         FuseFullscreenComponent,
         SearchComponent,
-        ShortcutsComponent,
-        MessagesComponent,
+      //  ShortcutsComponent,
+      //  MessagesComponent,
         RouterOutlet,
-        QuickChatComponent,
+       // QuickChatComponent,
     ],
 })
 export class ClassyLayoutComponent implements OnInit, OnDestroy {

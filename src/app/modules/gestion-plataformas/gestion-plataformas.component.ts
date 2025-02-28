@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewChild, OnInit, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -45,7 +45,7 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
   ],
 })
 export class GestionPlataformasComponent implements OnInit {
-  displayedColumns: string[] = ['cui','ubigeoCp', 'departamento', 'provincia', 'distrito', 'centroPoblado','tambo', 'estado', 'acciones'];
+  displayedColumns: string[] = ['item','cui','ubigeoCp', 'departamento', 'provincia', 'distrito', 'centroPoblado','tambo', 'estado', 'acciones'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
@@ -60,6 +60,7 @@ export class GestionPlataformasComponent implements OnInit {
   configForm: UntypedFormGroup;
 
   constructor(
+    private cdr: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService,
     private _matDialog: MatDialog,
     private maestraService: MaestrasService,
@@ -90,7 +91,7 @@ export class GestionPlataformasComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     this.getDepartamentos()
-    this.getFiltrarProyectos()
+    this.getFiltrarProyectos(true)
   }
 
 
@@ -292,51 +293,60 @@ dataModal(codigo, title, message): Promise<boolean> {
 totalElements = 0;
 pageSize = 10;
 pageIndex = 0; // Página actual
-  async getFiltrarProyectos() {
-    const filtros = this.filterForm.getRawValue();
+/*
+async getFiltrarProyectos() {
+  try {
+      const oRespL = await lastValueFrom(this.maestraService.getFiltrarProyectos(this.filterForm.getRawValue(), this.pageIndex, this.pageSize));
 
+      if (oRespL?.data?.content) {
+          this.proyectos = oRespL.data.content;
+          this.totalElements = oRespL.data.totalElements;
+          
+          this.dataSource = new MatTableDataSource(this.proyectos);
+        //  this.dataSource.paginator = this.paginator; // 🔥 Conectar paginador
+           this.dataSource.sort = this.sort; // 🔥 Habilitar ordenación
+          this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
 
-    console.log("Filtros enviados:", filtros);
-
-    try {
-        const oRespL = await lastValueFrom(this.maestraService.getFiltrarProyectos(filtros, this.pageIndex , this.pageSize ));
-        this.totalElements = oRespL.data.totalElements;
-        if (oRespL && oRespL.data && oRespL.data.content) {
-            this.proyectos = oRespL.data.content;
-           
-            console.log("Datos recibidos:", this.proyectos);
-
-
-             // 🔥 Total de elementos en la API
-        //    this.pageIndex = oRespL.data.pageable.pageNumber; // 🔥 Total de elementos en la API
-           // this.pageSize =  oRespL.data.pageable.pageSize; // 🔥 Total de elementos en la API
-
-
-
-            this.dataSource = new MatTableDataSource(this.proyectos);
-          //  this.dataSource.paginator = this.paginator;
-          //  this.dataSource.sort = this.sort;
- 
-            this.dataSource._updateChangeSubscription(); // 🔥 Forzar actualización
-        } else {
-            console.warn("No se encontraron proyectos.");
-            this.dataSource = new MatTableDataSource([]);
-            this.dataSource._updateChangeSubscription();
-        }
-
-        console.log("DataSource después de asignar:", this.dataSource);
-      console.log( this.totalElements)
-    } catch (error) {
-        console.error('Error al obtener proyectos:', error);
-        this.dataSource = new MatTableDataSource([]);
-        this.dataSource._updateChangeSubscription();
-    }
+          this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
+      }
+  } catch (error) {
+      console.error('Error al obtener proyectos:', error);
+  }
 }
+*/
 
+async getFiltrarProyectos(resetPage: boolean = false) {
+  try {
+      if (resetPage) {
+          this.pageIndex = 0; // 🔥 Reinicia la página al filtrar
+      }
 
+      const oRespL = await lastValueFrom(
+          this.maestraService.getFiltrarProyectos(
+              this.filterForm.getRawValue(), 
+              this.pageIndex, 
+              this.pageSize
+          )
+      );
+
+      if (oRespL?.data?.content) {
+          this.proyectos = oRespL.data.content;
+          this.totalElements = oRespL.data.totalElements;
+          
+          this.dataSource = new MatTableDataSource(this.proyectos);
+          this.dataSource.sort = this.sort; // 🔥 Habilitar ordenación
+          this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
+
+          this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
+      }
+  } catch (error) {
+      console.error('Error al obtener proyectos:', error);
+  }
+}
+  
 onPaginateChange(event: PageEvent) {
 console.log( event.pageIndex)
-  this.pageIndex = event.pageIndex +1;  // Actualizar página actual
+  this.pageIndex = event.pageIndex  ;  // Actualizar página actual
   this.pageSize = event.pageSize;    // Actualizar tamaño de página
    this.getFiltrarProyectos();        // Recargar datos con nueva paginación
 }

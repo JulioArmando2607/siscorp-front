@@ -33,7 +33,7 @@ export class MaestrasService {
   }
 
   getFiltrarProyectos(rawValue, pageIndex , pageSize): Observable<any> {
-    return this.http.post(`${this.getUrlPlataforma()}plataformas?page=${pageIndex}&size=${pageSize}&sort=idPlataforma,desc`,rawValue, { headers: Headers() });
+    return this.http.post(`${this.getUrlPlataforma()}plataformas?page=${pageIndex}&size=${pageSize}&sort=idProyecto,asc`,rawValue, { headers: Headers() });
   }
 
   getCrearPlataformas(rawValue): Observable<any> {
@@ -63,13 +63,21 @@ export class MaestrasService {
 }
 
 export function Headers(isJson = true): HttpHeaders {
-  let headers = new HttpHeaders();
+  let headers = new HttpHeaders({
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0'
+  });
+
+  const token = Session?.identity?.token;
+
+  if (token) {
+    headers = headers.set('Authorization', `Bearer ${token}`);
+  }
 
   if (isJson) {
     headers = headers.set('Content-Type', 'application/json');
   }
-
-  headers = headers.set('Authorization', `Bearer ${Session.identity.token}`);
 
   return headers;
 }
