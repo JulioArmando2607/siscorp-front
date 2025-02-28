@@ -1,6 +1,6 @@
 export const environment = {
     production: true,
-    apiurl:'http://localhost:8080',
+    apiurl:'http://localhost:8078',
     backendJavaUags:'http://localhost:8076',
     urlFile: 'https://www.pais.gob.pe/repo-pais/public'
 };
