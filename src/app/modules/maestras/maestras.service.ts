@@ -35,6 +35,9 @@ export class MaestrasService {
   getFiltrarProyectos(rawValue, pageIndex , pageSize): Observable<any> {
     return this.http.post(`${this.getUrlPlataforma()}plataformas?page=${pageIndex}&size=${pageSize}&sort=idProyecto,asc`,rawValue, { headers: Headers() });
   }
+  listarPlataformasExcel(rawValue): Observable<any>{
+    return this.http.post(`${this.getUrlPlataforma()}proyectos-excel`,rawValue, { headers: Headers() });
+  }
 
   getCrearPlataformas(rawValue): Observable<any> {
     return this.http.post(`${this.getUrlPlataforma()}crearProyecto`,rawValue, { headers: Headers() });

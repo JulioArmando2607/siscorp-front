@@ -22,6 +22,7 @@ import { MaestrasService } from '../maestras/maestras.service';
 import { FormBuilder, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Platform } from '@angular/cdk/platform';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { ExcelService } from '../maestras/excel.service';
 
 @Component({
   selector: 'gestion-plataformas',
@@ -45,6 +46,13 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
   ],
 })
 export class GestionPlataformasComponent implements OnInit {
+  async descargarExcelProyecto() {
+  const roresp =  await lastValueFrom( this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(), 
+))
+
+console.log(roresp)
+  this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");
+}
   displayedColumns: string[] = ['item','cui','ubigeoCp', 'departamento', 'provincia', 'distrito', 'centroPoblado','tambo', 'estado', 'acciones'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -66,7 +74,7 @@ export class GestionPlataformasComponent implements OnInit {
     private maestraService: MaestrasService,
     private fb: FormBuilder,
     private _formBuilder: UntypedFormBuilder,
-    
+    private excelService: ExcelService
     //private _notesService: NotesService
   ) {
     this.filterForm = this.fb.group({

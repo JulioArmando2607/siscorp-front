@@ -4,7 +4,7 @@ import { FuseNavigationItem } from '@fuse/components/navigation';
 export const defaultNavigation: FuseNavigationItem[] = [
     {
         id   : 'example',
-        title: 'Gestion Plataformas',
+        title: 'Gestión de Proyectos de los Tambos',
         type : 'basic',
         icon : 'heroicons_outline:chart-pie',
         link : '/gestion-plataformas'
