@@ -23,6 +23,7 @@ import { FormBuilder, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup,
 import { Platform } from '@angular/cdk/platform';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { ExcelService } from '../maestras/excel.service';
+import { RegistroPartidasComponent } from './registro-partidas/registro-partidas.component';
 
 @Component({
   selector: 'gestion-plataformas',
@@ -369,6 +370,26 @@ openConfirmationDialog(codigo): void {
           dialogRef.close();
       }, 1000);
   }
+}
+cargarPartidas(proyecto){
+  console.log('Ver detalles de:', proyecto);
+    const dialogRef = this._matDialog.open(RegistroPartidasComponent, {
+      autoFocus: false,
+      data: {
+        proyecto: cloneDeep(proyecto),
+        title:"ARGEGAR PARTIDAS Y PRECIOS UNITARIOS",
+        type:'edit'
+      },
+         
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log("Diálogo cerrado con resultado:", result);
+
+      // Aquí puedes hacer lo que necesites después del cierre
+      if (result === 'success') {
+        this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
+      }
+    });
 }
 
 

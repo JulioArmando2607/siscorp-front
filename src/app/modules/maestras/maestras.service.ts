@@ -19,6 +19,10 @@ export class MaestrasService {
     return environment.apiurl + '/api/plataforma/';
   }
 
+  getUrlPartidas() {
+    return environment.apiurl + '/api/partidas/';
+  }
+
   getDepartamentos(): Observable<any> {
     return this.http.get(`${this.getUrlMaestras()}departamentos`, { headers: Headers() });
   }
@@ -63,6 +67,9 @@ export class MaestrasService {
     return this.http.get(`${this.getUrlMaestras()}estado-plataforma`, { headers: Headers() });
   }
  
+  getEnviarPartidasExcel(formData : FormData): Observable<any> {
+    return this.http.post(`${this.getUrlPartidas()}leer-excel`,formData, { headers: Headers(false) });
+  }
 }
 
 export function Headers(isJson = true): HttpHeaders {

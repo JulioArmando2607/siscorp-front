@@ -76,6 +76,7 @@ export const appRoutes: Route[] = [
         children: [
             {path: 'example', loadChildren: () => import('app/modules/admin/example/example.routes')}, 
             {path: 'gestion-plataformas', loadChildren: () => import('app/modules/gestion-plataformas/gestion-plataformas.routes')},
+            {path: 'autorizacion-gastos', loadChildren: () => import('app/modules/autorizacion-gastos/autorizacion-gastos.routes')},
         ]
     }
 ];

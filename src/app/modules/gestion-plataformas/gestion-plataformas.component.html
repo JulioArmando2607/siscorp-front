@@ -134,13 +134,13 @@
         <mat-header-cell *matHeaderCellDef mat-sort-header> CUI </mat-header-cell>
         <mat-cell *matCellDef="let row"> {{ row.cui }} </mat-cell>
       </ng-container>
-      
-       <!-- CUI Column -->
-       <ng-container matColumnDef="ubigeoCp">
+
+      <!-- CUI Column -->
+      <ng-container matColumnDef="ubigeoCp">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Ubigeo Cp </mat-header-cell>
         <mat-cell *matCellDef="let row"> {{ row.ubigeoCp }} </mat-cell>
       </ng-container>
-      
+
 
       <!-- Departamento Column -->
       <ng-container matColumnDef="departamento">
@@ -182,9 +182,24 @@
       <ng-container matColumnDef="acciones">
         <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
         <mat-cell *matCellDef="let row">
-          <button mat-button color="primary" (click)="editar(row)">Editar</button>
-          <button mat-button color="warn" (click)="eliminarProyecto(row)">Eliminar</button>
+          <!-- Botón Editar -->
+          <button mat-icon-button color="primary" (click)="editar(row)" matTooltip="Editar Proyecto">
+            <mat-icon>edit</mat-icon>
+          </button>
+
+          <!-- Botón Eliminar -->
+          <button mat-icon-button color="warn" (click)="eliminarProyecto(row)" matTooltip="Eliminar Proyecto">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <!-- Botón para Cargar Partidas y Precios Unitarios -->
+          <button mat-icon-button color="accent" (click)="cargarPartidas(row)"
+            matTooltip="Cargar Partidas y Precios Unitarios">
+            <mat-icon>attach_money</mat-icon>
+          </button>
+
         </mat-cell>
+
+
       </ng-container>
 
       <!-- Encabezado de la tabla -->
@@ -195,15 +210,10 @@
 
     <!-- Paginador  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
 -->
-   
-    <mat-paginator
-  [length]="totalElements"
-  [pageSize]="pageSize"
- 
-  [pageSizeOptions]="[5, 10, 20]"
-  (page)="onPaginateChange($event)"
-  showFirstLastButtons>
-</mat-paginator>
+
+    <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+      (page)="onPaginateChange($event)" showFirstLastButtons>
+    </mat-paginator>
   </div>
 
 </div>

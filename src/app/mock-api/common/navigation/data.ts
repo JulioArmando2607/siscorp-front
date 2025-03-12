@@ -8,8 +8,24 @@ export const defaultNavigation: FuseNavigationItem[] = [
         type : 'basic',
         icon : 'heroicons_outline:chart-pie',
         link : '/gestion-plataformas'
+    },
+    {
+        id   : 'autorizacionGasto',
+        title: 'Autorización de gasto',
+        type : 'basic',
+        icon : 'heroicons_outline:chart-pie',
+        link : '/autorizacion-gastos'
     }
 ];
+/*export const autorizaciondeGastotNavigation: FuseNavigationItem[] = [
+    {
+        id   : 'example',
+        title: 'Aotorización de gasto',
+        type : 'basic',
+        icon : 'heroicons_outline:chart-pie',
+        link : '/gestion-plataformas'
+    }
+]; */
 export const compactNavigation: FuseNavigationItem[] = [
     {
         id   : 'example',
