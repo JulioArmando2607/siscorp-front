@@ -119,18 +119,107 @@ export class RegistroPartidasComponent {
       console.log('Enviando archivos:', this.selectedPartidasFile.name, this.selectedPreciosFile.name);
 
       // Llamar al servicio correctamente con ambos archivos
-      const response = await lastValueFrom(
+      const oRespL = await lastValueFrom(
         this.maestraService.getEnviarPartidasExcel(formData)
       );
 
-      console.log('Respuesta del servidor:', response);
-      return response;
+      console.log('Respuesta del servidor:', oRespL);
+
+      console.log(oRespL.data.codResultado);
+      if (oRespL.data.codResultado == 200) {
+          this.dataModal(
+              oRespL.data.codResultado,
+              'Exito!',
+              oRespL.data.msgResultado
+          );
+          this.matDialogRef.close('success'); // Enviar un resultado al modal padre
+           
+      } else if (oRespL.data.codResultado == 400) {
+          this.dataModal(
+              oRespL.data.codResultado,
+              'Error!',
+              oRespL.data.msgResultado
+          );
+      } else {
+          this.dataModal(
+              oRespL.data.codResultado,
+              'Error!',
+              oRespL.data.msgResultado
+          );
+      }
+     // return response;
+
     } catch (error) {
       console.error('Error al subir los archivos:', error);
       return null;
     }
   }
 
+  dataModal(codigo, title, message) {
+    const actions =
+        codigo === 200
+            ? {
+                  cancel: this._formBuilder.group({
+                      show: false,
+                      label: 'Cancelar',
+                  }),
+                  confirm: this._formBuilder.group({
+                      show: false,
+                      label: 'Remove',
+                      color: 'warn',
+                  }),
+              }
+            : {
+                  cancel: this._formBuilder.group({
+                      show: true,
+                      label: 'Cancelar',
+                  }),
+                  confirm: this._formBuilder.group({
+                      show: false,
+                      label: 'Remove',
+                      color: 'warn',
+                  }),
+              };
+
+    this.configForm = this._formBuilder.group({
+        title: title,
+        message: message,
+        icon: this._formBuilder.group({
+            show: true,
+            name:
+                codigo === 200
+                    ? 'heroicons_outline:check-circle'
+                    : 'heroicons_outline:exclamation-triangle',
+            color: codigo === 200 ? 'primary' : 'warn',
+        }),
+        actions: this._formBuilder.group(actions),
+
+        /*       actions: this._formBuilder.group({
+            confirm: this._formBuilder.group({
+                show: false,
+                label: 'Remove',
+                color: 'warn',
+            }),
+            cancel: this._formBuilder.group({
+                show: true,
+                label: 'Cancel',
+            }),
+        }), */
+        dismissible: true,
+    });
+    this.openConfirmationDialog(codigo);
+}
+openConfirmationDialog(codigo): void {
+  // Open the dialog and save the reference of it
+  const dialogRef = this._fuseConfirmationService.open(
+      this.configForm.value
+  );
+  if (codigo == 200) {
+      setTimeout(() => {
+          dialogRef.close();
+      }, 1000);
+  }
+}
 
   save() { this.uploadFile() }
   cancelar() { this.matDialogRef.close() }

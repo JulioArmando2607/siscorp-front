@@ -3,7 +3,7 @@
   
     <!-- Título -->
     <div class="text-center text-2xl font-bold mb-4">
-      BANDEJA PROYECTOS DEL TAMBO REGISTRADOS
+      BANDEJA PROYECTOS DEL TAMBO REGISTRADOS - AUTORIZACION DE GASTOS
     </div>
   
     <form [formGroup]="filterForm">
@@ -182,7 +182,7 @@
         <ng-container matColumnDef="acciones">
           <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
           <mat-cell *matCellDef="let row">
-            <button mat-raised-button color="accent" (click)="editar(row)" matTooltip="Solicitar Autorización">
+            <button mat-raised-button color="accent" (click)="registrarAutorizacionGastos(row)" matTooltip="Solicitar Autorización">
                 <mat-icon>request_quote</mat-icon>
               </button>
               

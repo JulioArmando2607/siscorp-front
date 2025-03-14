@@ -1,0 +1,164 @@
+<div class="flex min-w-0 flex-auto flex-col bg-card p-10">
+    <!-- Contenedor principal -->
+
+    <!-- Título -->
+    <div class="text-center text-2xl font-bold mb-4">
+
+        {{titulo}}
+    </div>
+    <!---BANDEJA PROYECTOS DEL TAMBO REGISTRADOS - AUTORIZACION DE GASTOS-->
+    <form [formGroup]="filterForm">
+        <!-- Contenedor de formulario -->
+        <div class="border p-6 rounded-lg shadow-lg">
+            <!-- Grid con inputs y selects -->
+            <div class="grid grid-cols-4 gap-4">
+
+
+                <!-- DEPARTAMENTO -->
+                <mat-form-field appearance="fill" class="w-full">
+                    <mat-label>PARTIDA</mat-label>
+                    <mat-select formControlName="departamento" class="mr-1.5"
+                        (selectionChange)="onDepartamentoChange($event)">
+                        <mat-option [value]="0">Todos</mat-option>
+                        <mat-option *ngFor="let item of departamentos" [value]="item.departamentoUbigeo">{{
+                            item.departamentoNombre
+                            }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+
+                <!-- PROVINCIA -->
+                <mat-form-field appearance="fill" class="w-full">
+                    <mat-label>INSUMO</mat-label>
+                    <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange($event)">
+                        <mat-option [value]="0">Todos</mat-option>
+                        <mat-option *ngFor="let item of provincias" [value]="item.provinciaUbigeo">{{
+                            item.provinciaDescripcion
+                            }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+
+                <!-- TAMBO -->
+                <mat-form-field appearance="fill" class="w-full">
+                    <mat-label>CANTIDAD</mat-label>
+                    <input matInput type="text" formControlName="plataforma">
+                </mat-form-field>
+
+                <!-- TAMBO -->
+                <mat-form-field appearance="fill" class="w-full">
+                    <mat-label>PRECIO</mat-label>
+                    <input matInput type="text" formControlName="plataforma">
+                </mat-form-field>
+
+
+                <!-- Actions -->
+                <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
+                    <button mat-flat-button style="background-color: #28a745; color: white;"
+                        (click)="getFiltrarProyectos(true)">
+                        <mat-icon class="icon-size-5">add</mat-icon>
+                        <span class="ml-2">REGISTRAR</span>
+                    </button>
+
+
+                    <button mat-flat-button color="warn" (click)="limpiar()">
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+                        <span class="ml-2">CANCELAR</span>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+    <!-- Tabla de proyectos registrados -->
+    <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
+        <!-- Contenedor de botones flotantes -->
+        <div class="botones-flotantes">
+
+            <!-- Botón -->
+            <!-- Botón mejorado -->
+            <button mat-flat-button style="background-color: #0056b3; color: white;" (click)="descargarExcelProyecto()">
+                <mat-icon>send</mat-icon>
+                <span class="ml-2">SOLICITAR AUTORIZACIÓN DE GASTO</span>
+            </button>
+
+        </div>
+        <mat-table [dataSource]="dataSource" matSort class="w-full">
+            <!-- item Column -->
+            <ng-container matColumnDef="item">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> ITEM </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.item }} </mat-cell>
+            </ng-container>
+            <!-- CUI Column -->
+            <ng-container matColumnDef="cui">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> CUI </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.cui }} </mat-cell>
+            </ng-container>
+
+            <!-- CUI Column -->
+            <ng-container matColumnDef="ubigeoCp">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Ubigeo Cp </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.ubigeoCp }} </mat-cell>
+            </ng-container>
+
+
+            <!-- Departamento Column -->
+            <ng-container matColumnDef="departamento">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Departamento </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.departamentoNombre }} </mat-cell>
+            </ng-container>
+
+            <!-- Provincia Column -->
+            <ng-container matColumnDef="provincia">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Provincia </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.provinciaDescripcion }} </mat-cell>
+            </ng-container>
+
+            <!-- Distrito Column -->
+            <ng-container matColumnDef="distrito">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Distrito </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.distritoDescripcion }} </mat-cell>
+            </ng-container>
+
+            <!-- Centro Poblado Column -->
+            <ng-container matColumnDef="centroPoblado">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Centro Poblado </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.centroPobladoDescripcion }} </mat-cell>
+            </ng-container>
+
+            <!-- Centro Poblado Column -->
+            <ng-container matColumnDef="tambo">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Tambo </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.tambo }} </mat-cell>
+            </ng-container>
+
+            <!-- Estado Column -->
+            <ng-container matColumnDef="estado">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Estado </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.estado }} </mat-cell>
+            </ng-container>
+
+            <!-- Botón de acciones -->
+            <ng-container matColumnDef="acciones">
+                <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+
+
+                </mat-cell>
+            </ng-container>
+
+            <!-- Encabezado de la tabla -->
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <!-- Filas de datos -->
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+
+
+        <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+            (page)="onPaginateChange($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+
+</div>

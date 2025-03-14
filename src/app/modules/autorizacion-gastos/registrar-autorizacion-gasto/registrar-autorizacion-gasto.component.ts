@@ -11,20 +11,14 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { ExcelService } from 'app/modules/maestras/excel.service';
+import { MaestrasService } from 'app/modules/maestras/maestras.service';
 import { lastValueFrom } from 'rxjs';
-import { MaestrasService } from '../maestras/maestras.service';
-import { ExcelService } from '../maestras/excel.service';
-import { cloneDeep } from 'lodash';
-import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-autorizacion-gastos',
-  standalone: true, // Declarar como componente standalone
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './autorizacion-gastos.component.html',
-  styleUrl: './autorizacion-gastos.component.scss',
+  selector: 'app-registrar-autorizacion-gasto',
   imports: [
     ReactiveFormsModule, // <== Agregar esta línea
     CommonModule,
@@ -38,9 +32,13 @@ import { Router } from '@angular/router';
     MatIconModule,
     MatProgressBarModule,
   ],
+  standalone: true, // Declarar como componente standalone
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './registrar-autorizacion-gasto.component.html',
+  styleUrl: './registrar-autorizacion-gasto.component.scss'
 })
-
-export class AutorizacionGastosComponent {
+export class RegistrarAutorizacionGastoComponent {
   async descargarExcelProyecto() {
     const roresp = await lastValueFrom(this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(),
     ))
@@ -61,7 +59,8 @@ export class AutorizacionGastosComponent {
   departamentos: any[] = []
   proyectos: any[]
   configForm: UntypedFormGroup;
-
+  id: string | null = null;
+  titulo:string;
   constructor(
     private cdr: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService,
@@ -70,7 +69,7 @@ export class AutorizacionGastosComponent {
     private fb: FormBuilder,
     private _formBuilder: UntypedFormBuilder,
     private excelService: ExcelService,
-    private _router: Router
+    private route: ActivatedRoute
     //private _notesService: NotesService
   ) {
     this.filterForm = this.fb.group({
@@ -96,6 +95,10 @@ export class AutorizacionGastosComponent {
     this.dataSource.sort = this.sort;
     this.getDepartamentos()
     this.getFiltrarProyectos(true)
+
+    this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
+    this.titulo="PROYECTO TAMBO: NAYAP"
+    console.log('ID obtenido de la URL:', this.id);
   }
 
   async eliminarProyecto(proyecto: any) {
@@ -147,62 +150,8 @@ export class AutorizacionGastosComponent {
       });
     });
   }
-  /*
-    agregarProyecto(note) {   
-      const dialogRef = this._matDialog.open(RegistroComponent, {
-        autoFocus: false,
-        disableClose: false,
-        data: {
-          note: cloneDeep(note),
-            title: "REGISTRAR PROYECTO",
-          type:'create'
-        },
-      });
-      // Acción cuando se cierra el modal
-      dialogRef.afterClosed().subscribe((result) => {
-        console.log("Diálogo cerrado con resultado:", result);
-        // Aquí puedes hacer lo que necesites después del cierre
-        if (result === 'success') {
-          this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
-        }
-      });
-    }
-     */
+
   descargarProyectos() { }
-
-  /*  openNoteDialog(note): void {
-      this._matDialog.open(RegistroComponent, {
-        autoFocus: false,
-        data: {
-          note: cloneDeep(note),
-        },
-      });
-  
-      this._matDialog.afterAllClosed().subscribe((result) => {
-        
-        console.log(result);
-      });
-    } */
-
-  /*   openNoteDialog(note): void {
-      const dialogRef = this._matDialog.open(RegistroComponent, {
-        autoFocus: false,
-        disableClose: false,
-        data: {
-          note: cloneDeep(note),
-        },
-      });
-  
-      // Acción cuando se cierra el modal
-      dialogRef.afterClosed().subscribe((result) => {
-        console.log("Diálogo cerrado con resultado:", result);
-  
-        // Aquí puedes hacer lo que necesites después del cierre
-        if (result === 'success') {
-          this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
-        }
-      });
-    } */
 
   async getDepartamentos() {
     this.departamentos = []
@@ -345,40 +294,25 @@ export class AutorizacionGastosComponent {
     }
   }
 
-  registrarAutorizacionGastos(proyecto){
-    console.log('Ver detalles de:', proyecto);
-   /*    {
-           path: 'registrar-autorizacion-gasto/:id',
-           component: RegistrarAutorizacionGastoComponent,
-       },  */
-       this._router.navigate(['autorizacion-gastos/registrar-autorizacion-gasto/', proyecto.idProyecto]);
 
-     /*  const url = this._router.serializeUrl(
-        this._router.createUrlTree([
-          '/registrar-autorizacion-gasto',
-         2
-        ])
-      ); */
-    //  window.open(url, '_blank');
-      }
-  
-   /*    const dialogRef = this._matDialog.open(RegistroPartidasComponent, {
-        autoFocus: false,
-        data: {
-          proyecto: cloneDeep(proyecto),
-          title:"ARGEGAR PARTIDAS Y PRECIOS UNITARIOS",
-          type:'edit'
-        },
-           
-      });
-      dialogRef.afterClosed().subscribe((result) => {
-        console.log("Diálogo cerrado con resultado:", result);
-  
-        // Aquí puedes hacer lo que necesites después del cierre
-        if (result === 'success') {
-          this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
-        }
-      }); */
+
+  /*    const dialogRef = this._matDialog.open(RegistroPartidasComponent, {
+       autoFocus: false,
+       data: {
+         proyecto: cloneDeep(proyecto),
+         title:"ARGEGAR PARTIDAS Y PRECIOS UNITARIOS",
+         type:'edit'
+       },
+          
+     });
+     dialogRef.afterClosed().subscribe((result) => {
+       console.log("Diálogo cerrado con resultado:", result);
+ 
+       // Aquí puedes hacer lo que necesites después del cierre
+       if (result === 'success') {
+         this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
+       }
+     }); */
 
 }
 
