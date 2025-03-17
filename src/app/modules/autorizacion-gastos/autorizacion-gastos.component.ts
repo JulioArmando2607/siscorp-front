@@ -351,7 +351,7 @@ export class AutorizacionGastosComponent {
            path: 'registrar-autorizacion-gasto/:id',
            component: RegistrarAutorizacionGastoComponent,
        },  */
-       this._router.navigate(['autorizacion-gastos/registrar-autorizacion-gasto/', proyecto.idProyecto]);
+       this._router.navigate(['autorizacion-gastos/listar-solicitud-autorizacion-gasto/', proyecto.idProyecto]);
 
      /*  const url = this._router.serializeUrl(
         this._router.createUrlTree([

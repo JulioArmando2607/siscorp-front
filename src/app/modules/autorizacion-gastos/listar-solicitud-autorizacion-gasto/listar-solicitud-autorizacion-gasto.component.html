@@ -3,7 +3,7 @@
 
     <!-- Título -->
     <div class="text-center text-2xl font-bold mb-4">
-     LISTA DE SOLICITUDES DE AUTORIZACION DE GASTO  {{titulo}}
+        LISTA DE SOLICITUDES DE AUTORIZACION DE GASTO {{titulo}}
     </div>
     <!---BANDEJA PROYECTOS DEL TAMBO REGISTRADOS - AUTORIZACION DE GASTOS-->
     <form [formGroup]="filterForm">
@@ -49,15 +49,16 @@
                 </mat-form-field>
 
                 <!-- Actions -->
+                <!-- Actions -->
                 <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
-                    <button mat-flat-button style="background-color: #28a745; color: white;"
-                        (click)="getFiltrarProyectos(true)">
-                        <mat-icon class="icon-size-5">add</mat-icon>
-                        <span class="ml-2">REGISTRAR</span>
+                    <button mat-flat-button color="accent" (click)="getFiltrarProyectos(true)">
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:funnel'"></mat-icon>
+                        <span class="ml-2">Filtrar</span>
                     </button>
-                    <button mat-flat-button color="warn" (click)="limpiar()">
+
+                    <button mat-flat-button color="primary" (click)="limpiar()">
                         <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:trash'"></mat-icon>
-                        <span class="ml-2">CANCELAR</span>
+                        <span class="ml-2">Limpiar</span>
                     </button>
 
                 </div>
@@ -74,7 +75,7 @@
             <!-- Botón -->
             <!-- Botón mejorado -->
             <button mat-flat-button style="background-color: #0056b3; color: white;" (click)="descargarExcelProyecto()">
-                <mat-icon>send</mat-icon>
+                <mat-icon>plus</mat-icon>
                 <span class="ml-2">SOLICITAR AUTORIZACIÓN DE GASTO</span>
             </button>
 
