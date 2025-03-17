@@ -11,35 +11,39 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { ExcelService } from 'app/modules/maestras/excel.service';
 import { MaestrasService } from 'app/modules/maestras/maestras.service';
-import { lastValueFrom } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, map, Observable, startWith, switchMap } from 'rxjs';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-listar-solicitud-autorizacion-gasto',
-    imports: [
-      ReactiveFormsModule, // <== Agregar esta línea
-      CommonModule,
-      MatTableModule, // <== Agregar la importación de MatTableModule
-      MatSortModule,  // <== Agregar la importación de MatSortModule
-      MatPaginatorModule, // <== Agregar la importación de MatPaginatorModule
-      MatFormFieldModule,
-      MatInputModule,
-      MatSelectModule,
-      MatButtonModule,
-      MatIconModule,
-      MatProgressBarModule,
-    ],
-    standalone: true, // Declarar como componente standalone
-    encapsulation: ViewEncapsulation.None,
-    changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    ReactiveFormsModule, // <== Agregar esta línea
+    CommonModule,
+    MatTableModule, // <== Agregar la importación de MatTableModule
+    MatSortModule,  // <== Agregar la importación de MatSortModule
+    MatPaginatorModule, // <== Agregar la importación de MatPaginatorModule
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressBarModule,
+    MatAutocompleteModule
+  ],
+  standalone: true, // Declarar como componente standalone
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './listar-solicitud-autorizacion-gasto.component.html',
   styleUrl: './listar-solicitud-autorizacion-gasto.component.scss'
 })
 export class ListarSolicitudAutorizacionGastoComponent {
-async descargarExcelProyecto() {
+  recursos: any;
+  recursosSubject: any;
+  async descargarExcelProyecto() {
     const roresp = await lastValueFrom(this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(),
     ))
 
@@ -60,7 +64,17 @@ async descargarExcelProyecto() {
   proyectos: any[]
   configForm: UntypedFormGroup;
   id: string | null = null;
-  titulo:string;
+  titulo: string;
+
+  partidas: any[] = []
+  partidasFiltradas!: Observable<any[]>; // Observable para filtrar en memoria
+  recursosFiltradas!: Observable<any[]>; // Observable para filtrar en memoria
+  partidasSubject = new BehaviorSubject<any[]>([]); // Para manejar el filtrado en memoria
+
+  // Variables de paginación
+  totalElements = 0;
+  pageSize = 10;
+  pageIndex = 0; // Página actual
   constructor(
     private cdr: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService,
@@ -69,36 +83,59 @@ async descargarExcelProyecto() {
     private fb: FormBuilder,
     private _formBuilder: UntypedFormBuilder,
     private excelService: ExcelService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private _router: Router
+
     //private _notesService: NotesService
   ) {
-    this.filterForm = this.fb.group({
-      cui: [''],
-      ubigeoCp: [''],
-      ubigeo_distrito: [''],
-      departamento: [0], // Número en lugar de string si idDepartamento es numérico
-      provincia: [0],
-      distrito: [0],
-      centroPoblado: [0],
-      plataforma: [""],
-      numeroConvenio: [""],
-      estado: [0],
-      //  masivo: [false], // 👈 Checkbox agregado con valor por defecto
-      //  archivo: [null] // Campo para el archivo
 
-    });
+
     //this.getFiltrarProyectos()
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+
+    this.filterForm = this.fb.group({
+      cantidad: [''],
+      precio: [''],
+      estado: [0],
+      partidaControl: [""],
+      recursoControl: [""]
+    });
+
+
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    this.getDepartamentos()
     this.getFiltrarProyectos(true)
 
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
-    this.titulo="PROYECTO TAMBO: NAYAP"
-    console.log('ID obtenido de la URL:', this.id);
+    this.titulo = "PROYECTO TAMBO: NAYAP"
+
+    this.getPartidas(this.id);
+
+    // 🔥 Monitorear el input de partidas y actualizar el filtrado en tiempo real
+    this.filterForm.controls['partidaControl'].valueChanges.pipe(
+      startWith(''),
+      map(value => {
+        if (!value) {
+          // Si el usuario borra el input, mostramos todas las partidas de nuevo
+          return this.partidas;
+        }
+        return this.filtrarPartidas(value);
+      })
+    ).subscribe(filtered => this.partidasFiltradas = new BehaviorSubject(filtered));
+
+    // 🔥 Monitorear el input de recursos y actualizar el filtrado en tiempo real
+    this.filterForm.controls['recursoControl'].valueChanges.pipe(
+      startWith(''),
+      map(value => {
+        if (!value) {
+          // Si el usuario borra el input, mostramos todos los recursos de nuevo
+          return this.recursos;
+        }
+        return this.filtrarRecursos(value);
+      })
+    ).subscribe(filtered => this.recursosFiltradas = new BehaviorSubject(filtered));
   }
 
   async eliminarProyecto(proyecto: any) {
@@ -151,39 +188,37 @@ async descargarExcelProyecto() {
     });
   }
 
-  descargarProyectos() { }
+  descargarSolicitudes() { }
 
-  async getDepartamentos() {
-    this.departamentos = []
-    const oRespL = await lastValueFrom(
-      this.maestraService.getDepartamentos()
-    );
-    this.departamentos = oRespL.data
+  // Método para obtener partidas UNA SOLA VEZ desde la API
+  async getPartidas(id) {
+    try {
+      const response = await this.maestraService.getPartidas(id).toPromise();
+      this.partidas = response.data || [];
+      this.partidasSubject.next(this.partidas); // Guardamos los datos en el Subject
+    } catch (error) {
+      console.error('Error al cargar partidas:', error);
+      this.partidas = [];
+      this.partidasSubject.next([]);
+    }
   }
 
-  async getProvincia(departamentoUbigeo) {
-    this.provincias = []
-    this.distritos = []
-    this.centrosPoblados = []
-    const oRespL = await lastValueFrom(
-      this.maestraService.getProvincias(departamentoUbigeo)
-    );
-    this.provincias = oRespL.data
-  }
-  async getDistrito(provinciaUbigeo) {
-    this.distritos = []
-    this.centrosPoblados = []
-    const oRespL = await lastValueFrom(
-      this.maestraService.getDistrito(provinciaUbigeo)
-    );
-    this.distritos = oRespL.data
-  }
-  async getCentrosPoblados(distritoUbigeo) {
-    this.centrosPoblados = []
-    const oRespL = await lastValueFrom(
-      this.maestraService.getCentrosPoblados(distritoUbigeo)
-    );
-    this.centrosPoblados = oRespL.data
+  // Obtener recursos según la partida seleccionada
+  async getRecursos(idPartida: number) {
+    try {
+      const response = await this.maestraService.getRecursosxPartidas(idPartida).toPromise();
+      this.recursos = response.data || [];
+
+      // 🔥 Reactivamos el filtrado en tiempo real
+      this.filterForm.controls['recursoControl'].valueChanges.pipe(
+        startWith(''),
+        map(value => this.filtrarRecursos(value || ''))
+      ).subscribe(filtered => this.recursosFiltradas = new BehaviorSubject(filtered));
+
+    } catch (error) {
+      console.error('Error al cargar recursos:', error);
+      this.recursos = [];
+    }
   }
 
   filtrar() {
@@ -207,44 +242,10 @@ async descargarExcelProyecto() {
 
 
   }
-  onDepartamentoChange(event) {
-    const departamentoSeleccionado = event.value;
-    this.getProvincia(departamentoSeleccionado);
-  }
-  onProvinciaChange(event) {
-    const provinciaSeleccionado = event.value;
-    this.getDistrito(provinciaSeleccionado);
-  }
-  onDistritoChange(event) {
-    const distritoSeleccionado = event.value;
-    this.getCentrosPoblados(distritoSeleccionado);
-  }
 
-  // Variables de paginación
-  totalElements = 0;
-  pageSize = 10;
-  pageIndex = 0; // Página actual
-  /*
-  async getFiltrarProyectos() {
-    try {
-        const oRespL = await lastValueFrom(this.maestraService.getFiltrarProyectos(this.filterForm.getRawValue(), this.pageIndex, this.pageSize));
-  
-        if (oRespL?.data?.content) {
-            this.proyectos = oRespL.data.content;
-            this.totalElements = oRespL.data.totalElements;
-            
-            this.dataSource = new MatTableDataSource(this.proyectos);
-          //  this.dataSource.paginator = this.paginator; // 🔥 Conectar paginador
-             this.dataSource.sort = this.sort; // 🔥 Habilitar ordenación
-            this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
-  
-            this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
-        }
-    } catch (error) {
-        console.error('Error al obtener proyectos:', error);
-    }
-  }
-  */
+
+
+
 
   async getFiltrarProyectos(resetPage: boolean = false) {
     try {
@@ -294,25 +295,51 @@ async descargarExcelProyecto() {
     }
   }
 
+  registrarSolicitudAutorizacionGasto() {
+    this._router.navigate(['autorizacion-gastos/registrar-autorizacion-gasto/', this.id]);
+  }
+
+  filtrarPartidas(value: any): any[] {
+    const filterValue = (typeof value === 'string') ? value.toLowerCase() : '';
+    return this.partidas.filter(partida =>
+        partida.descripcionPartida.toLowerCase().includes(filterValue)
+    );
+}
+
+  filtrarRecursos(value: string): any[] {
+    const filterValue = value ? value.toLowerCase() : '';
+    return this.recursos.filter(recurso =>
+      recurso.nombreRecurso.toLowerCase().includes(filterValue)
+    );
+  }
 
 
-  /*    const dialogRef = this._matDialog.open(RegistroPartidasComponent, {
-       autoFocus: false,
-       data: {
-         proyecto: cloneDeep(proyecto),
-         title:"ARGEGAR PARTIDAS Y PRECIOS UNITARIOS",
-         type:'edit'
-       },
-          
-     });
-     dialogRef.afterClosed().subscribe((result) => {
-       console.log("Diálogo cerrado con resultado:", result);
- 
-       // Aquí puedes hacer lo que necesites después del cierre
-       if (result === 'success') {
-         this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
-       }
-     }); */
+
+  onPartidaSelected(event: any) {
+    const selectedPartida = this.partidas.find(partida => partida.idPartida === event.option.value);
+
+    if (selectedPartida) {
+      this.filterForm.patchValue({ partidaControl: selectedPartida.descripcionPartida });
+
+      // 🔥 Llamamos a `getRecursos()` para traer los recursos de la partida
+      this.getRecursos(selectedPartida.idPartida);
+    } else {
+      // Si el usuario borra el campo, restablecemos los filtros
+      this.partidasFiltradas = new BehaviorSubject(this.partidas);
+      this.recursosFiltradas = new BehaviorSubject([]);
+    }
+
+    console.log('Partida seleccionada:', selectedPartida);
+  }
+
+
+  onRecursoSelected(event: any) {
+    const selectedRecurso = this.recursos.find(recursos => recursos.idRecurso === event.option.value);
+    if (selectedRecurso) {
+      this.filterForm.patchValue({ recursoControl: selectedRecurso.nombreRecurso });
+    }
+    console.log('Partida seleccionada:', selectedRecurso);
+  }
 
 }
 

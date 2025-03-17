@@ -12,40 +12,41 @@
             <!-- Grid con inputs y selects -->
             <div class="grid grid-cols-4 gap-4">
 
-
-                <!-- DEPARTAMENTO -->
+                <!-- PARTIDA -->
+                <!-- PARTIDA -->
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>PARTIDA</mat-label>
-                    <mat-select formControlName="departamento" class="mr-1.5"
-                        (selectionChange)="onDepartamentoChange($event)">
-                        <mat-option [value]="0">Todos</mat-option>
-                        <mat-option *ngFor="let item of departamentos" [value]="item.departamentoUbigeo">{{
-                            item.departamentoNombre
-                            }}</mat-option>
-                    </mat-select>
+                    <input type="text" matInput formControlName="partidaControl" [matAutocomplete]="autoPartida">
+                    <mat-autocomplete #autoPartida="matAutocomplete" (optionSelected)="onPartidaSelected($event)">
+                        <mat-option *ngFor="let item of partidasFiltradas | async" [value]="item.idPartida">
+                            {{ item.descripcionPartida }}
+                        </mat-option>
+                    </mat-autocomplete>
                 </mat-form-field>
 
-                <!-- PROVINCIA -->
-                <mat-form-field appearance="fill" class="w-full">
-                    <mat-label>INSUMO</mat-label>
-                    <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange($event)">
-                        <mat-option [value]="0">Todos</mat-option>
-                        <mat-option *ngFor="let item of provincias" [value]="item.provinciaUbigeo">{{
-                            item.provinciaDescripcion
-                            }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
+
+                <!-- RECURSO--->
+                 <mat-form-field appearance="fill" class="w-full">
+                    <mat-label>RECURSO</mat-label>
+                    <input type="text" matInput formControlName="recursoControl" [matAutocomplete]="autoRecurso">
+                    <mat-autocomplete #autoRecurso="matAutocomplete" (optionSelected)="onRecursoSelected($event)">
+                        <mat-option *ngFor="let item of recursosFiltradas | async" [value]="item.idRecurso">
+                            {{ item.nombreRecurso }}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>  
+
 
                 <!-- TAMBO -->
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>CANTIDAD</mat-label>
-                    <input matInput type="text" formControlName="plataforma">
+                    <input matInput type="text" formControlName="cantidad">
                 </mat-form-field>
 
                 <!-- TAMBO -->
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>PRECIO</mat-label>
-                    <input matInput type="text" formControlName="plataforma">
+                    <input matInput type="text" formControlName="precio">
                 </mat-form-field>
 
                 <!-- Actions -->
@@ -74,9 +75,10 @@
 
             <!-- Botón -->
             <!-- Botón mejorado -->
-            <button mat-flat-button style="background-color: #0056b3; color: white;" (click)="descargarExcelProyecto()">
-                <mat-icon>plus</mat-icon>
-                <span class="ml-2">SOLICITAR AUTORIZACIÓN DE GASTO</span>
+            <button mat-flat-button style="background-color: #0056b3; color: white;"
+                (click)="registrarSolicitudAutorizacionGasto()">
+                <mat-icon>add</mat-icon>
+                <span class="ml-2">REGISTRAR SOLICITUD AUTORIZACIÓN DE GASTO</span>
             </button>
 
         </div>

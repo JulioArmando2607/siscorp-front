@@ -11,47 +11,47 @@
         <!-- Contenedor de formulario -->
         <div class="border p-6 rounded-lg shadow-lg">
             <!-- Grid con inputs y selects -->
-            <div class="grid grid-cols-4 gap-4">
+            <div class="grid grid-cols-6 gap-4">
 
 
                 <!-- DEPARTAMENTO -->
-                <mat-form-field appearance="fill" class="w-full">
+                <mat-form-field appearance="fill" class="col-span-2">
                     <mat-label>PARTIDA</mat-label>
-                    <mat-select formControlName="departamento" class="mr-1.5"
-                        (selectionChange)="onDepartamentoChange($event)">
-                        <mat-option [value]="0">Todos</mat-option>
-                        <mat-option *ngFor="let item of departamentos" [value]="item.departamentoUbigeo">{{
-                            item.departamentoNombre
-                            }}</mat-option>
-                    </mat-select>
+                    <input type="text" matInput formControlName="partidaControl" [matAutocomplete]="autoPartida">
+                    <mat-autocomplete #autoPartida="matAutocomplete" (optionSelected)="onPartidaSelected($event)">
+                        <mat-option *ngFor="let item of partidasFiltradas | async" [value]="item.idPartida">
+                            {{ item.descripcionPartida }}
+                        </mat-option>
+                    </mat-autocomplete>
                 </mat-form-field>
 
 
-                <!-- PROVINCIA -->
-                <mat-form-field appearance="fill" class="w-full">
-                    <mat-label>INSUMO</mat-label>
-                    <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange($event)">
-                        <mat-option [value]="0">Todos</mat-option>
-                        <mat-option *ngFor="let item of provincias" [value]="item.provinciaUbigeo">{{
-                            item.provinciaDescripcion
-                            }}</mat-option>
-                    </mat-select>
+                <!-- RECURSO--->
+                <mat-form-field appearance="fill" class="col-span-2">
+                    <mat-label>RECURSO</mat-label>
+                    <input type="text" matInput formControlName="recursoControl" [matAutocomplete]="autoRecurso">
+                    <mat-autocomplete #autoRecurso="matAutocomplete" (optionSelected)="onRecursoSelected($event)">
+                        <mat-option *ngFor="let item of recursosFiltradas | async" [value]="item.idRecurso">
+                            {{ item.nombreRecurso }}
+                        </mat-option>
+                    </mat-autocomplete>
                 </mat-form-field>
 
-
-                <!-- TAMBO -->
-                <mat-form-field appearance="fill" class="w-full">
+                <!-- CANTIDAD -->
+                <mat-form-field appearance="fill" class="col-span-1">
                     <mat-label>CANTIDAD</mat-label>
-                    <input matInput type="text" formControlName="plataforma">
+                    <input matInput type="text" formControlName="cantidad">
                 </mat-form-field>
 
-                <!-- TAMBO -->
-                <mat-form-field appearance="fill" class="w-full">
+                <!-- PRECIO -->
+                <mat-form-field appearance="fill" class="col-span-1">
                     <mat-label>PRECIO</mat-label>
-                    <input matInput type="text" formControlName="plataforma">
+                    <input matInput type="text" formControlName="precio">
                 </mat-form-field>
 
 
+            </div>
+            
                 <!-- Actions -->
                 <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
                     <button mat-flat-button style="background-color: #28a745; color: white;"
@@ -59,15 +59,12 @@
                         <mat-icon class="icon-size-5">add</mat-icon>
                         <span class="ml-2">REGISTRAR</span>
                     </button>
-
-
                     <button mat-flat-button color="warn" (click)="limpiar()">
                         <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:trash'"></mat-icon>
                         <span class="ml-2">CANCELAR</span>
                     </button>
 
                 </div>
-            </div>
         </div>
 
     </form>
@@ -91,53 +88,40 @@
                 <mat-header-cell *matHeaderCellDef mat-sort-header> ITEM </mat-header-cell>
                 <mat-cell *matCellDef="let row"> {{ row.item }} </mat-cell>
             </ng-container>
-            <!-- CUI Column -->
-            <ng-container matColumnDef="cui">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> CUI </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.cui }} </mat-cell>
-            </ng-container>
-
-            <!-- CUI Column -->
-            <ng-container matColumnDef="ubigeoCp">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Ubigeo Cp </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.ubigeoCp }} </mat-cell>
-            </ng-container>
-
-
-            <!-- Departamento Column -->
-            <ng-container matColumnDef="departamento">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Departamento </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.departamentoNombre }} </mat-cell>
-            </ng-container>
-
-            <!-- Provincia Column -->
-            <ng-container matColumnDef="provincia">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Provincia </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.provinciaDescripcion }} </mat-cell>
-            </ng-container>
-
-            <!-- Distrito Column -->
-            <ng-container matColumnDef="distrito">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Distrito </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.distritoDescripcion }} </mat-cell>
-            </ng-container>
-
             <!-- Centro Poblado Column -->
             <ng-container matColumnDef="centroPoblado">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> Centro Poblado </mat-header-cell>
                 <mat-cell *matCellDef="let row"> {{ row.centroPobladoDescripcion }} </mat-cell>
             </ng-container>
-
-            <!-- Centro Poblado Column -->
-            <ng-container matColumnDef="tambo">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Tambo </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.tambo }} </mat-cell>
+            <!-- Distrito Column -->
+            <ng-container matColumnDef="proyecto">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> PROYECTO </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.distritoDescripcion }} </mat-cell>
             </ng-container>
 
-            <!-- Estado Column -->
-            <ng-container matColumnDef="estado">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Estado </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.estado }} </mat-cell>
+            <!-- CUI Column -->
+            <ng-container matColumnDef="recurso">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> RECURSO </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.cui }} </mat-cell>
+            </ng-container>
+
+            <!-- CUI Column -->
+            <ng-container matColumnDef="und">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> UND </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.ubigeoCp }} </mat-cell>
+            </ng-container>
+
+
+            <!-- Departamento Column -->
+            <ng-container matColumnDef="cantidad">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.departamentoNombre }} </mat-cell>
+            </ng-container>
+
+            <!-- Provincia Column -->
+            <ng-container matColumnDef="precio_unitario">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> PRECIO UNITARIO </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.provinciaDescripcion }} </mat-cell>
             </ng-container>
 
             <!-- Botón de acciones -->
@@ -155,10 +139,10 @@
             <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
         </mat-table>
 
-
+<!--
         <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
             (page)="onPaginateChange($event)" showFirstLastButtons>
-        </mat-paginator>
+        </mat-paginator>-->
     </div>
 
 </div>

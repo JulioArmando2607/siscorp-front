@@ -70,6 +70,15 @@ export class MaestrasService {
   getEnviarPartidasExcel(formData : FormData): Observable<any> {
     return this.http.post(`${this.getUrlPartidas()}leer-excel`,formData, { headers: Headers(false) });
   }
+
+  getPartidas(idProyecto): Observable<any> {
+    return this.http.get(`${this.getUrlMaestras()}partidas-proyecto/${idProyecto}`, { headers: Headers() });
+  }
+
+  getRecursosxPartidas(idProyecto): Observable<any> {
+    return this.http.get(`${this.getUrlMaestras()}recursos-partida/${idProyecto}`, { headers: Headers() });
+  }
+
 }
 
 export function Headers(isJson = true): HttpHeaders {
