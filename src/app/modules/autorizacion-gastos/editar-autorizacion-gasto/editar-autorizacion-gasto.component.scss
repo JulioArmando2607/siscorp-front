@@ -1,0 +1,19 @@
+.botones-flotantes {
+    position: absolute;
+    top: -30px;  /* Coloca los botones encima de la tabla */
+    right: 10px; /* Mueve los botones hacia la izquierda */
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    z-index: 100; /* Asegura que estén sobre la tabla */
+}
+
+.botones-flotantes-atras {
+    position: absolute;
+    top: -30px;  /* Coloca los botones encima de la tabla */
+    right: 10px; /* Mueve los botones hacia la izquierda */
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    z-index: 100; /* Asegura que estén sobre la tabla */
+}

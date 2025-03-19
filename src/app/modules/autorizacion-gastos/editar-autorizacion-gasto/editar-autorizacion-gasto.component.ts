@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,11 +17,9 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { ExcelService } from 'app/modules/maestras/excel.service';
 import { MaestrasService } from 'app/modules/maestras/maestras.service';
 import { BehaviorSubject, lastValueFrom, map, Observable, startWith, switchMap } from 'rxjs';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
-  selector: 'app-listar-solicitud-autorizacion-gasto',
+  selector: 'app-editar-autorizacion-gasto',
   imports: [
     ReactiveFormsModule, // <== Agregar esta línea
     CommonModule,
@@ -33,18 +32,18 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
-    MatAutocompleteModule,
-    MatTooltipModule
+    MatAutocompleteModule
   ],
   standalone: true, // Declarar como componente standalone
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './listar-solicitud-autorizacion-gasto.component.html',
-  styleUrl: './listar-solicitud-autorizacion-gasto.component.scss'
+  templateUrl: './editar-autorizacion-gasto.component.html',
+  styleUrl: './editar-autorizacion-gasto.component.scss'
 })
-export class ListarSolicitudAutorizacionGastoComponent {
-  recursos: any;
-  recursosSubject: any;
+export class EditarAutorizacionGastoComponent {
+  idPartidaSeleccionada: any;
+  idRecursoSeleccionado: any;
+  idAutorizacionGasto: any = 0;
   async descargarExcelProyecto() {
     const roresp = await lastValueFrom(this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(),
     ))
@@ -52,7 +51,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
     console.log(roresp)
     this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");
   }
-  displayedColumns: string[] = ['item', 'cag', 'fechaRegistro', 'cantidadRecursos', 'estado','acciones'];
+  displayedColumns: string[] = ['item', 'partida', 'recurso', 'und', 'cantidad', 'precio_unitario','precio_cantidad'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
@@ -72,7 +71,8 @@ export class ListarSolicitudAutorizacionGastoComponent {
   partidasFiltradas!: Observable<any[]>; // Observable para filtrar en memoria
   recursosFiltradas!: Observable<any[]>; // Observable para filtrar en memoria
   partidasSubject = new BehaviorSubject<any[]>([]); // Para manejar el filtrado en memoria
-
+  recursos: any;
+  recursosSubject: any;
   // Variables de paginación
   totalElements = 0;
   pageSize = 10;
@@ -85,31 +85,29 @@ export class ListarSolicitudAutorizacionGastoComponent {
     private fb: FormBuilder,
     private _formBuilder: UntypedFormBuilder,
     private excelService: ExcelService,
-    private route: ActivatedRoute,
-    private _router: Router
-
+    private route: ActivatedRoute
     //private _notesService: NotesService
   ) {
 
-
-    //this.getFiltrarProyectos()
   }
-
   async ngOnInit() {
-
     this.filterForm = this.fb.group({
-      cantidad: [''],
-      precio: [''],
-      estado: [0],
-      partidaControl: [""],
-      recursoControl: [""]
-    });
 
+      estado: [0],
+
+      partidaControl: ["", Validators.required],  // ✅ Campo obligatorio
+      recursoControl: ["", Validators.required],  // ✅ Campo obligatorio
+      cantidad: ["", [Validators.required, Validators.min(1)]],  // ✅ Mayor a 0
+      precio: ["", [Validators.required, Validators.min(0.01)]]  // ✅ Mayor a 0.01
+    });
 
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
 
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
+    this.idAutorizacionGasto = this.route.snapshot.paramMap.get('ag'); // Obtiene el ID de la URL
+    this.getFiltraRecursosAturorizacionGasto(true)
+
     this.titulo = "PROYECTO TAMBO: NAYAP"
 
     this.getPartidas(this.id);
@@ -137,11 +135,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
         return this.filtrarRecursos(value);
       })
     ).subscribe(filtered => this.recursosFiltradas = new BehaviorSubject(filtered));
-
-    this.getFiltrarProyectos(true)
-
   }
-
   async eliminarProyecto(proyecto: any) {
     const confirmado = await this.dataModal(522, 'Eliminar proyecto', 'Deseas eliminar este proyecto?');
 
@@ -150,7 +144,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
       const oRespL = await lastValueFrom(this.maestraService.getEliminar(proyecto.idProyecto));
 
       if (oRespL) {
-        this.getFiltrarProyectos();
+        this.getFiltraRecursosAturorizacionGasto();
       }
     } else {
       console.log('Eliminación cancelada.');
@@ -192,7 +186,113 @@ export class ListarSolicitudAutorizacionGastoComponent {
     });
   }
 
-  descargarSolicitudes() { }
+  descargarProyectos() { }
+
+  async getDepartamentos() {
+    this.departamentos = []
+    const oRespL = await lastValueFrom(
+      this.maestraService.getDepartamentos()
+    );
+    this.departamentos = oRespL.data
+  }
+
+  async getProvincia(departamentoUbigeo) {
+    this.provincias = []
+    this.distritos = []
+    this.centrosPoblados = []
+    const oRespL = await lastValueFrom(
+      this.maestraService.getProvincias(departamentoUbigeo)
+    );
+    this.provincias = oRespL.data
+  }
+  async getDistrito(provinciaUbigeo) {
+    this.distritos = []
+    this.centrosPoblados = []
+    const oRespL = await lastValueFrom(
+      this.maestraService.getDistrito(provinciaUbigeo)
+    );
+    this.distritos = oRespL.data
+  }
+  async getCentrosPoblados(distritoUbigeo) {
+    this.centrosPoblados = []
+    const oRespL = await lastValueFrom(
+      this.maestraService.getCentrosPoblados(distritoUbigeo)
+    );
+    this.centrosPoblados = oRespL.data
+  }
+
+  filtrar() {
+    const filtros = this.filterForm.getRawValue();
+    console.log('Valores del formulario:', filtros);
+  }
+
+  limpiar() {
+    this.filterForm.reset()
+  }
+
+  onDepartamentoChange(event) {
+    const departamentoSeleccionado = event.value;
+    this.getProvincia(departamentoSeleccionado);
+  }
+  onProvinciaChange(event) {
+    const provinciaSeleccionado = event.value;
+    this.getDistrito(provinciaSeleccionado);
+  }
+  onDistritoChange(event) {
+    const distritoSeleccionado = event.value;
+    this.getCentrosPoblados(distritoSeleccionado);
+  }
+
+
+
+
+  async getFiltraRecursosAturorizacionGasto(resetPage: boolean = false) {
+    try {
+       
+      const data = {
+        idAutorizacionGasto: this.idAutorizacionGasto,
+        idProyecto: this.id
+      }
+      const oRespL = await lastValueFrom(
+        this.maestraService.getlistarRecursosAturorizacionGasto(
+          data
+        )
+      );
+
+      console.log(oRespL)
+      if (oRespL?.data) {
+        this.proyectos = oRespL.data;
+        this.totalElements = oRespL.data.length;
+
+        this.dataSource = new MatTableDataSource(this.proyectos);
+        this.dataSource.sort = this.sort; // 🔥 Habilitar ordenación
+        this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
+
+        this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
+      }
+    } catch (error) {
+      console.error('Error al obtener proyectos:', error);
+    }
+  }
+
+  onPaginateChange(event: PageEvent) {
+    console.log(event.pageIndex)
+    this.pageIndex = event.pageIndex;  // Actualizar página actual
+    this.pageSize = event.pageSize;    // Actualizar tamaño de página
+    this.getFiltraRecursosAturorizacionGasto();        // Recargar datos con nueva paginación
+  }
+
+  openConfirmationDialog(codigo): void {
+    // Open the dialog and save the reference of it
+    const dialogRef = this._fuseConfirmationService.open(
+      this.configForm.value
+    );
+    if (codigo == 200) {
+      setTimeout(() => {
+        dialogRef.close();
+      }, 1000);
+    }
+  }
 
   // Método para obtener partidas UNA SOLA VEZ desde la API
   async getPartidas(id) {
@@ -225,92 +325,12 @@ export class ListarSolicitudAutorizacionGastoComponent {
     }
   }
 
-  filtrar() {
-    const filtros = this.filterForm.getRawValue();
-    console.log('Valores del formulario:', filtros);
-  }
-
-  limpiar() {
-    this.filterForm.reset()
-    this.getFiltrarProyectos()
-  }
-
-
-  buscarDetalleCentroPoblado(event) {
-    console.log("aqui esty")
-    const valor = event.target.value.trim();
-    if (valor.length > 2) { // Opcional: Para evitar búsquedas con pocos caracteres
-      console.log('Buscando:', valor);
-      //  this.buscarValor(valor);
-    }
-
-
-  }
-
-
-
-
-
-  async getFiltrarProyectos(resetPage: boolean = false) {
-    try {
-      if (resetPage) {
-        this.pageIndex = 0; // 🔥 Reinicia la página al filtrar
-      }
-      const data ={
-        idProyecto:this.id
-      }
-      const oRespL = await lastValueFrom(
-        this.maestraService.getListarAutorizacionGasto(
-          data,
-          this.pageIndex,
-          this.pageSize  
-        )
-      );
-
-      if (oRespL?.data?.content) {
-        this.proyectos = oRespL.data.content;
-        this.totalElements = oRespL.data.totalElements;
-
-        this.dataSource = new MatTableDataSource(this.proyectos);
-        this.dataSource.sort = this.sort; // 🔥 Habilitar ordenación
-        this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
-
-        this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
-      }
-    } catch (error) {
-      console.error('Error al obtener proyectos:', error);
-    }
-  }
-
-  onPaginateChange(event: PageEvent) {
-    console.log(event.pageIndex)
-    this.pageIndex = event.pageIndex;  // Actualizar página actual
-    this.pageSize = event.pageSize;    // Actualizar tamaño de página
-    this.getFiltrarProyectos();        // Recargar datos con nueva paginación
-  }
-
-  openConfirmationDialog(codigo): void {
-    // Open the dialog and save the reference of it
-    const dialogRef = this._fuseConfirmationService.open(
-      this.configForm.value
-    );
-    if (codigo == 200) {
-      setTimeout(() => {
-        dialogRef.close();
-      }, 1000);
-    }
-  }
-
-  registrarSolicitudAutorizacionGasto() {
-    this._router.navigate(['autorizacion-gastos/registrar-autorizacion-gasto/', this.id]);
-  }
-
   filtrarPartidas(value: any): any[] {
     const filterValue = (typeof value === 'string') ? value.toLowerCase() : '';
     return this.partidas.filter(partida =>
-        partida.descripcionPartida.toLowerCase().includes(filterValue)
+      partida.descripcionPartida.toLowerCase().includes(filterValue)
     );
-}
+  }
 
   filtrarRecursos(value: string): any[] {
     const filterValue = value ? value.toLowerCase() : '';
@@ -326,7 +346,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
 
     if (selectedPartida) {
       this.filterForm.patchValue({ partidaControl: selectedPartida.descripcionPartida });
-
+      this.idPartidaSeleccionada = selectedPartida.idPartida
       // 🔥 Llamamos a `getRecursos()` para traer los recursos de la partida
       this.getRecursos(selectedPartida.idPartida);
     } else {
@@ -342,20 +362,41 @@ export class ListarSolicitudAutorizacionGastoComponent {
   onRecursoSelected(event: any) {
     const selectedRecurso = this.recursos.find(recursos => recursos.idRecurso === event.option.value);
     if (selectedRecurso) {
+      this.idRecursoSeleccionado = selectedRecurso.idRecurso
       this.filterForm.patchValue({ recursoControl: selectedRecurso.nombreRecurso });
     }
     console.log('Partida seleccionada:', selectedRecurso);
   }
 
-  editar(row){
-    console.log(row)
-    this._router.navigate(['autorizacion-gastos/editar-autorizacion-gasto/', this.id, row.idAutorizacionGasto]);
+  async setRegistrarAutorizacionGasto() {
+    console.log(this.id)
+    console.log(this.idPartidaSeleccionada)
+    console.log(this.idRecursoSeleccionado)
+    console.log(this.filterForm.get("cantidad").value)
+    console.log(this.filterForm.get("precio").value)
+
+
+    const data = {
+      idProyecto: this.id,
+      idAutorizacionGasto: this.idAutorizacionGasto,
+      idPartida: this.idPartidaSeleccionada,
+      idRecurso: this.idRecursoSeleccionado,
+      cantidad: this.filterForm.get("cantidad").value,
+      precio: this.filterForm.get("precio").value,
+      precioCantidad: this.filterForm.get("cantidad").value * this.filterForm.get("precio").value
+    }
+
+    const response = await this.maestraService.setRegistrarAutorizacionGasto(data).toPromise();
+    this.idAutorizacionGasto = response.data.response
+    console.log(response.data.response);
+    //this.partidas = response.data || [];
+    if (response) {
+      this.getFiltraRecursosAturorizacionGasto()
+    }
+
+    this.idPartidaSeleccionada = 0
+    this.idRecursoSeleccionado = 0
+    this.filterForm.reset();
   }
-
-  eliminarAutorizacion(row){}
-
-  aprobarSupervisor(row){}
-
-  descargarAutorizacion(row){}
 }
 

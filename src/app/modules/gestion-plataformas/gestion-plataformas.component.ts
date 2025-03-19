@@ -24,6 +24,7 @@ import { Platform } from '@angular/cdk/platform';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { ExcelService } from '../maestras/excel.service';
 import { RegistroPartidasComponent } from './registro-partidas/registro-partidas.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'gestion-plataformas',
@@ -44,17 +45,16 @@ import { RegistroPartidasComponent } from './registro-partidas/registro-partidas
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
+    MatTooltipModule
   ],
 })
 export class GestionPlataformasComponent implements OnInit {
-  async descargarExcelProyecto() {
-  const roresp =  await lastValueFrom( this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(), 
-))
-
-console.log(roresp)
-  this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");
-}
-  displayedColumns: string[] = ['item','cui','ubigeoCp', 'departamento', 'provincia', 'distrito', 'centroPoblado','tambo', 'estado', 'acciones'];
+  // Variables de paginación
+  totalElements = 0;
+  pageSize = 10;
+  pageIndex = 0; // Página actual
+ 
+  displayedColumns: string[] = ['item', 'cui', 'ubigeoCp', 'departamento', 'provincia', 'distrito', 'centroPoblado', 'tambo', 'estado', 'acciones'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
@@ -110,10 +110,10 @@ console.log(roresp)
       autoFocus: false,
       data: {
         proyecto: cloneDeep(proyecto),
-        title:"EDITAR PROYECTO",
-        type:'edit'
+        title: "EDITAR PROYECTO",
+        type: 'edit'
       },
-         
+
     });
     dialogRef.afterClosed().subscribe((result) => {
       console.log("Diálogo cerrado con resultado:", result);
@@ -127,62 +127,62 @@ console.log(roresp)
 
   async eliminarProyecto(proyecto: any) {
     const confirmado = await this.dataModal(522, 'Eliminar proyecto', 'Deseas eliminar este proyecto?');
-    
+
     if (confirmado) {
-        console.log('Eliminando proyecto:', proyecto);
-        const oRespL = await lastValueFrom(this.maestraService.getEliminar(proyecto.idProyecto));
+      console.log('Eliminando proyecto:', proyecto);
+      const oRespL = await lastValueFrom(this.maestraService.getEliminar(proyecto.idProyecto));
 
-        if (oRespL) {
-            this.getFiltrarProyectos();
-        }
+      if (oRespL) {
+        this.getFiltrarProyectos();
+      }
     } else {
-        console.log('Eliminación cancelada.');
+      console.log('Eliminación cancelada.');
     }
-}
+  }
 
-dataModal(codigo, title, message): Promise<boolean> {
+  dataModal(codigo, title, message): Promise<boolean> {
     return new Promise((resolve) => {
-        const actions = {
-            cancel: this._formBuilder.group({
-                show: true,
-                label: 'Cancelar',
-            }),
-            confirm: this._formBuilder.group({
-                show: true,
-                label: 'Eliminar',
-                color: 'warn',
-            }),
-        };
+      const actions = {
+        cancel: this._formBuilder.group({
+          show: true,
+          label: 'Cancelar',
+        }),
+        confirm: this._formBuilder.group({
+          show: true,
+          label: 'Eliminar',
+          color: 'warn',
+        }),
+      };
 
-        this.configForm = this._formBuilder.group({
-            title: title,
-            message: message,
-            icon: this._formBuilder.group({
-                show: true,
-                name: codigo === 200 ? 'heroicons_outline:check-circle' : 'heroicons_outline:exclamation-triangle',
-                color: codigo === 200 ? 'primary' : 'warn',
-            }),
-            actions: this._formBuilder.group(actions),
-            dismissible: true,
-        });
+      this.configForm = this._formBuilder.group({
+        title: title,
+        message: message,
+        icon: this._formBuilder.group({
+          show: true,
+          name: codigo === 200 ? 'heroicons_outline:check-circle' : 'heroicons_outline:exclamation-triangle',
+          color: codigo === 200 ? 'primary' : 'warn',
+        }),
+        actions: this._formBuilder.group(actions),
+        dismissible: true,
+      });
 
-        // Abrir el diálogo y esperar la respuesta del usuario
-        const dialogRef = this._fuseConfirmationService.open(this.configForm.value);
+      // Abrir el diálogo y esperar la respuesta del usuario
+      const dialogRef = this._fuseConfirmationService.open(this.configForm.value);
 
-        dialogRef.afterClosed().subscribe((result) => {
-            resolve(result === 'confirmed'); // Si el usuario confirma, retorna true; si cancela, retorna false
-        });
+      dialogRef.afterClosed().subscribe((result) => {
+        resolve(result === 'confirmed'); // Si el usuario confirma, retorna true; si cancela, retorna false
+      });
     });
   }
 
-  agregarProyecto(note) {   
+  agregarProyecto(note) {
     const dialogRef = this._matDialog.open(RegistroComponent, {
       autoFocus: false,
       disableClose: false,
       data: {
         note: cloneDeep(note),
-          title: "REGISTRAR PROYECTO",
-        type:'create'
+        title: "REGISTRAR PROYECTO",
+        type: 'create'
       },
     });
     // Acción cuando se cierra el modal
@@ -194,22 +194,8 @@ dataModal(codigo, title, message): Promise<boolean> {
       }
     });
   }
-  
-  descargarProyectos() { }
 
-  /*  openNoteDialog(note): void {
-      this._matDialog.open(RegistroComponent, {
-        autoFocus: false,
-        data: {
-          note: cloneDeep(note),
-        },
-      });
-  
-      this._matDialog.afterAllClosed().subscribe((result) => {
-        
-        console.log(result);
-      });
-    } */
+  descargarProyectos() { }
 
   openNoteDialog(note): void {
     const dialogRef = this._matDialog.open(RegistroComponent, {
@@ -280,10 +266,8 @@ dataModal(codigo, title, message): Promise<boolean> {
     const valor = event.target.value.trim();
     if (valor.length > 2) { // Opcional: Para evitar búsquedas con pocos caracteres
       console.log('Buscando:', valor);
-      //  this.buscarValor(valor);
-    }
-
-
+     }
+ 
   }
   onDepartamentoChange(event) {
     const departamentoSeleccionado = event.value;
@@ -298,100 +282,80 @@ dataModal(codigo, title, message): Promise<boolean> {
     this.getCentrosPoblados(distritoSeleccionado);
   }
 
-  // Variables de paginación
-totalElements = 0;
-pageSize = 10;
-pageIndex = 0; // Página actual
-/*
-async getFiltrarProyectos() {
-  try {
-      const oRespL = await lastValueFrom(this.maestraService.getFiltrarProyectos(this.filterForm.getRawValue(), this.pageIndex, this.pageSize));
-
-      if (oRespL?.data?.content) {
-          this.proyectos = oRespL.data.content;
-          this.totalElements = oRespL.data.totalElements;
-          
-          this.dataSource = new MatTableDataSource(this.proyectos);
-        //  this.dataSource.paginator = this.paginator; // 🔥 Conectar paginador
-           this.dataSource.sort = this.sort; // 🔥 Habilitar ordenación
-          this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
-
-          this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
-      }
-  } catch (error) {
-      console.error('Error al obtener proyectos:', error);
-  }
-}
-*/
-
-async getFiltrarProyectos(resetPage: boolean = false) {
-  try {
+  async getFiltrarProyectos(resetPage: boolean = false) {
+    try {
       if (resetPage) {
-          this.pageIndex = 0; // 🔥 Reinicia la página al filtrar
+        this.pageIndex = 0; // 🔥 Reinicia la página al filtrar
       }
 
       const oRespL = await lastValueFrom(
-          this.maestraService.getFiltrarProyectos(
-              this.filterForm.getRawValue(), 
-              this.pageIndex, 
-              this.pageSize
-          )
+        this.maestraService.getFiltrarProyectos(
+          this.filterForm.getRawValue(),
+          this.pageIndex,
+          this.pageSize
+        )
       );
 
       if (oRespL?.data?.content) {
-          this.proyectos = oRespL.data.content;
-          this.totalElements = oRespL.data.totalElements;
-          
-          this.dataSource = new MatTableDataSource(this.proyectos);
-          this.dataSource.sort = this.sort; // 🔥 Habilitar ordenación
-          this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
+        this.proyectos = oRespL.data.content;
+        this.totalElements = oRespL.data.totalElements;
 
-          this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
+        this.dataSource = new MatTableDataSource(this.proyectos);
+        this.dataSource.sort = this.sort; // 🔥 Habilitar ordenación
+        this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
+
+        this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
       }
-  } catch (error) {
+    } catch (error) {
       console.error('Error al obtener proyectos:', error);
+    }
   }
-}
-  
-onPaginateChange(event: PageEvent) {
-console.log( event.pageIndex)
-  this.pageIndex = event.pageIndex  ;  // Actualizar página actual
-  this.pageSize = event.pageSize;    // Actualizar tamaño de página
-   this.getFiltrarProyectos();        // Recargar datos con nueva paginación
-}
 
-openConfirmationDialog(codigo): void {
-  // Open the dialog and save the reference of it
-  const dialogRef = this._fuseConfirmationService.open(
-      this.configForm.value
-  );
-  if (codigo == 200) {
-      setTimeout(() => {
-          dialogRef.close();
-      }, 1000);
+  onPaginateChange(event: PageEvent) {
+    console.log(event.pageIndex)
+    this.pageIndex = event.pageIndex;  // Actualizar página actual
+    this.pageSize = event.pageSize;    // Actualizar tamaño de página
+    this.getFiltrarProyectos();        // Recargar datos con nueva paginación
   }
-}
-cargarPartidas(proyecto){
-  console.log('Ver detalles de:', proyecto);
+
+  openConfirmationDialog(codigo): void {
+    // Open the dialog and save the reference of it
+    const dialogRef = this._fuseConfirmationService.open(
+      this.configForm.value
+    );
+    if (codigo == 200) {
+      setTimeout(() => {
+        dialogRef.close();
+      }, 1000);
+    }
+  }
+  cargarPartidas(proyecto) {
+    console.log('Ver detalles de:', proyecto);
     const dialogRef = this._matDialog.open(RegistroPartidasComponent, {
       autoFocus: false,
       data: {
         proyecto: cloneDeep(proyecto),
-        title:"ARGEGAR PARTIDAS Y PRECIOS UNITARIOS",
-        type:'edit'
+        title: "ARGEGAR PARTIDAS Y PRECIOS UNITARIOS",
+        type: 'edit'
       },
-         
+
     });
     dialogRef.afterClosed().subscribe((result) => {
       console.log("Diálogo cerrado con resultado:", result);
 
-      // Aquí puedes hacer lo que necesites después del cierre
       if (result === 'success') {
         this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
       }
     });
+  }
+
+  async descargarExcelProyecto() {
+    const roresp = await lastValueFrom(this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(),
+    ))
+
+    console.log(roresp)
+    this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");
+  }
+
 }
 
-
-}
- 

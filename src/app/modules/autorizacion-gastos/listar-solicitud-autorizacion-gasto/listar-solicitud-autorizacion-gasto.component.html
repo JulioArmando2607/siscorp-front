@@ -26,7 +26,7 @@
 
 
                 <!-- RECURSO--->
-                 <mat-form-field appearance="fill" class="w-full">
+                <mat-form-field appearance="fill" class="w-full">
                     <mat-label>RECURSO</mat-label>
                     <input type="text" matInput formControlName="recursoControl" [matAutocomplete]="autoRecurso">
                     <mat-autocomplete #autoRecurso="matAutocomplete" (optionSelected)="onRecursoSelected($event)">
@@ -34,7 +34,7 @@
                             {{ item.nombreRecurso }}
                         </mat-option>
                     </mat-autocomplete>
-                </mat-form-field>  
+                </mat-form-field>
 
 
                 <!-- TAMBO -->
@@ -89,59 +89,60 @@
                 <mat-cell *matCellDef="let row"> {{ row.item }} </mat-cell>
             </ng-container>
             <!-- CUI Column -->
-            <ng-container matColumnDef="cui">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> CUI </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.cui }} </mat-cell>
+            <ng-container matColumnDef="cag">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> CODIGO AUTORIZACION GASTO </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.codigoAutorizacionGasto }} </mat-cell>
             </ng-container>
 
             <!-- CUI Column -->
-            <ng-container matColumnDef="ubigeoCp">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Ubigeo Cp </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.ubigeoCp }} </mat-cell>
+            <ng-container matColumnDef="fechaRegistro">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> FECHA REGISTRO </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.fechaRegistro }} </mat-cell>
             </ng-container>
 
 
             <!-- Departamento Column -->
-            <ng-container matColumnDef="departamento">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Departamento </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.departamentoNombre }} </mat-cell>
-            </ng-container>
-
-            <!-- Provincia Column -->
-            <ng-container matColumnDef="provincia">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Provincia </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.provinciaDescripcion }} </mat-cell>
-            </ng-container>
-
-            <!-- Distrito Column -->
-            <ng-container matColumnDef="distrito">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Distrito </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.distritoDescripcion }} </mat-cell>
-            </ng-container>
-
-            <!-- Centro Poblado Column -->
-            <ng-container matColumnDef="centroPoblado">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Centro Poblado </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.centroPobladoDescripcion }} </mat-cell>
-            </ng-container>
-
-            <!-- Centro Poblado Column -->
-            <ng-container matColumnDef="tambo">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Tambo </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.tambo }} </mat-cell>
+            <ng-container matColumnDef="cantidadRecursos">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD RECURSOS </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.cantidadRecursos }} </mat-cell>
             </ng-container>
 
             <!-- Estado Column -->
             <ng-container matColumnDef="estado">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> Estado </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.estado }} </mat-cell>
+                <mat-header-cell *matHeaderCellDef mat-sort-header> ESTADO </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.nombreEstado }} </mat-cell>
             </ng-container>
 
             <!-- Botón de acciones -->
             <ng-container matColumnDef="acciones">
                 <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
                 <mat-cell *matCellDef="let row">
+                    <!-- Botón Editar -->
+                    <button mat-icon-button color="primary" (click)="editar(row)" matTooltip="Editar">
+                        <mat-icon>edit</mat-icon>
+                    </button>
 
+                    <!-- Botón Eliminar -->
+                    <button mat-icon-button color="warn" (click)="eliminarAutorizacion(row)" matTooltip="Eliminar">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+
+                    <!-- Botón Solicitar -->
+                    <button mat-icon-button color="accent" (click)="solicitarAutorizacion(row)" matTooltip="Solicitar"
+                        matTooltipPosition="above">
+                        <mat-icon>send</mat-icon>
+                    </button>
+
+                    <!-- Botón aporbar -->
+                    <button mat-icon-button color="primary" (click)="aprobarSupervisor(row)" matTooltip="Aprobar"
+                        matTooltipPosition="above">
+                        <mat-icon>check</mat-icon>
+                    </button>
+                    <!-- Botón para Cargar Partidas y Precios Unitarios -->
+                    <button mat-icon-button color="accent" (click)="descargarAutorizacion(row)"
+                        matTooltip="Descargar Autorizacion de Gasto">
+                        <mat-icon>download</mat-icon>
+                    </button>
 
                 </mat-cell>
             </ng-container>

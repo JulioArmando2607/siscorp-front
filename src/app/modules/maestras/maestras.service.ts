@@ -23,6 +23,10 @@ export class MaestrasService {
     return environment.apiurl + '/api/partidas/';
   }
 
+  getUrlAutorizacionGasto() {
+    return environment.apiurl + '/api/autorizacion-gasto/';
+  }
+
   getDepartamentos(): Observable<any> {
     return this.http.get(`${this.getUrlMaestras()}departamentos`, { headers: Headers() });
   }
@@ -39,6 +43,7 @@ export class MaestrasService {
   getFiltrarProyectos(rawValue, pageIndex , pageSize): Observable<any> {
     return this.http.post(`${this.getUrlPlataforma()}plataformas?page=${pageIndex}&size=${pageSize}&sort=idProyecto,asc`,rawValue, { headers: Headers() });
   }
+
   listarPlataformasExcel(rawValue): Observable<any>{
     return this.http.post(`${this.getUrlPlataforma()}proyectos-excel`,rawValue, { headers: Headers() });
   }
@@ -79,6 +84,17 @@ export class MaestrasService {
     return this.http.get(`${this.getUrlMaestras()}recursos-partida/${idProyecto}`, { headers: Headers() });
   }
 
+  setRegistrarAutorizacionGasto(formData): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}registrar-autorizacion-gasto`,formData, { headers: Headers() });
+  }
+  getlistarRecursosAturorizacionGasto(rawValue): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}listar-recursos-aturorizacion-gasto`,rawValue, { headers: Headers() });
+  }
+  getListarAutorizacionGasto(rawValue,pageIndex , pageSize): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}listar-autorizacion-gasto?page=${pageIndex}&size=${pageSize}&sort=idAutorizacionGasto,desc`,rawValue, { headers: Headers() });
+  }
+
+  
 }
 
 export function Headers(isJson = true): HttpHeaders {

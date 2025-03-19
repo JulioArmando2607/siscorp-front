@@ -123,14 +123,18 @@
         <mat-icon>arrow_downward</mat-icon>
       </button>
     </div>
-    <mat-table [dataSource]="dataSource" matSort class="w-full">
+    <mat-table [dataSource]="dataSource" matSort class="w-full table-auto">
       <!-- item Column -->
       <ng-container matColumnDef="item">
-        <mat-header-cell *matHeaderCellDef mat-sort-header> ITEM </mat-header-cell>
-        <mat-cell *matCellDef="let row"> {{ row.item }} </mat-cell>
+        <mat-header-cell *matHeaderCellDef mat-sort-header style="width: 50px; min-width: 50px; max-width: 60px; text-align: center;"> 
+          ITEM 
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" style="width: 50px; min-width: 50px; max-width: 60px; text-align: center;"> 
+          {{ row.item }} 
+        </mat-cell>
       </ng-container>
       <!-- CUI Column -->
-      <ng-container matColumnDef="cui">
+      <ng-container matColumnDef="cui"> 
         <mat-header-cell *matHeaderCellDef mat-sort-header> CUI </mat-header-cell>
         <mat-cell *matCellDef="let row"> {{ row.cui }} </mat-cell>
       </ng-container>
@@ -191,6 +195,13 @@
           <button mat-icon-button color="warn" (click)="eliminarProyecto(row)" matTooltip="Eliminar Proyecto">
             <mat-icon>delete</mat-icon>
           </button>
+
+          <!-- Botón para configurar usuarios -->
+          <button mat-icon-button color="accent" (click)="configurarUsuarios(row)"
+            matTooltip="Configurar Residente y Supervisor" matTooltipPosition="above">
+            <mat-icon>manage_accounts</mat-icon>
+          </button>
+
           <!-- Botón para Cargar Partidas y Precios Unitarios -->
           <button mat-icon-button color="accent" (click)="cargarPartidas(row)"
             matTooltip="Cargar Partidas y Precios Unitarios">
