@@ -85,9 +85,13 @@
         <mat-table [dataSource]="dataSource" matSort class="w-full">
             <!-- item Column -->
             <ng-container matColumnDef="item">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> ITEM </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.item }} </mat-cell>
-            </ng-container>
+                <mat-header-cell *matHeaderCellDef mat-sort-header style="width: 50px; min-width: 50px; max-width: 60px; text-align: center;"> 
+                  ITEM 
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" style="width: 50px; min-width: 50px; max-width: 60px; text-align: center;"> 
+                  {{ row.item }} 
+                </mat-cell>
+              </ng-container>
             <!-- CUI Column -->
             <ng-container matColumnDef="cag">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> CODIGO AUTORIZACION GASTO </mat-header-cell>

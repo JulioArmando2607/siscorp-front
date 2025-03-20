@@ -48,6 +48,10 @@ export class MaestrasService {
     return this.http.post(`${this.getUrlPlataforma()}proyectos-excel`,rawValue, { headers: Headers() });
   }
 
+  verProyecto(rawValue): Observable<any>{
+    return this.http.post(`${this.getUrlPlataforma()}ver-proyectos`,rawValue, { headers: Headers() });
+  }
+
   getCrearPlataformas(rawValue): Observable<any> {
     return this.http.post(`${this.getUrlPlataforma()}crearProyecto`,rawValue, { headers: Headers() });
   }
@@ -87,6 +91,12 @@ export class MaestrasService {
   setRegistrarAutorizacionGasto(formData): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}registrar-autorizacion-gasto`,formData, { headers: Headers() });
   }
+  setEditarAutorizacionGasto(formData): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}editar-autorizacion-gasto`,formData, { headers: Headers() });
+  }
+  setEliminarAutorizacionGastoRecurso(formData): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}eliminar-autorizacion-gasto-recurso`,formData, { headers: Headers() });
+  }
   getlistarRecursosAturorizacionGasto(rawValue): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}listar-recursos-aturorizacion-gasto`,rawValue, { headers: Headers() });
   }
@@ -94,6 +104,10 @@ export class MaestrasService {
     return this.http.post(`${this.getUrlAutorizacionGasto()}listar-autorizacion-gasto?page=${pageIndex}&size=${pageSize}&sort=idAutorizacionGasto,desc`,rawValue, { headers: Headers() });
   }
 
+  getConsultaUsuarioDni(dni): Observable<any> {
+    return this.http.get(`${this.getUrlMaestras()}consulta-usuario-dni/${dni}`, { headers: Headers() });
+  }
+ 
   
 }
 

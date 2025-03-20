@@ -52,7 +52,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
     console.log(roresp)
     this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");
   }
-  displayedColumns: string[] = ['item', 'cag', 'fechaRegistro', 'cantidadRecursos', 'estado','acciones'];
+  displayedColumns: string[] = ['item', 'cag', 'fechaRegistro', 'cantidadRecursos', 'estado', 'acciones'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
@@ -105,15 +105,14 @@ export class ListarSolicitudAutorizacionGastoComponent {
       recursoControl: [""]
     });
 
+    this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
+    this.verProyecto()
+    this.getPartidas(this.id);
 
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
 
-    this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
-    this.titulo = "PROYECTO TAMBO: NAYAP"
-
-    this.getPartidas(this.id);
-
+    
     // 🔥 Monitorear el input de partidas y actualizar el filtrado en tiempo real
     this.filterForm.controls['partidaControl'].valueChanges.pipe(
       startWith(''),
@@ -256,14 +255,14 @@ export class ListarSolicitudAutorizacionGastoComponent {
       if (resetPage) {
         this.pageIndex = 0; // 🔥 Reinicia la página al filtrar
       }
-      const data ={
-        idProyecto:this.id
+      const data = {
+        idProyecto: this.id
       }
       const oRespL = await lastValueFrom(
         this.maestraService.getListarAutorizacionGasto(
           data,
           this.pageIndex,
-          this.pageSize  
+          this.pageSize
         )
       );
 
@@ -308,9 +307,9 @@ export class ListarSolicitudAutorizacionGastoComponent {
   filtrarPartidas(value: any): any[] {
     const filterValue = (typeof value === 'string') ? value.toLowerCase() : '';
     return this.partidas.filter(partida =>
-        partida.descripcionPartida.toLowerCase().includes(filterValue)
+      partida.descripcionPartida.toLowerCase().includes(filterValue)
     );
-}
+  }
 
   filtrarRecursos(value: string): any[] {
     const filterValue = value ? value.toLowerCase() : '';
@@ -347,15 +346,26 @@ export class ListarSolicitudAutorizacionGastoComponent {
     console.log('Partida seleccionada:', selectedRecurso);
   }
 
-  editar(row){
+  editar(row) {
     console.log(row)
     this._router.navigate(['autorizacion-gastos/editar-autorizacion-gasto/', this.id, row.idAutorizacionGasto]);
   }
 
-  eliminarAutorizacion(row){}
+  eliminarAutorizacion(row) { }
 
-  aprobarSupervisor(row){}
+  aprobarSupervisor(row) { }
 
-  descargarAutorizacion(row){}
+  descargarAutorizacion(row) { }
+
+  async verProyecto() {
+    const data = { idProyecto: this.id }
+    const roresp = await lastValueFrom(this.maestraService.verProyecto(data))
+    console.log(roresp)
+
+    if (roresp) {
+      this.titulo = "PROYECTO TAMBO:" + roresp.data[0].tambo
+      console.log(this.titulo)
+    }
+  }
 }
 

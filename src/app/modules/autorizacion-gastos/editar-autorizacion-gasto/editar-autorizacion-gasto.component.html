@@ -51,20 +51,20 @@
 
 
             </div>
-            
-                <!-- Actions -->
-                <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
-                    <button mat-flat-button style="background-color: #28a745; color: white;"
-                        (click)="setRegistrarAutorizacionGasto()" [disabled]="!filterForm.valid">
-                        <mat-icon class="icon-size-5">add</mat-icon>
-                        <span class="ml-2">REGISTRAR</span>
-                    </button>
-                    <button mat-flat-button color="warn" (click)="limpiar()">
-                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:trash'"></mat-icon>
-                        <span class="ml-2">CANCELAR</span>
-                    </button>
 
-                </div>
+            <!-- Actions -->
+            <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
+                <button mat-flat-button style="background-color: #28a745; color: white;"
+                    (click)="setRegistrarAutorizacionGasto()" [disabled]="!filterForm.valid">
+                    <mat-icon class="icon-size-5">add</mat-icon>
+                    <span class="ml-2">REGISTRAR</span>
+                </button>
+                <button mat-flat-button color="warn" (click)="limpiar()">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+                    <span class="ml-2">CANCELAR</span>
+                </button>
+
+            </div>
         </div>
 
     </form>
@@ -85,8 +85,12 @@
         <mat-table [dataSource]="dataSource" matSort class="w-full">
             <!-- item Column -->
             <ng-container matColumnDef="item">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> ITEM </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.item }} </mat-cell>
+                <mat-header-cell *matHeaderCellDef mat-sort-header>
+                    ITEM
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    {{ row.item }}
+                </mat-cell>
             </ng-container>
             <!-- Distrito Column -->
             <ng-container matColumnDef="partida">
@@ -129,6 +133,15 @@
             <ng-container matColumnDef="acciones">
                 <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
                 <mat-cell *matCellDef="let row">
+                    <!-- Botón Editar -->
+                    <button mat-icon-button color="primary" (click)="editar(row)" matTooltip="Editar Proyecto">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+
+                    <!-- Botón Eliminar -->
+                    <button mat-icon-button color="warn" (click)="eliminar(row)" matTooltip="Eliminar Proyecto">
+                        <mat-icon>delete</mat-icon>
+                    </button>
 
 
                 </mat-cell>
@@ -136,14 +149,29 @@
 
             <!-- Encabezado de la tabla -->
             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+
             <!-- Filas de datos -->
             <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+            <!-- Fila de total -->
+            <mat-footer-row *matFooterRowDef="footerColumns"></mat-footer-row>
+
+
+            <ng-container matColumnDef="totalLabel">
+                <mat-footer-cell *matFooterCellDef colspan="5" align="right">
+                    <strong>TOTAL</strong>
+                </mat-footer-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="totalValue">
+                <mat-footer-cell style="font-weight: 600;" *matFooterCellDef align="lefth">
+                    S/{{ getTotalCost()}}
+                </mat-footer-cell>
+            </ng-container>
+
+
         </mat-table>
 
-<!--
-        <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
-            (page)="onPaginateChange($event)" showFirstLastButtons>
-        </mat-paginator>-->
     </div>
 
 </div>

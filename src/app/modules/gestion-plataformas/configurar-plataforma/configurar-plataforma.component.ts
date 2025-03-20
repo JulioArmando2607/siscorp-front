@@ -53,7 +53,8 @@ export class ConfigurarPlataformaComponent {
 
   selectedPartidasFile: File | null = null;
   selectedPreciosFile: File | null = null;
-
+  residenteNombre: string = ''
+  SupervisorNombre: string = ''
   constructor(
     private fb: FormBuilder,
     private maestraService: MaestrasService,
@@ -63,7 +64,8 @@ export class ConfigurarPlataformaComponent {
     @Inject(MAT_DIALOG_DATA) private data: any
   ) {
     this.FormRegistro = this.fb.group({
-
+      dniSupervisor: "",
+      dniResidente: ""
     });
   }
 
@@ -75,6 +77,77 @@ export class ConfigurarPlataformaComponent {
     if (this.isEdit) {
       //this.cargarDatos(this.data.proyecto);
     }
+  }
+
+  async validarDniResidente() {
+    this.residenteNombre = "";
+    const dniSupervisor = this.FormRegistro.get("dniSupervisor")?.value;
+    const dniResidente = this.FormRegistro.get("dniResidente")?.value;
+
+    if (!dniResidente || dniSupervisor === dniResidente) {
+      this.mostrarError("El DNI no puede ser el mismo que el del supervisor ni estar vacío");
+      return;
+    }
+
+    try {
+      const oRespL = await lastValueFrom(this.maestraService.getConsultaUsuarioDni(dniResidente));
+
+      if (!oRespL?.data || oRespL.data.length === 0) {
+        this.mostrarError("El DNI no está registrado en nuestras bases de datos.");
+        return;
+      }
+
+      this.residenteNombre = `Residente: ${oRespL.data[0]?.empleado || "No disponible"}`;
+    } catch (error) {
+      console.error("Error en la consulta del DNI:", error);
+      this.mostrarError("Ocurrió un error al validar el DNI del residente. Intente nuevamente.");
+    }
+  }
+
+
+  eliminarResidente() {
+
+    this.residenteNombre = "";
+  }
+
+  eliminarSupervisor() {
+
+    this.SupervisorNombre = "";
+  }
+
+  async validarDniSupervisor() {
+    this.SupervisorNombre = "";
+    const dniResidente = this.FormRegistro.get("dniResidente")?.value;
+    const dniSupervisor = this.FormRegistro.get("dniSupervisor")?.value;
+
+    if (!dniSupervisor || dniResidente === dniSupervisor) {
+      this.mostrarError(
+        "El DNI no puede ser el mismo que el del residente ni estar vacío"
+      );
+      return;
+    }
+
+    try {
+      const oRespL = await lastValueFrom(this.maestraService.getConsultaUsuarioDni(dniSupervisor));
+
+      if (!oRespL?.data || oRespL.data.length === 0) {
+        this.mostrarError(
+          "El DNI no está registrado en nuestras bases de datos. Favor de enviar un correo al administrador"
+        );
+        return;
+      }
+
+      this.SupervisorNombre = `Supervisor: ${oRespL.data[0]?.empleado || "No disponible"}`;
+    } catch (error) {
+      console.error("Error en la consulta del DNI:", error);
+      this.mostrarError("Ocurrió un error al validar el DNI del supervisor. Intente nuevamente.");
+    }
+  }
+
+  private mostrarError(mensaje: string) {
+    this.dataModal(300, 'Error!', mensaje);
+    this.FormRegistro.get("dniSupervisor")?.setValue("");
+    this.SupervisorNombre = "";
   }
 
   onFileSelected(event: Event, tipo: string): void {
@@ -188,18 +261,6 @@ export class ConfigurarPlataformaComponent {
         color: codigo === 200 ? 'primary' : 'warn',
       }),
       actions: this._formBuilder.group(actions),
-
-      /*       actions: this._formBuilder.group({
-          confirm: this._formBuilder.group({
-              show: false,
-              label: 'Remove',
-              color: 'warn',
-          }),
-          cancel: this._formBuilder.group({
-              show: true,
-              label: 'Cancel',
-          }),
-      }), */
       dismissible: true,
     });
     this.openConfirmationDialog(codigo);
@@ -218,4 +279,8 @@ export class ConfigurarPlataformaComponent {
 
   save() { this.uploadFile() }
   cancelar() { this.matDialogRef.close() }
+
+
+
+
 }

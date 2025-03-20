@@ -1,74 +1,87 @@
 <div class="prose prose-sm max-w-4xl overflow-y-auto max-h-screen">
-
     <!-- Header sin franja morada, con botón a la izquierda y título centrado -->
     <div class="flex h-16 flex-0 items-center justify-between border-b px-4">
-  
-      <!-- Botón de cerrar a la izquierda -->
-      <button mat-icon-button (click)="matDialogRef.close()" [tabIndex]="-1">
-        <mat-icon class="text-gray-500" [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
-      </button>
-  
-      <!-- Título centrado -->
-      <div class="flex-1 text-center text-lg font-medium">{{title}}</div>
-  
-      <!-- Espacio vacío para mantener el título centrado -->
-      <div class="w-10"></div>
+        <!-- Botón de cerrar a la izquierda -->
+        <button mat-icon-button (click)="matDialogRef.close()">
+            <mat-icon class="text-gray-500" [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+        </button>
+        <!-- Título centrado -->
+        <div class="flex-1 text-center text-lg font-medium text-gray-700">{{title}}</div>
+        <!-- Espacio vacío para mantener el título centrado -->
+        <div class="w-10"></div>
     </div>
-  
+
     <form class="flex w-full flex-col" [formGroup]="FormRegistro" (ngSubmit)="save()">
-  
-      <!-- Sección para adjuntar archivos -->
-      <div class="flex flex-col gap-4 px-8 pb-4">
-  
-        <!-- Cargar Partidas -->
-        <div class="flex items-center gap-4">
-          <button mat-icon-button (click)="filePartidasInput.click()" type="button">
-            <mat-icon [svgIcon]="'heroicons_outline:paper-clip'"></mat-icon>
-          </button>
-          <p>Agregar Partidas</p>
-  
-          <!-- Input de archivo oculto para partidas -->
-          <input #filePartidasInput type="file" (change)="onFileSelected($event, 'partidas')" hidden />
-  
-          <!-- Mostrar nombre del archivo si se selecciona -->
-          <div *ngIf="selectedPartidasFile" class="flex items-center gap-2">
-            <span>{{ selectedPartidasFile.name }}</span>
-            <button mat-icon-button (click)="removeFile('partidas')">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
+        <!-- Sección para adjuntar archivos -->
+        <div class="flex flex-col gap-4 px-8 pb-4">
+            <!-- Validar DNI Residente -->
+            <div class="grid grid-cols-3 items-center gap-4">
+                <p class="font-medium text-gray-700">Ingresar DNI Residente</p>
+                <mat-form-field appearance="fill" class="w-full">
+                    <mat-label>DNI</mat-label>
+                    <input matInput type="text" formControlName="dniResidente" maxlength="8" pattern="[0-9]{8}" required>
+                </mat-form-field>
+                <button mat-flat-button color="primary" (click)="validarDniResidente()">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:funnel'"></mat-icon>
+                    <span class="ml-2">Validar Residente </span>
+ 
+                </button>
+
+            </div>
+
+            <div *ngIf="residenteNombre !== ''" class="row relative">
+                <span class="ml-2"><strong>{{ residenteNombre }}</strong></span>
+                <span 
+                    *ngIf="residenteNombre !== ''" 
+                    class="ml-2 text-red-500 cursor-pointer relative group" 
+                    (click)="eliminarResidente()"
+                >
+                    ✖
+                    <span class="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1">
+                        ¿Desea eliminar el Residente?
+                    </span>
+                </span>
+            </div>
+            
+            
+            
+            <!-- Validar DNI Supervisor -->
+            <div class="grid grid-cols-3 items-center gap-4">
+                <p class="font-medium text-gray-700">Ingresar DNI Supervisor</p>
+                <mat-form-field appearance="fill" class="w-full">
+                    <mat-label>DNI</mat-label>
+                    <input matInput type="text" formControlName="dniSupervisor" maxlength="8" pattern="[0-9]{8}" required>
+                </mat-form-field>
+                <button mat-flat-button color="primary" (click)="validarDniSupervisor()">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:funnel'"></mat-icon>
+                    <span class="ml-2">Validar Supervisor</span>
+                </button>
+            </div>
+
+            <div *ngIf="SupervisorNombre !== ''"  class="row relative">
+                <span class="ml-2"><strong>{{ SupervisorNombre }}</strong></span>
+                <span *ngIf="SupervisorNombre !== ''" class="ml-2 text-red-500 cursor-pointer relative group"
+                (click)="eliminarSupervisor()">
+                    ✖
+                    <span class="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1">
+                        ¿Desea eliminar el Supervisor?
+                    </span>
+                </span>
+            </div>
+            
+ 
         </div>
-  
-        <!-- Cargar Precios Unitarios -->
-        <div class="flex items-center gap-4">
-          <button mat-icon-button (click)="filePreciosInput.click()" type="button">
-            <mat-icon [svgIcon]="'heroicons_outline:paper-clip'"></mat-icon>
-          </button>
-          <p>Agregar Precios Unitarios</p>
-  
-          <!-- Input de archivo oculto para precios unitarios -->
-          <input #filePreciosInput type="file" (change)="onFileSelected($event, 'precios')" hidden />
-  
-          <!-- Mostrar nombre del archivo si se selecciona -->
-          <div *ngIf="selectedPreciosFile" class="flex items-center gap-2">
-            <span>{{ selectedPreciosFile.name }}</span>
-            <button mat-icon-button (click)="removeFile('precios')">
-              <mat-icon>close</mat-icon>
+
+        <!-- Botón de enviar -->
+        <div class="flex w-full items-center justify-end px-8 py-4">
+            <button mat-flat-button color="warn" type="button" (click)="cancelar()">
+                Cancelar
             </button>
-          </div>
+            &nbsp;
+            <button mat-flat-button color="primary" type="submit"
+                [disabled]="!FormRegistro.valid || !residenteNombre || !SupervisorNombre">
+                Guardar
+            </button>
         </div>
-      </div>
-  
-      <!-- Botón de enviar -->
-      <div class="flex w-full items-center justify-end px-8 py-4">
-        <button mat-flat-button color="warn" type="button" (click)="cancelar()">
-          Cancelar
-        </button>
-        <button mat-flat-button color="primary" type="submit"
-          [disabled]="!selectedPartidasFile || !selectedPreciosFile">
-          Guardar
-        </button>
-      </div>
-  
     </form>
-  </div>
+</div>

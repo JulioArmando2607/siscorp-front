@@ -25,6 +25,7 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { ExcelService } from '../maestras/excel.service';
 import { RegistroPartidasComponent } from './registro-partidas/registro-partidas.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ConfigurarPlataformaComponent } from './configurar-plataforma/configurar-plataforma.component';
 
 @Component({
   selector: 'gestion-plataformas',
@@ -355,6 +356,27 @@ export class GestionPlataformasComponent implements OnInit {
 
     console.log(roresp)
     this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");
+  }
+
+  configurarUsuarios(row){
+    console.log('Ver detalles de:', row);
+    const dialogRef = this._matDialog.open(ConfigurarPlataformaComponent, {
+      autoFocus: false,
+      data: {
+        proyecto: cloneDeep(row),
+        title: "CONFIGURAR RESIDENTE Y SUPERVISOR",
+        type: 'create'
+      },
+
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log("Diálogo cerrado con resultado:", result);
+
+      if (result === 'success') {
+        this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
+      }
+    });
+
   }
 
 }
