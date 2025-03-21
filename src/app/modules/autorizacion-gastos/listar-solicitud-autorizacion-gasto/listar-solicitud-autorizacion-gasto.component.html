@@ -16,24 +16,25 @@
                 <!-- PARTIDA -->
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>CODIGO</mat-label>
-                    <input type="text" matInput formControlName="partidaControl" [matAutocomplete]="autoPartida">
-                    <mat-autocomplete #autoPartida="matAutocomplete" (optionSelected)="onPartidaSelected($event)">
+                    <input type="text" matInput formControlName="partidaControl" >
+                 <!--[matAutocomplete]="autoPartida"   <mat-autocomplete #autoPartida="matAutocomplete" (optionSelected)="onPartidaSelected($event)">
                         <mat-option *ngFor="let item of partidasFiltradas | async" [value]="item.idPartida">
                             {{ item.descripcionPartida }}
                         </mat-option>
-                    </mat-autocomplete>
+                    </mat-autocomplete>-->
                 </mat-form-field>
 
 
                 <!-- RECURSO--->
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>FECHA</mat-label>
-                    <input type="text" matInput formControlName="recursoControl" [matAutocomplete]="autoRecurso">
+                    <input type="date" matInput formControlName="partidaControl" >
+                   <!--- <input type="text" matInput formControlName="recursoControl" [matAutocomplete]="autoRecurso">
                     <mat-autocomplete #autoRecurso="matAutocomplete" (optionSelected)="onRecursoSelected($event)">
                         <mat-option *ngFor="let item of recursosFiltradas | async" [value]="item.idRecurso">
                             {{ item.nombreRecurso }}
                         </mat-option>
-                    </mat-autocomplete>
+                    </mat-autocomplete>-->
                 </mat-form-field>
 
 

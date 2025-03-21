@@ -143,7 +143,7 @@ export class EditarAutorizacionGastoComponent {
     ).subscribe(filtered => this.recursosFiltradas = new BehaviorSubject(filtered));
   }
   async eliminarProyecto(proyecto: any) {
-    const confirmado = await this.dataModal(522, 'Eliminar proyecto', 'Deseas eliminar este proyecto?');
+    const confirmado = await this.dataModal(522, 'Eliminar proyecto', 'Deseas eliminar este proyecto?',"warning" );
 
     if (confirmado) {
       console.log('Eliminando proyecto:', proyecto);
@@ -156,42 +156,7 @@ export class EditarAutorizacionGastoComponent {
       console.log('Eliminación cancelada.');
     }
   }
-
-  dataModal(codigo, title, message): Promise<boolean> {
-    return new Promise((resolve) => {
-      const actions = {
-        cancel: this._formBuilder.group({
-          show: true,
-          label: 'Cancelar',
-        }),
-        confirm: this._formBuilder.group({
-          show: true,
-          label: 'Eliminar',
-          color: 'warn',
-        }),
-      };
-
-      this.configForm = this._formBuilder.group({
-        title: title,
-        message: message,
-        icon: this._formBuilder.group({
-          show: true,
-          name: codigo === 200 ? 'heroicons_outline:check-circle' : 'heroicons_outline:exclamation-triangle',
-          color: codigo === 200 ? 'primary' : 'warn',
-        }),
-        actions: this._formBuilder.group(actions),
-        dismissible: true,
-      });
-
-      // Abrir el diálogo y esperar la respuesta del usuario
-      const dialogRef = this._fuseConfirmationService.open(this.configForm.value);
-
-      dialogRef.afterClosed().subscribe((result) => {
-        resolve(result === 'confirmed'); // Si el usuario confirma, retorna true; si cancela, retorna false
-      });
-    });
-  }
-
+ 
   descargarProyectos() { }
 
   async getDepartamentos() {
@@ -472,7 +437,7 @@ export class EditarAutorizacionGastoComponent {
   }
 
   async eliminar(row) {
-    const confirmado = await this.dataModal(522, 'Eliminar recurso', 'Deseas eliminar este recurso?');
+    const confirmado = await this.dataModal(522, 'Eliminar recurso', 'Deseas eliminar este recurso?',"warning");
     if (confirmado) {
       const data = {
         idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso
@@ -491,6 +456,97 @@ export class EditarAutorizacionGastoComponent {
 
   salir(){
     this.location.back(); // Vuelve a la página anterior
+  }
+  async solicitarAutorizacion(){
+    const confirmado = await this.dataModal(600, 'Solicitar Autorización de Gasto', '¿Deseas solicitar la autorización de gasto?', 'approve');
+    if (confirmado) {
+      const data = {
+        idAutorizacionGasto:this.idAutorizacionGasto
+      }    
+      const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();     
+      if (response) {
+        this.salir()
+       // this.get()
+      }
+    } 
+   }
+
+   dataModal(codigo: number, title: string, message: string, type: 'success' | 'warning' | 'error' | 'approve' | 'reject'): Promise<boolean> {
+    return new Promise((resolve) => {
+      let confirmLabel = 'Aceptar';
+      let confirmColor = 'primary';
+      let iconName = 'heroicons_outline:check-circle';
+      let iconColor = 'primary';
+  
+      // Definir el comportamiento según el tipo de modal
+      switch (type) {
+        case 'success':
+          confirmLabel = 'Aceptar';
+          confirmColor = 'primary';
+          iconName = 'heroicons_outline:check-circle';
+          iconColor = 'primary';
+          break;
+  
+        case 'warning':
+          confirmLabel = 'Entendido';
+          confirmColor = 'warn';
+          iconName = 'heroicons_outline:exclamation-triangle';
+          iconColor = 'warn';
+          break;
+  
+        case 'error':
+          confirmLabel = 'Eliminar';
+          confirmColor = 'warn';
+          iconName = 'heroicons_outline:x-circle';
+          iconColor = 'warn';
+          break;
+  
+        case 'approve':
+          confirmLabel = 'Aprobar';
+          confirmColor = 'primary';
+          iconName = 'heroicons_outline:check';
+          iconColor = 'success';
+          break;
+  
+        case 'reject':
+          confirmLabel = 'Desaprobar';
+          confirmColor = 'warn';
+          iconName = 'heroicons_outline:x-circle';
+          iconColor = 'warn';
+          break;
+      }
+  
+      const actions = {
+        cancel: this._formBuilder.group({
+          show: true,
+          label: 'Cancelar',
+        }),
+        confirm: this._formBuilder.group({
+          show: true,
+          label: confirmLabel,
+          color: confirmColor,
+        }),
+      };
+  
+      this.configForm = this._formBuilder.group({
+        title: title,
+        message: message,
+        icon: this._formBuilder.group({
+          show: true,
+          name: iconName,
+          color: iconColor,
+        }),
+        actions: this._formBuilder.group(actions),
+        dismissible: true,
+      });
+  
+      // Abrir el diálogo y esperar la respuesta del usuario
+      const dialogRef = this._fuseConfirmationService.open(this.configForm.value);
+  
+      dialogRef.afterClosed().subscribe((result) => {
+        resolve(result === 'confirmed'); // Retorna true si el usuario confirma
+      });
+    });
   }
 }
 
