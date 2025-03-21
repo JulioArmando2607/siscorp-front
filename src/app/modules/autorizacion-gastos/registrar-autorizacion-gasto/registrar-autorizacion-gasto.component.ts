@@ -114,7 +114,7 @@ export class RegistrarAutorizacionGastoComponent {
 
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
     this.titulo = "PROYECTO TAMBO: NAYAP"
-
+    this.verProyecto(this.id)
     this.getPartidas(this.id);
 
     // 🔥 Monitorear el input de partidas y actualizar el filtrado en tiempo real
@@ -141,6 +141,18 @@ export class RegistrarAutorizacionGastoComponent {
       })
     ).subscribe(filtered => this.recursosFiltradas = new BehaviorSubject(filtered));
   }
+
+  async verProyecto(id) {
+    const data = { idProyecto:id }
+    const roresp = await lastValueFrom(this.maestraService.verProyecto(data))
+    console.log(roresp)
+
+    if (roresp) {
+      this.titulo = "PROYECTO TAMBO: " + roresp.data[0].tambo
+      console.log(this.titulo)
+    }
+  }
+
   async eliminarProyecto(proyecto: any) {
     const confirmado = await this.dataModal(522, 'Eliminar proyecto', 'Deseas eliminar este proyecto?',"warning");
 

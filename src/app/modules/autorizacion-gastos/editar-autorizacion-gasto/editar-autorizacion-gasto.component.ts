@@ -111,6 +111,7 @@ export class EditarAutorizacionGastoComponent {
     this.dataSource.sort = this.sort;
 
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
+    this.verProyecto(this.id)
     this.idAutorizacionGasto = this.route.snapshot.paramMap.get('ag'); // Obtiene el ID de la URL
     this.getFiltraRecursosAturorizacionGasto(true)
 
@@ -548,5 +549,17 @@ export class EditarAutorizacionGastoComponent {
       });
     });
   }
+  
+  async verProyecto(id) {
+    const data = { idProyecto:id }
+    const roresp = await lastValueFrom(this.maestraService.verProyecto(data))
+    console.log(roresp)
+
+    if (roresp) {
+      this.titulo = "PROYECTO TAMBO: " + roresp.data[0].tambo
+      console.log(this.titulo)
+    }
+  }
+
 }
 

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -90,8 +90,8 @@ export class ListarSolicitudAutorizacionGastoComponent {
     private _formBuilder: UntypedFormBuilder,
     private excelService: ExcelService,
     private route: ActivatedRoute,
-    private _router: Router
-
+    private _router: Router,
+    private location: Location
     //private _notesService: NotesService
   ) {
 
@@ -110,7 +110,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
     });
 
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
-    this.verProyecto()
+    this.verProyecto(this.id)
     this.getPartidas(this.id);
 
     this.dataSource.paginator = this.paginator;
@@ -398,10 +398,64 @@ export class ListarSolicitudAutorizacionGastoComponent {
 
   aprobarSupervisor(row) { }
 
-  descargarAutorizacion(row) { }
+ /* 
+  async getFiltraRecursosAturorizacionGasto(resetPage: boolean = false) {
+    try {
 
-  async verProyecto() {
-    const data = { idProyecto: this.id }
+      const data = {
+        idAutorizacionGasto: this.idAutorizacionGasto,
+        idProyecto: this.id
+      }
+      const oRespL = await lastValueFrom(
+        this.maestraService.getlistarRecursosAturorizacionGasto(
+          data
+        )
+      );
+
+      console.log(oRespL)
+      if (oRespL?.data) {
+        this.proyectos = oRespL.data;
+        this.totalElements = oRespL.data.length;
+
+        this.dataSource = new MatTableDataSource(this.proyectos);
+        this.dataSource.sort = this.sort; // 🔥 Habilitar ordenación
+        this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
+
+        this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
+      }
+    } catch (error) {
+      console.error('Error al obtener proyectos:', error);
+    }
+  } */
+  async descargarAutorizacion(row) { 
+    try {
+
+      const data = {
+        idAutorizacionGasto: row.idAutorizacionGasto,
+        idProyecto: this.id
+      }
+      const oRespL = await lastValueFrom(
+        this.maestraService.getlistarRecursosAturorizacionGasto(
+          data
+        )
+      );
+
+      console.log(oRespL)
+      if (oRespL?.data) {
+        this.proyectos = oRespL.data;
+        this.excelService.exportToExcelAutorizaciondeGasto(oRespL.data, "AUTORIZACION DE GASTO - "+this.titulo);
+
+        this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
+
+        this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
+      }
+    } catch (error) {
+      console.error('Error al obtener proyectos:', error);
+    }
+   }
+
+  async verProyecto(id) {
+    const data = { idProyecto: id }
     const roresp = await lastValueFrom(this.maestraService.verProyecto(data))
     console.log(roresp)
 
@@ -447,6 +501,9 @@ export class ListarSolicitudAutorizacionGastoComponent {
       }
     } 
    }
+   salir(){
+    this.location.back(); // Vuelve a la página anterior
+  }
 
 }
 
