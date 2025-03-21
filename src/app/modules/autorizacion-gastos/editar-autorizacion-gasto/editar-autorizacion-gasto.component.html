@@ -1,10 +1,17 @@
 <div class="flex min-w-0 flex-auto flex-col bg-card p-10">
-    <!-- Contenedor principal -->
-
-    <!-- Título -->
-    <div class="text-center text-2xl font-bold mb-4">
-
-        {{titulo}}
+ 
+    <!-- Contenedor de título y botón alineados -->
+    <div class="flex justify-center relative items-center mb-4">
+        <!-- Título centrado -->
+        <div class="text-2xl font-bold text-center flex-1">
+            {{titulo}}
+        </div>
+        <!-- Botón de salida alineado a la derecha -->
+        <div class="absolute right-0">
+            <button mat-flat-button style="background-color: red; color: white;" (click)="salir()">
+                <mat-icon>exit_to_app</mat-icon> Salir
+            </button>
+        </div>
     </div>
     <!---BANDEJA PROYECTOS DEL TAMBO REGISTRADOS - AUTORIZACION DE GASTOS-->
     <form [formGroup]="filterForm">
@@ -72,11 +79,9 @@
     <!-- Tabla de proyectos registrados -->
     <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
         <!-- Contenedor de botones flotantes -->
-        <div class="botones-flotantes">
-
-            <!-- Botón -->
+        <div class="botones-flotantes"> 
             <!-- Botón mejorado -->
-            <button mat-flat-button style="background-color: #0056b3; color: white;" (click)="descargarExcelProyecto()">
+            <button [disabled]="getTotalCost() <= 0" mat-flat-button style="background-color: #0056b3; color: white;" (click)="descargarExcelProyecto()">
                 <mat-icon>send</mat-icon>
                 <span class="ml-2">SOLICITAR AUTORIZACIÓN DE GASTO</span>
             </button>

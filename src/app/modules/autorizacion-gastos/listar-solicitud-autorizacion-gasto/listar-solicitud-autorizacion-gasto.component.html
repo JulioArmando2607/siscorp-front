@@ -15,7 +15,7 @@
                 <!-- PARTIDA -->
                 <!-- PARTIDA -->
                 <mat-form-field appearance="fill" class="w-full">
-                    <mat-label>PARTIDA</mat-label>
+                    <mat-label>CODIGO</mat-label>
                     <input type="text" matInput formControlName="partidaControl" [matAutocomplete]="autoPartida">
                     <mat-autocomplete #autoPartida="matAutocomplete" (optionSelected)="onPartidaSelected($event)">
                         <mat-option *ngFor="let item of partidasFiltradas | async" [value]="item.idPartida">
@@ -27,7 +27,7 @@
 
                 <!-- RECURSO--->
                 <mat-form-field appearance="fill" class="w-full">
-                    <mat-label>RECURSO</mat-label>
+                    <mat-label>FECHA</mat-label>
                     <input type="text" matInput formControlName="recursoControl" [matAutocomplete]="autoRecurso">
                     <mat-autocomplete #autoRecurso="matAutocomplete" (optionSelected)="onRecursoSelected($event)">
                         <mat-option *ngFor="let item of recursosFiltradas | async" [value]="item.idRecurso">
@@ -39,15 +39,10 @@
 
                 <!-- TAMBO -->
                 <mat-form-field appearance="fill" class="w-full">
-                    <mat-label>CANTIDAD</mat-label>
+                    <mat-label>ESTADO</mat-label>
                     <input matInput type="text" formControlName="cantidad">
                 </mat-form-field>
-
-                <!-- TAMBO -->
-                <mat-form-field appearance="fill" class="w-full">
-                    <mat-label>PRECIO</mat-label>
-                    <input matInput type="text" formControlName="precio">
-                </mat-form-field>
+ 
 
                 <!-- Actions -->
                 <!-- Actions -->
@@ -85,10 +80,10 @@
         <mat-table [dataSource]="dataSource" matSort class="w-full">
             <!-- item Column -->
             <ng-container matColumnDef="item">
-                <mat-header-cell *matHeaderCellDef mat-sort-header style="width: 50px; min-width: 50px; max-width: 60px; text-align: center;"> 
+                <mat-header-cell *matHeaderCellDef mat-sort-header> 
                   ITEM 
                 </mat-header-cell>
-                <mat-cell *matCellDef="let row" style="width: 50px; min-width: 50px; max-width: 60px; text-align: center;"> 
+                <mat-cell *matCellDef="let row"> 
                   {{ row.item }} 
                 </mat-cell>
               </ng-container>
@@ -116,6 +111,12 @@
                 <mat-header-cell *matHeaderCellDef mat-sort-header> ESTADO </mat-header-cell>
                 <mat-cell *matCellDef="let row"> {{ row.nombreEstado }} </mat-cell>
             </ng-container>
+            
+             <!-- Estado Column -->
+             <ng-container matColumnDef="total">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> TOTAL </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.total }} </mat-cell>
+            </ng-container>
 
             <!-- Botón de acciones -->
             <ng-container matColumnDef="acciones">
@@ -132,7 +133,7 @@
                     </button>
 
                     <!-- Botón Solicitar -->
-                    <button mat-icon-button color="accent" (click)="solicitarAutorizacion(row)" matTooltip="Solicitar"
+                    <button mat-icon-button color="accent" (click)="solicitarAutorizacion(row)" matTooltip="Solicitar Autorizacion de Gasto"
                         matTooltipPosition="above">
                         <mat-icon>send</mat-icon>
                     </button>

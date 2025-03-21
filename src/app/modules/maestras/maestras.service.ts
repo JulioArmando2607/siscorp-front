@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 })
 export class MaestrasService {
 
+
   constructor(public http: HttpClient) { }
 
   getUrlMaestras() {
@@ -107,8 +108,22 @@ export class MaestrasService {
   getConsultaUsuarioDni(dni): Observable<any> {
     return this.http.get(`${this.getUrlMaestras()}consulta-usuario-dni/${dni}`, { headers: Headers() });
   }
- 
+
+  registrarResidenteSupervisor(data): Observable<any> {
+    return this.http.post(`${this.getUrlPlataforma()}registrar-residente-supervisor`,data, { headers: Headers() });
+  }
+
+  setEliminarAutorizacionGasto(data): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}eliminar-autorizacion-gasto`,data, { headers: Headers() });
+  }
   
+  listarUsuarioProyecto(idProyecto): Observable<any> {
+    return this.http.get(`${this.getUrlPlataforma()}listar-usuario-proyecto/${idProyecto}`, { headers: Headers() });
+  }
+
+  solicitarAutorizacionGastoResidente(data): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}solicitar-autorizacion-gasto-residente`,data, { headers: Headers() });
+  }
 }
 
 export function Headers(isJson = true): HttpHeaders {

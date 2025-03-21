@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -46,6 +46,7 @@ export class EditarAutorizacionGastoComponent {
   idAutorizacionGasto: any = 0;
   isEditar: boolean;
   idAutorizacionGastoRecurso: any;
+  idHistorialPrecio: any;
   async descargarExcelProyecto() {
     const roresp = await lastValueFrom(this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(),
     ))
@@ -89,7 +90,8 @@ export class EditarAutorizacionGastoComponent {
     private fb: FormBuilder,
     private _formBuilder: UntypedFormBuilder,
     private excelService: ExcelService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private location: Location
     //private _notesService: NotesService
   ) {
 
@@ -380,16 +382,18 @@ export class EditarAutorizacionGastoComponent {
   }
   async setRegistrarAutorizacionGasto() {
 
-    if (this.isEditar) {   
+    if (this.isEditar) {
 
       console.log(this.id)
       console.log(this.idPartidaSeleccionada)
       console.log(this.idRecursoSeleccionado)
+      console.log(this.idAutorizacionGastoRecurso)
       console.log(this.filterForm.get("cantidad").value)
       console.log(this.filterForm.get("precio").value)
-    
+
       const data = {
-        idAutorizacionGastoRecurso:this.idAutorizacionGastoRecurso,
+        idHistorialPrecio:this.idHistorialPrecio,
+        idAutorizacionGastoRecurso: this.idAutorizacionGastoRecurso,
         idProyecto: this.id,
         idAutorizacionGasto: this.idAutorizacionGasto,
         idPartida: this.idPartidaSeleccionada,
@@ -398,32 +402,32 @@ export class EditarAutorizacionGastoComponent {
         precio: this.filterForm.get("precio").value,
         precioCantidad: this.filterForm.get("cantidad").value * this.filterForm.get("precio").value
       }
-  
+
       const response = await this.maestraService.setRegistrarAutorizacionGasto(data).toPromise();
-      this.idAutorizacionGasto = response.data.response
+     // this.idAutorizacionGasto = response.data.response
       console.log(response.data.response);
       //this.partidas = response.data || [];
       if (response) {
         this.getFiltraRecursosAturorizacionGasto()
       }
-  
+
       this.idPartidaSeleccionada = 0
       this.idRecursoSeleccionado = 0
       this.filterForm.reset();
-    }else{
+    } else {
       if (this.validarRecursoSeleccionado()) {
         alert('Este recurso ya ha sido seleccionado en el proyecto.');
         return; // Sale de la función y evita el registro duplicado
       }
 
-      
+
       console.log(this.id)
       console.log(this.idPartidaSeleccionada)
       console.log(this.idRecursoSeleccionado)
       console.log(this.filterForm.get("cantidad").value)
       console.log(this.filterForm.get("precio").value)
-  
-  
+
+
       const data = {
         idProyecto: this.id,
         idAutorizacionGasto: this.idAutorizacionGasto,
@@ -433,11 +437,15 @@ export class EditarAutorizacionGastoComponent {
         precio: this.filterForm.get("precio").value,
         precioCantidad: this.filterForm.get("cantidad").value * this.filterForm.get("precio").value
       }
-  
-      const response = await this.maestraService.setRegistrarAutorizacionGasto(data).toPromise();
-      this.idAutorizacionGasto = response.data.response
-      console.log(response.data.response);
 
+      const response = await this.maestraService.setRegistrarAutorizacionGasto(data).toPromise();
+      //this.idAutorizacionGasto = response.data.response
+      console.log(response.data.response);
+      if (response) {
+        this.getFiltraRecursosAturorizacionGasto()
+        this.filterForm.reset();
+
+      }
 
     }
 
@@ -452,12 +460,15 @@ export class EditarAutorizacionGastoComponent {
     this.isEditar = true
     this.idPartidaSeleccionada = row.idPartida
     this.idRecursoSeleccionado = row.idRecurso
+    this.idHistorialPrecio = row.idHistorialPrecio
+    this.idAutorizacionGasto = row.idAutorizacionGasto,
+
     this.filterForm.get("cantidad").setValue(row.cantidad)
-    this.filterForm.get("precio").setValue(row.precio) 
+    this.filterForm.get("precio").setValue(row.precio)
     this.filterForm.get("partidaControl").setValue(row.descripcionPartida)
-    this.onPartidaSelected({option:{value:this.idPartidaSeleccionada}})
+    this.onPartidaSelected({ option: { value: this.idPartidaSeleccionada } })
     this.filterForm.get("recursoControl").setValue(row.nombreRecurso)
-    this.onRecursoSelected({option:{value:this.idRecursoSeleccionado}}) 
+    this.onRecursoSelected({ option: { value: this.idRecursoSeleccionado } })
   }
 
   async eliminar(row) {
@@ -466,16 +477,20 @@ export class EditarAutorizacionGastoComponent {
       const data = {
         idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso
       }
-  
+
       const response = await this.maestraService.setEliminarAutorizacionGastoRecurso(data).toPromise();
-       console.log(response);
+      console.log(response);
       //this.partidas = response.data || [];
       if (response) {
         this.getFiltraRecursosAturorizacionGasto()
       }
     }
-  
+
     console.log(row)
+  }
+
+  salir(){
+    this.location.back(); // Vuelve a la página anterior
   }
 }
 

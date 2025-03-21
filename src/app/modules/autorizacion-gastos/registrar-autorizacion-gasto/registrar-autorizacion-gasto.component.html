@@ -1,10 +1,17 @@
 <div class="flex min-w-0 flex-auto flex-col bg-card p-10">
-    <!-- Contenedor principal -->
-
-    <!-- Título -->
-    <div class="text-center text-2xl font-bold mb-4">
-
-        {{titulo}}
+ 
+    <!-- Contenedor de título y botón alineados -->
+    <div class="flex justify-center relative items-center mb-4">
+        <!-- Título centrado -->
+        <div class="text-2xl font-bold text-center flex-1">
+            {{titulo}}
+        </div>
+        <!-- Botón de salida alineado a la derecha -->
+        <div class="absolute right-0">
+            <button mat-flat-button style="background-color: red; color: white;" (click)="salir()">
+                <mat-icon>exit_to_app</mat-icon> Salir
+            </button>
+        </div>
     </div>
     <!---BANDEJA PROYECTOS DEL TAMBO REGISTRADOS - AUTORIZACION DE GASTOS-->
     <form [formGroup]="filterForm">
@@ -51,20 +58,20 @@
 
 
             </div>
-            
-                <!-- Actions -->
-                <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
-                    <button mat-flat-button style="background-color: #28a745; color: white;"
-                        (click)="setRegistrarAutorizacionGasto()" [disabled]="!filterForm.valid">
-                        <mat-icon class="icon-size-5">add</mat-icon>
-                        <span class="ml-2">REGISTRAR</span>
-                    </button>
-                    <button mat-flat-button color="warn" (click)="limpiar()">
-                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:trash'"></mat-icon>
-                        <span class="ml-2">CANCELAR</span>
-                    </button>
 
-                </div>
+            <!-- Actions -->
+            <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
+                <button mat-flat-button style="background-color: #28a745; color: white;"
+                    (click)="setRegistrarAutorizacionGasto()" [disabled]="!filterForm.valid">
+                    <mat-icon class="icon-size-5">add</mat-icon>
+                    <span class="ml-2">REGISTRAR</span>
+                </button>
+                <button mat-flat-button color="warn" (click)="limpiar()">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+                    <span class="ml-2">CANCELAR</span>
+                </button>
+
+            </div>
         </div>
 
     </form>
@@ -76,7 +83,7 @@
 
             <!-- Botón -->
             <!-- Botón mejorado -->
-            <button mat-flat-button style="background-color: #0056b3; color: white;" (click)="descargarExcelProyecto()">
+            <button [disabled]="getTotalCost() <= 0"  mat-flat-button style="background-color: #0056b3; color: white;" (click)="descargarExcelProyecto()">
                 <mat-icon>send</mat-icon>
                 <span class="ml-2">SOLICITAR AUTORIZACIÓN DE GASTO</span>
             </button>
@@ -129,6 +136,15 @@
             <ng-container matColumnDef="acciones">
                 <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
                 <mat-cell *matCellDef="let row">
+                    <!-- Botón Editar -->
+                    <button mat-icon-button color="primary" (click)="editar(row)" matTooltip="Editar Proyecto">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+
+                    <!-- Botón Eliminar -->
+                    <button mat-icon-button color="warn" (click)="eliminar(row)" matTooltip="Eliminar Proyecto">
+                        <mat-icon>delete</mat-icon>
+                    </button>
 
 
                 </mat-cell>
@@ -138,9 +154,25 @@
             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
             <!-- Filas de datos -->
             <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+            <!-- Fila de total -->
+            <mat-footer-row *matFooterRowDef="footerColumns"></mat-footer-row>
+
+            <ng-container matColumnDef="totalLabel">
+                <mat-footer-cell *matFooterCellDef colspan="5" align="right">
+                    <strong>TOTAL</strong>
+                </mat-footer-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="totalValue">
+                <mat-footer-cell style="font-weight: 600;" *matFooterCellDef align="lefth">
+                    S/{{ getTotalCost()}}
+                </mat-footer-cell>
+            </ng-container>
+
         </mat-table>
 
-<!--
+        <!--
         <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
             (page)="onPaginateChange($event)" showFirstLastButtons>
         </mat-paginator>-->

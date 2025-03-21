@@ -379,6 +379,17 @@ export class AutorizacionGastosComponent {
           this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
         }
       }); */
-
+      async eliminar(row) {
+        const confirmado = await this.dataModal(522, 'Eliminar Solicitud de Autorizacion de Gasto', 'Deseas eliminar esta solicitud?');
+        if (confirmado) {
+          const data = {
+            idAutorizacionGasto: row.idAutorizacionGasto
+          }    
+          const response = await this.maestraService.setEliminarAutorizacionGasto(data).toPromise();     
+          if (response) {
+            this.getFiltrarProyectos()
+          }
+        } 
+      }
 }
 

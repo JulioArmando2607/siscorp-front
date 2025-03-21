@@ -45,6 +45,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class ListarSolicitudAutorizacionGastoComponent {
   recursos: any;
   recursosSubject: any;
+  Sess
   async descargarExcelProyecto() {
     const roresp = await lastValueFrom(this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(),
     ))
@@ -52,7 +53,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
     console.log(roresp)
     this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");
   }
-  displayedColumns: string[] = ['item', 'cag', 'fechaRegistro', 'cantidadRecursos', 'estado', 'acciones'];
+  displayedColumns: string[] = ['item', 'cag', 'fechaRegistro', 'cantidadRecursos','total', 'estado', 'acciones'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
@@ -77,6 +78,9 @@ export class ListarSolicitudAutorizacionGastoComponent {
   totalElements = 0;
   pageSize = 10;
   pageIndex = 0; // Página actual
+  isSupervisor: boolean = true
+  isResidente: boolean = true
+
   constructor(
     private cdr: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService,
@@ -112,7 +116,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
 
-    
+
     // 🔥 Monitorear el input de partidas y actualizar el filtrado en tiempo real
     this.filterForm.controls['partidaControl'].valueChanges.pipe(
       startWith(''),
@@ -142,7 +146,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
   }
 
   async eliminarProyecto(proyecto: any) {
-    const confirmado = await this.dataModal(522, 'Eliminar proyecto', 'Deseas eliminar este proyecto?');
+    const confirmado = await this.dataModal(522, 'Eliminar proyecto', 'Deseas eliminar este proyecto?', 'warning');
 
     if (confirmado) {
       console.log('Eliminando proyecto:', proyecto);
@@ -156,8 +160,51 @@ export class ListarSolicitudAutorizacionGastoComponent {
     }
   }
 
-  dataModal(codigo, title, message): Promise<boolean> {
+  dataModal(codigo: number, title: string, message: string, type: 'success' | 'warning' | 'error' | 'approve' | 'reject'): Promise<boolean> {
     return new Promise((resolve) => {
+      let confirmLabel = 'Aceptar';
+      let confirmColor = 'primary';
+      let iconName = 'heroicons_outline:check-circle';
+      let iconColor = 'primary';
+  
+      // Definir el comportamiento según el tipo de modal
+      switch (type) {
+        case 'success':
+          confirmLabel = 'Aceptar';
+          confirmColor = 'primary';
+          iconName = 'heroicons_outline:check-circle';
+          iconColor = 'primary';
+          break;
+  
+        case 'warning':
+          confirmLabel = 'Entendido';
+          confirmColor = 'warn';
+          iconName = 'heroicons_outline:exclamation-triangle';
+          iconColor = 'warn';
+          break;
+  
+        case 'error':
+          confirmLabel = 'Eliminar';
+          confirmColor = 'warn';
+          iconName = 'heroicons_outline:x-circle';
+          iconColor = 'warn';
+          break;
+  
+        case 'approve':
+          confirmLabel = 'Aprobar';
+          confirmColor = 'primary';
+          iconName = 'heroicons_outline:check';
+          iconColor = 'success';
+          break;
+  
+        case 'reject':
+          confirmLabel = 'Desaprobar';
+          confirmColor = 'warn';
+          iconName = 'heroicons_outline:x-circle';
+          iconColor = 'warn';
+          break;
+      }
+  
       const actions = {
         cancel: this._formBuilder.group({
           show: true,
@@ -165,31 +212,32 @@ export class ListarSolicitudAutorizacionGastoComponent {
         }),
         confirm: this._formBuilder.group({
           show: true,
-          label: 'Eliminar',
-          color: 'warn',
+          label: confirmLabel,
+          color: confirmColor,
         }),
       };
-
+  
       this.configForm = this._formBuilder.group({
         title: title,
         message: message,
         icon: this._formBuilder.group({
           show: true,
-          name: codigo === 200 ? 'heroicons_outline:check-circle' : 'heroicons_outline:exclamation-triangle',
-          color: codigo === 200 ? 'primary' : 'warn',
+          name: iconName,
+          color: iconColor,
         }),
         actions: this._formBuilder.group(actions),
         dismissible: true,
       });
-
+  
       // Abrir el diálogo y esperar la respuesta del usuario
       const dialogRef = this._fuseConfirmationService.open(this.configForm.value);
-
+  
       dialogRef.afterClosed().subscribe((result) => {
-        resolve(result === 'confirmed'); // Si el usuario confirma, retorna true; si cancela, retorna false
+        resolve(result === 'confirmed'); // Retorna true si el usuario confirma
       });
     });
   }
+  
 
   descargarSolicitudes() { }
 
@@ -245,10 +293,6 @@ export class ListarSolicitudAutorizacionGastoComponent {
 
 
   }
-
-
-
-
 
   async getFiltrarProyectos(resetPage: boolean = false) {
     try {
@@ -351,7 +395,6 @@ export class ListarSolicitudAutorizacionGastoComponent {
     this._router.navigate(['autorizacion-gastos/editar-autorizacion-gasto/', this.id, row.idAutorizacionGasto]);
   }
 
-  eliminarAutorizacion(row) { }
 
   aprobarSupervisor(row) { }
 
@@ -367,5 +410,43 @@ export class ListarSolicitudAutorizacionGastoComponent {
       console.log(this.titulo)
     }
   }
+
+  async eliminarAutorizacion(row) {
+    const confirmado = await this.dataModal(522, 'Eliminar Solicitud de Autorizacion de Gasto', 'Deseas eliminar esta solicitud?', 'warning');
+    if (confirmado) {
+      const data = {
+        idAutorizacionGasto: row.idAutorizacionGasto
+      }
+
+      const response = await this.maestraService.setEliminarAutorizacionGasto(data).toPromise();
+      console.log(response);
+      //this.partidas = response.data || [];
+      if (response) {
+        this.getFiltrarProyectos()
+      }
+    }
+
+    console.log(row)
+  }
+
+  validarTipoUser() {
+    if (this.id) {
+
+    };
+  }
+
+  async solicitarAutorizacion(row){
+    const confirmado = await this.dataModal(600, 'Solicitar Autorización de Gasto', '¿Deseas solicitar la autorización de gasto?', 'approve');
+    if (confirmado) {
+      const data = {
+        idAutorizacionGasto: row.idAutorizacionGasto
+      }    
+      const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();     
+      if (response) {
+        this.getFiltrarProyectos()
+      }
+    } 
+   }
+
 }
 

@@ -11,7 +11,7 @@
         <div class="w-10"></div>
     </div>
 
-    <form class="flex w-full flex-col" [formGroup]="FormRegistro" (ngSubmit)="save()">
+    <form class="flex w-full flex-col" [formGroup]="FormRegistro">
         <!-- Sección para adjuntar archivos -->
         <div class="flex flex-col gap-4 px-8 pb-4">
             <!-- Validar DNI Residente -->
@@ -78,7 +78,7 @@
                 Cancelar
             </button>
             &nbsp;
-            <button mat-flat-button color="primary" type="submit"
+            <button mat-flat-button color="primary" type="button" (click)="save()"
                 [disabled]="!FormRegistro.valid || !residenteNombre || !SupervisorNombre">
                 Guardar
             </button>

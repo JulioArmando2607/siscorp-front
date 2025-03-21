@@ -55,6 +55,13 @@ export class ConfigurarPlataformaComponent {
   selectedPreciosFile: File | null = null;
   residenteNombre: string = ''
   SupervisorNombre: string = ''
+  idRol: any;
+  idUsuario: any;
+  idProyecto: any;
+  idUsuarioSupervisor: any;
+  idRolSupervisor: any;
+  idUsuarioResidente: any;
+  idRolResidente: any;
   constructor(
     private fb: FormBuilder,
     private maestraService: MaestrasService,
@@ -71,12 +78,14 @@ export class ConfigurarPlataformaComponent {
 
   ngOnInit() {
     console.log(this.data.proyecto.idProyecto);
+    this.idProyecto = this.data.proyecto.idProyecto
     this.title = this.data.title;
     this.isEdit = this.data.type == 'edit' ? true : false;
     console.log(this.isEdit);
     if (this.isEdit) {
       //this.cargarDatos(this.data.proyecto);
     }
+    this.listarUsuarios()
   }
 
   async validarDniResidente() {
@@ -96,6 +105,10 @@ export class ConfigurarPlataformaComponent {
         this.mostrarError("El DNI no está registrado en nuestras bases de datos.");
         return;
       }
+
+      this.idRolResidente = oRespL.data[0]?.idRol
+      this.idUsuarioResidente = oRespL.data[0]?.idUsuario
+
 
       this.residenteNombre = `Residente: ${oRespL.data[0]?.empleado || "No disponible"}`;
     } catch (error) {
@@ -136,6 +149,9 @@ export class ConfigurarPlataformaComponent {
         );
         return;
       }
+
+      this.idRolSupervisor = oRespL.data[0]?.idRol
+      this.idUsuarioSupervisor = oRespL.data[0]?.idUsuario
 
       this.SupervisorNombre = `Supervisor: ${oRespL.data[0]?.empleado || "No disponible"}`;
     } catch (error) {
@@ -277,7 +293,60 @@ export class ConfigurarPlataformaComponent {
     }
   }
 
-  save() { this.uploadFile() }
+  async save() {
+    const data = [
+      {
+        idUsuario: this.idUsuarioResidente, // Obtenido del input después de validación
+        idRol: this.idRolResidente, // Rol del residente
+        idProyecto: this.idProyecto // Proyecto seleccionado
+      },
+      {
+        idUsuario: this.idUsuarioSupervisor, // Obtenido del input después de validación
+        idRol: this.idRolSupervisor, // Rol del supervisor
+        idProyecto: this.idProyecto
+      }
+    ];
+    const oRespL = await lastValueFrom(this.maestraService.registrarResidenteSupervisor(data));
+    console.log(oRespL)
+    if (oRespL) {
+      this.dataModal(oRespL.data.codResultado, 'Exit!', oRespL.data.msgResultado);
+      this.matDialogRef.close('success'); // Enviar un resultado al modal padre
+    }
+
+  }
+
+  async listarUsuarios() {
+    try {
+      const oRespL = await lastValueFrom(this.maestraService.listarUsuarioProyecto(this.idProyecto));
+      console.log(oRespL);
+
+      if (oRespL && oRespL.data) {
+        // Filtrar Residente
+        const residente = oRespL.data.find(user => user.rolDescripcion === "UPS-RESIDENTE-PROYECTO");
+        console.log(residente)
+        if (residente) {
+          this.idUsuarioResidente = residente.idUsuario;
+          this.idRolResidente = residente.idRol;
+          this.residenteNombre = `Residente: ${residente.empleado || "No disponible"}`;
+          
+        }
+
+        // Filtrar Supervisor
+        const supervisor = oRespL.data.find(user => user.rolDescripcion === "UPS-SUPERVISOR-PROYECTO");
+        if (supervisor) {
+          this.idUsuarioSupervisor = supervisor.idUsuario;
+          this.idRolSupervisor = supervisor.idRol;
+          this.SupervisorNombre = `Supervisor: ${supervisor.empleado || "No disponible"}`;
+        }
+
+        console.log("Residente:", this.idUsuarioResidente);
+        console.log("Supervisor:", this.idUsuarioSupervisor);
+      }
+    } catch (error) {
+      console.error("Error al listar usuarios:", error);
+    }
+  }
+
   cancelar() { this.matDialogRef.close() }
 
 
