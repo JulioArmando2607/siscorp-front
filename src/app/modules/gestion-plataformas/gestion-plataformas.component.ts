@@ -26,6 +26,7 @@ import { ExcelService } from '../maestras/excel.service';
 import { RegistroPartidasComponent } from './registro-partidas/registro-partidas.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfigurarPlataformaComponent } from './configurar-plataforma/configurar-plataforma.component';
+import { Session } from 'app/core/auth/Session';
 
 @Component({
   selector: 'gestion-plataformas',
@@ -68,6 +69,9 @@ export class GestionPlataformasComponent implements OnInit {
   departamentos: any[] = []
   proyectos: any[]
   configForm: UntypedFormGroup;
+  isSupervisor: boolean = true;
+  isResidente: boolean = true;
+  isBotonesGestion: boolean = true;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -98,6 +102,7 @@ export class GestionPlataformasComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.validarusuario()
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     this.getDepartamentos()
@@ -377,6 +382,12 @@ export class GestionPlataformasComponent implements OnInit {
       }
     });
 
+  }
+
+  validarusuario(){
+    if(Session.identity.rol=='UPS-RESIDENTE-PROYECTO' || Session.identity.rol=='UPS-SUPERVISOR-PROYECTO')
+    this.isBotonesGestion= false;
+  //  this.isSupervisor= false;
   }
 
 }

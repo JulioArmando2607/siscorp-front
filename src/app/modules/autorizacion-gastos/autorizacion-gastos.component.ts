@@ -17,6 +17,7 @@ import { MaestrasService } from '../maestras/maestras.service';
 import { ExcelService } from '../maestras/excel.service';
 import { cloneDeep } from 'lodash';
 import { Router } from '@angular/router';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-autorizacion-gastos',
@@ -37,6 +38,7 @@ import { Router } from '@angular/router';
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
+    MatTooltipModule
   ],
 })
 

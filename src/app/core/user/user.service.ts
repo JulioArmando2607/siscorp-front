@@ -1,13 +1,17 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { User } from 'app/core/user/user.types';
 import { map, Observable, ReplaySubject, tap } from 'rxjs';
+import { Session } from '../auth/Session';
+import { environment } from 'environments/environment.prod';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
     private _httpClient = inject(HttpClient);
     private _user: ReplaySubject<User> = new ReplaySubject<User>(1);
+    constructor(public http: HttpClient) { }
 
+    /*constructor(public http: HttpClient) { } */
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
     // -----------------------------------------------------------------------------------------------------
@@ -33,6 +37,10 @@ export class UserService {
     /**
      * Get the current signed-in user data
      */
+    getUrlMaestras() {
+        return environment.apiurl + '/api/maestras/';
+    }
+
     get(): Observable<User> {
         return this._httpClient.get<User>('api/common/user').pipe(
             tap((user) => {
@@ -52,5 +60,10 @@ export class UserService {
                 this._user.next(response);
             })
         );
+    }
+
+
+    obtenerUsuarioSesion(): Observable<any> {
+        return this.http.get(`${this.getUrlMaestras()}consulta-usuario-session`);
     }
 }

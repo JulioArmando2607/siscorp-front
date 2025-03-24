@@ -28,35 +28,28 @@
                 <!-- PARTIDA -->
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>CODIGO</mat-label>
-                    <input type="text" matInput formControlName="partidaControl">
-                    <!--[matAutocomplete]="autoPartida"   <mat-autocomplete #autoPartida="matAutocomplete" (optionSelected)="onPartidaSelected($event)">
-                        <mat-option *ngFor="let item of partidasFiltradas | async" [value]="item.idPartida">
-                            {{ item.descripcionPartida }}
-                        </mat-option>
-                    </mat-autocomplete>-->
+                    <input type="text" matInput formControlName="partidaControl">                   
                 </mat-form-field>
 
 
-                <!-- RECURSO--->
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>FECHA</mat-label>
-                    <input type="date" matInput formControlName="partidaControl">
-                    <!--- <input type="text" matInput formControlName="recursoControl" [matAutocomplete]="autoRecurso">
-                    <mat-autocomplete #autoRecurso="matAutocomplete" (optionSelected)="onRecursoSelected($event)">
-                        <mat-option *ngFor="let item of recursosFiltradas | async" [value]="item.idRecurso">
-                            {{ item.nombreRecurso }}
-                        </mat-option>
-                    </mat-autocomplete>-->
-                </mat-form-field>
-
-
-                <!-- TAMBO -->
+                    <input matInput [matDatepicker]="picker" formControlName="partidaControl">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                  </mat-form-field>
+                  
+  
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>ESTADO</mat-label>
-                    <input matInput type="text" formControlName="cantidad">
-                </mat-form-field>
-
-
+                    <mat-select formControlName="estado">
+                      <mat-option [value]="0">Todos</mat-option>
+                      <mat-option *ngFor="let item of estados" [value]="item.idEstado">{{ item.nombreEstado
+                        }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+  
+                  
                 <!-- Actions -->
                 <!-- Actions -->
                 <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
@@ -116,13 +109,13 @@
             <!-- Departamento Column -->
             <ng-container matColumnDef="cantidadRecursos">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD RECURSOS </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.cantidadRecursos }} </mat-cell>
+                <mat-cell *matCellDef="let row" > {{ row.cantidadRecursos }} </mat-cell>
             </ng-container>
 
             <!-- Estado Column -->
             <ng-container matColumnDef="estado">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> ESTADO </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.nombreEstado }} </mat-cell>
+                <mat-cell *matCellDef="let row"  [matTooltip]="row.observacion"> {{ row.nombreEstado }} </mat-cell>
             </ng-container>
 
             <!-- Estado Column -->
@@ -136,26 +129,35 @@
                 <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
                 <mat-cell *matCellDef="let row">
                     <!-- Botón Editar -->
-                    <button mat-icon-button color="primary" (click)="editar(row)" matTooltip="Editar">
+                    <button *ngIf="row.cidEstado!=='002' && row.cidEstado!=='004'" mat-icon-button color="primary" (click)="editar(row)"
+                        matTooltip="Editar">
                         <mat-icon>edit</mat-icon>
                     </button>
 
                     <!-- Botón Eliminar -->
-                    <button mat-icon-button color="warn" (click)="eliminarAutorizacion(row)" matTooltip="Eliminar">
+                    <button *ngIf="row.cidEstado!=='002' && row.cidEstado!=='004'" mat-icon-button color="warn"
+                        (click)="eliminarAutorizacion(row)" matTooltip="Eliminar">
                         <mat-icon>delete</mat-icon>
                     </button>
 
                     <!-- Botón Solicitar -->
-                    <button mat-icon-button color="accent" (click)="solicitarAutorizacion(row)"
-                        matTooltip="Solicitar Autorizacion de Gasto" matTooltipPosition="above">
+                    <button *ngIf="row.cidEstado!=='002' && isResidente && row.cidEstado!=='004'" mat-icon-button color="accent"
+                        (click)="solicitarAutorizacion(row)" matTooltip="Solicitar Autorizacion de Gasto"
+                        matTooltipPosition="above">
                         <mat-icon>send</mat-icon>
                     </button>
 
-                    <!-- Botón aporbar  <button mat-icon-button color="primary" (click)="aprobarSupervisor(row)" matTooltip="Aprobar"
-                        matTooltipPosition="above">
+                    <button *ngIf="isSupervisor && row.cidEstado!=='004' && row.cidEstado!=='003'" mat-icon-button color="primary" (click)="aprobarSupervisor(row)"
+                        matTooltip="Aprobar" matTooltipPosition="above">
                         <mat-icon>check</mat-icon>
-                    </button>-->
-                   
+                    </button>
+
+                    <button *ngIf="isSupervisor && row.cidEstado!=='004' && row.cidEstado!=='003' " mat-icon-button color="primary"
+                        (click)="observarAutorizacionGasto(row)" matTooltip="Observar Autorización de Gasto"
+                        matTooltipPosition="above">
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+
                     <!-- Botón para Cargar Partidas y Precios Unitarios -->
                     <button mat-icon-button color="accent" (click)="descargarAutorizacion(row)"
                         matTooltip="Descargar Autorizacion de Gasto">

@@ -18,6 +18,10 @@ import { MaestrasService } from 'app/modules/maestras/maestras.service';
 import { BehaviorSubject, lastValueFrom, map, Observable, startWith, switchMap } from 'rxjs';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Session } from 'app/core/auth/Session';
+import { ObservarDialogComponent } from '../observar-dialog/observar-dialog.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+
 
 @Component({
   selector: 'app-listar-solicitud-autorizacion-gasto',
@@ -34,7 +38,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatIconModule,
     MatProgressBarModule,
     MatAutocompleteModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDatepickerModule,
   ],
   standalone: true, // Declarar como componente standalone
   encapsulation: ViewEncapsulation.None,
@@ -91,7 +96,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
     private excelService: ExcelService,
     private route: ActivatedRoute,
     private _router: Router,
-    private location: Location
+    private location: Location,private dialog: MatDialog
     //private _notesService: NotesService
   ) {
 
@@ -142,7 +147,8 @@ export class ListarSolicitudAutorizacionGastoComponent {
     ).subscribe(filtered => this.recursosFiltradas = new BehaviorSubject(filtered));
 
     this.getFiltrarProyectos(true)
-
+    this.validarusuario()
+    this.getEstados()
   }
 
   async eliminarProyecto(proyecto: any) {
@@ -395,8 +401,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
     this._router.navigate(['autorizacion-gastos/editar-autorizacion-gasto/', this.id, row.idAutorizacionGasto]);
   }
 
-
-  aprobarSupervisor(row) { }
+ 
 
  /* 
   async getFiltraRecursosAturorizacionGasto(resetPage: boolean = false) {
@@ -493,7 +498,9 @@ export class ListarSolicitudAutorizacionGastoComponent {
     const confirmado = await this.dataModal(600, 'Solicitar Autorización de Gasto', '¿Deseas solicitar la autorización de gasto?', 'approve');
     if (confirmado) {
       const data = {
-        idAutorizacionGasto: row.idAutorizacionGasto
+        idAutorizacionGasto: row.idAutorizacionGasto,
+        cidEstadoAG: "002",
+        observacion:"Solicitar Autorización de Gasto desde el Residente"
       }    
       const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();     
       if (response) {
@@ -505,5 +512,80 @@ export class ListarSolicitudAutorizacionGastoComponent {
     this.location.back(); // Vuelve a la página anterior
   }
 
+  async observarAutorizacionGasto(row) {
+    const dialogRef = this.dialog.open(ObservarDialogComponent, {
+      width: '500px',
+      data: {
+        title: 'Observar Autorización de Gasto',
+        message: 'Escriba el motivo de la observación.',
+      },
+    });
+  
+    const comentario = await dialogRef.afterClosed().toPromise();
+  
+    if (comentario) {
+      const data = {
+        idAutorizacionGasto: row.idAutorizacionGasto,
+        cidEstadoAG: "003",
+        observacion: comentario
+      };
+  
+      const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();
+  
+      if (response) {
+        this.getFiltrarProyectos();
+      }
+    }
+  }
+
+  async aprobarSupervisor(row) {
+    const confirmado = await this.dataModal(600, 'Aprobar Autorización de Gasto', '¿Deseas aprobar la autorización de gasto?', 'approve');
+    if (confirmado) {
+      const data = {
+        idAutorizacionGasto: row.idAutorizacionGasto,
+        cidEstadoAG: "004",
+        observacion:"Aprobado desde el Supervisor"
+      } 
+      const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();     
+      if (response) {
+        this.getFiltrarProyectos()
+      }
+    } 
+  }
+
+    validarusuario(){
+      if(Session.identity.rol=='UPS-RESIDENTE-PROYECTO' ){
+        this.isSupervisor= false;
+        this.isResidente = true
+
+      }
+     // this.isBotonesGestion= false;
+
+      if (Session.identity.rol=='UPS-SUPERVISOR-PROYECTO' ) {
+        this.isResidente = false
+        this.isSupervisor = true
+
+      }
+
+      if (
+        Session.identity.rol !== 'UPS-RESIDENTE-PROYECTO' &&
+        Session.identity.rol !== 'UPS-SUPERVISOR-PROYECTO'
+      ) {
+        this.isSupervisor = false;
+        this.isResidente = false;
+      }
+
+    } 
+
+    async getEstados(){
+
+      const response = await this.maestraService.getEstadosAutorizacion().toPromise();     
+      if (response) {
+        this.estados = response.data.response
+      }
+
+      
+    }
+   
 }
 

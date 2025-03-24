@@ -139,6 +139,8 @@ export class AuthService {
 
         // Set the authenticated flag to false
         this._authenticated = false;
+        
+        localStorage.removeItem('userSesion');
 
         // Return the observable
         return of(true);

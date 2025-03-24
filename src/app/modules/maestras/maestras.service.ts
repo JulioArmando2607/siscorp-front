@@ -29,40 +29,40 @@ export class MaestrasService {
   }
 
   getDepartamentos(): Observable<any> {
-    return this.http.get(`${this.getUrlMaestras()}departamentos`, { headers: Headers() });
+    return this.http.get(`${this.getUrlMaestras()}departamentos`);
   }
   getProvincias(departamentoUbigeo): Observable<any> {
-    return this.http.get(`${this.getUrlMaestras()}provincias/${departamentoUbigeo}`, { headers: Headers() });
+    return this.http.get(`${this.getUrlMaestras()}provincias/${departamentoUbigeo}`);
   }
   getDistrito(provinciaUbigeo): Observable<any> {
-    return this.http.get(`${this.getUrlMaestras()}distritos/${provinciaUbigeo}`, { headers: Headers() });
+    return this.http.get(`${this.getUrlMaestras()}distritos/${provinciaUbigeo}`);
   }
   getCentrosPoblados(distritoUbigeo): Observable<any> {
-    return this.http.get(`${this.getUrlMaestras()}centros-poblados/${distritoUbigeo}`, { headers: Headers() });
+    return this.http.get(`${this.getUrlMaestras()}centros-poblados/${distritoUbigeo}`);
   }
 
   getFiltrarProyectos(rawValue, pageIndex , pageSize): Observable<any> {
-    return this.http.post(`${this.getUrlPlataforma()}plataformas?page=${pageIndex}&size=${pageSize}&sort=idProyecto,asc`,rawValue, { headers: Headers() });
+    return this.http.post(`${this.getUrlPlataforma()}plataformas?page=${pageIndex}&size=${pageSize}&sort=idProyecto,asc`,rawValue);
   }
 
   listarPlataformasExcel(rawValue): Observable<any>{
-    return this.http.post(`${this.getUrlPlataforma()}proyectos-excel`,rawValue, { headers: Headers() });
+    return this.http.post(`${this.getUrlPlataforma()}proyectos-excel`,rawValue);
   }
 
   verProyecto(rawValue): Observable<any>{
-    return this.http.post(`${this.getUrlPlataforma()}ver-proyectos`,rawValue, { headers: Headers() });
+    return this.http.post(`${this.getUrlPlataforma()}ver-proyectos`,rawValue);
   }
 
   getCrearPlataformas(rawValue): Observable<any> {
-    return this.http.post(`${this.getUrlPlataforma()}crearProyecto`,rawValue, { headers: Headers() });
+    return this.http.post(`${this.getUrlPlataforma()}crearProyecto`,rawValue);
   }
 
   getEditaPlataformas(rawValue): Observable<any> {
-    return this.http.post(`${this.getUrlPlataforma()}editarProyecto`,rawValue, { headers: Headers() });
+    return this.http.post(`${this.getUrlPlataforma()}editarProyecto`,rawValue);
   }
 
   getEliminar(idProyecto): Observable<any> {
-    return this.http.get(`${this.getUrlPlataforma()}eliminar-proyecto/${idProyecto}`, { headers: Headers() });
+    return this.http.get(`${this.getUrlPlataforma()}eliminar-proyecto/${idProyecto}`);
   }
 
   getLerrExcel(formData : FormData): Observable<any> {
@@ -70,11 +70,11 @@ export class MaestrasService {
   }
 
   getDetalleCentrosPoblados(ubigeo): Observable<any> {
-    return this.http.get(`${this.getUrlMaestras()}detalle-cpp/${ubigeo}`, { headers: Headers() });
+    return this.http.get(`${this.getUrlMaestras()}detalle-cpp/${ubigeo}`);
   }
 
   getEstados(): Observable<any> {
-    return this.http.get(`${this.getUrlMaestras()}estado-plataforma`, { headers: Headers() });
+    return this.http.get(`${this.getUrlMaestras()}estado-plataforma`);
   }
  
   getEnviarPartidasExcel(formData : FormData): Observable<any> {
@@ -82,47 +82,51 @@ export class MaestrasService {
   }
 
   getPartidas(idProyecto): Observable<any> {
-    return this.http.get(`${this.getUrlMaestras()}partidas-proyecto/${idProyecto}`, { headers: Headers() });
+    return this.http.get(`${this.getUrlMaestras()}partidas-proyecto/${idProyecto}`);
   }
 
   getRecursosxPartidas(idProyecto): Observable<any> {
-    return this.http.get(`${this.getUrlMaestras()}recursos-partida/${idProyecto}`, { headers: Headers() });
+    return this.http.get(`${this.getUrlMaestras()}recursos-partida/${idProyecto}`);
   }
 
   setRegistrarAutorizacionGasto(formData): Observable<any> {
-    return this.http.post(`${this.getUrlAutorizacionGasto()}registrar-autorizacion-gasto`,formData, { headers: Headers() });
+    return this.http.post(`${this.getUrlAutorizacionGasto()}registrar-autorizacion-gasto`,formData);
   }
   setEditarAutorizacionGasto(formData): Observable<any> {
-    return this.http.post(`${this.getUrlAutorizacionGasto()}editar-autorizacion-gasto`,formData, { headers: Headers() });
+    return this.http.post(`${this.getUrlAutorizacionGasto()}editar-autorizacion-gasto`,formData);
   }
   setEliminarAutorizacionGastoRecurso(formData): Observable<any> {
-    return this.http.post(`${this.getUrlAutorizacionGasto()}eliminar-autorizacion-gasto-recurso`,formData, { headers: Headers() });
+    return this.http.post(`${this.getUrlAutorizacionGasto()}eliminar-autorizacion-gasto-recurso`,formData);
   }
   getlistarRecursosAturorizacionGasto(rawValue): Observable<any> {
-    return this.http.post(`${this.getUrlAutorizacionGasto()}listar-recursos-aturorizacion-gasto`,rawValue, { headers: Headers() });
+    return this.http.post(`${this.getUrlAutorizacionGasto()}listar-recursos-aturorizacion-gasto`,rawValue);
   }
   getListarAutorizacionGasto(rawValue,pageIndex , pageSize): Observable<any> {
-    return this.http.post(`${this.getUrlAutorizacionGasto()}listar-autorizacion-gasto?page=${pageIndex}&size=${pageSize}&sort=idAutorizacionGasto,desc`,rawValue, { headers: Headers() });
+    return this.http.post(`${this.getUrlAutorizacionGasto()}listar-autorizacion-gasto?page=${pageIndex}&size=${pageSize}&sort=idAutorizacionGasto,desc`,rawValue);
   }
 
   getConsultaUsuarioDni(dni): Observable<any> {
-    return this.http.get(`${this.getUrlMaestras()}consulta-usuario-dni/${dni}`, { headers: Headers() });
+    return this.http.get(`${this.getUrlMaestras()}consulta-usuario-dni/${dni}`);
   }
 
   registrarResidenteSupervisor(data): Observable<any> {
-    return this.http.post(`${this.getUrlPlataforma()}registrar-residente-supervisor`,data, { headers: Headers() });
+    return this.http.post(`${this.getUrlPlataforma()}registrar-residente-supervisor`,data);
   }
 
   setEliminarAutorizacionGasto(data): Observable<any> {
-    return this.http.post(`${this.getUrlAutorizacionGasto()}eliminar-autorizacion-gasto`,data, { headers: Headers() });
+    return this.http.post(`${this.getUrlAutorizacionGasto()}eliminar-autorizacion-gasto`,data);
   }
   
   listarUsuarioProyecto(idProyecto): Observable<any> {
-    return this.http.get(`${this.getUrlPlataforma()}listar-usuario-proyecto/${idProyecto}`, { headers: Headers() });
+    return this.http.get(`${this.getUrlPlataforma()}listar-usuario-proyecto/${idProyecto}`);
   }
 
   solicitarAutorizacionGastoResidente(data): Observable<any> {
-    return this.http.post(`${this.getUrlAutorizacionGasto()}solicitar-autorizacion-gasto-residente`,data, { headers: Headers() });
+    return this.http.post(`${this.getUrlAutorizacionGasto()}solicitar-autorizacion-gasto-residente`,data);
+  }
+
+  getEstadosAutorizacion(): Observable<any> {
+    return this.http.get(`${this.getUrlMaestras()}estado-autorizacion`);
   }
 }
 
@@ -133,11 +137,11 @@ export function Headers(isJson = true): HttpHeaders {
     'Expires': '0'
   });
 
-  const token = Session?.identity?.token;
+/*  const token = Session?.identity?.token;
 
   if (token) {
     headers = headers.set('Authorization', `Bearer ${token}`);
-  }
+  } */
 
   if (isJson) {
     headers = headers.set('Content-Type', 'application/json');

@@ -187,23 +187,23 @@
         <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
         <mat-cell *matCellDef="let row">
           <!-- Botón Editar -->
-          <button mat-icon-button color="primary" (click)="editar(row)" matTooltip="Editar Proyecto">
+          <button *ngIf="isBotonesGestion" mat-icon-button color="primary" (click)="editar(row)" matTooltip="Editar Proyecto">
             <mat-icon>edit</mat-icon>
           </button>
 
           <!-- Botón Eliminar -->
-          <button mat-icon-button color="warn" (click)="eliminarProyecto(row)" matTooltip="Eliminar Proyecto">
+          <button *ngIf="isBotonesGestion"  mat-icon-button color="warn" (click)="eliminarProyecto(row)" matTooltip="Eliminar Proyecto">
             <mat-icon>delete</mat-icon>
           </button>
 
           <!-- Botón para configurar usuarios -->
-          <button mat-icon-button color="accent" (click)="configurarUsuarios(row)"
+          <button *ngIf="isBotonesGestion"  mat-icon-button color="accent" (click)="configurarUsuarios(row)"
             matTooltip="Configurar Residente y Supervisor" matTooltipPosition="above">
             <mat-icon>manage_accounts</mat-icon>
           </button>
 
           <!-- Botón para Cargar Partidas y Precios Unitarios -->
-          <button mat-icon-button color="accent" (click)="cargarPartidas(row)"
+          <button *ngIf="isBotonesGestion"  mat-icon-button color="accent" (click)="cargarPartidas(row)"
             matTooltip="Cargar Partidas y Precios Unitarios">
             <mat-icon>attach_money</mat-icon>
           </button>

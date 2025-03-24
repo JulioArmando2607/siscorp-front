@@ -20,7 +20,7 @@ import { QuickChatComponent } from 'app/layout/common/quick-chat/quick-chat.comp
 import { SearchComponent } from 'app/layout/common/search/search.component';
 import { ShortcutsComponent } from 'app/layout/common/shortcuts/shortcuts.component';
 import { UserComponent } from 'app/layout/common/user/user.component';
-import { Subject, takeUntil } from 'rxjs';
+import { lastValueFrom, Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'classy-layout',
@@ -33,13 +33,13 @@ import { Subject, takeUntil } from 'rxjs';
         UserComponent,
         MatIconModule,
         MatButtonModule,
-       /// LanguagesComponent,
+        /// LanguagesComponent,
         FuseFullscreenComponent,
         SearchComponent,
-      //  ShortcutsComponent,
-      //  MessagesComponent,
+        //  ShortcutsComponent,
+        //  MessagesComponent,
         RouterOutlet,
-       // QuickChatComponent,
+        // QuickChatComponent,
     ],
 })
 export class ClassyLayoutComponent implements OnInit, OnDestroy {
@@ -47,7 +47,7 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy {
     navigation: Navigation;
     user: User;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
-
+    data: any
     /**
      * Constructor
      */
@@ -58,7 +58,7 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy {
         private _userService: UserService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseNavigationService: FuseNavigationService
-    ) {}
+    ) { }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
@@ -101,6 +101,7 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy {
                 // Check if the screen is small
                 this.isScreenSmall = !matchingAliases.includes('md');
             });
+        this.obtenerUsuarioSesion()
     }
 
     /**
@@ -133,4 +134,41 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy {
             navigation.toggle();
         }
     }
+
+    async obtenerUsuarioSesion() {
+        const data = await lastValueFrom(
+            this._userService.obtenerUsuarioSesion()
+        ); 
+        this.user = {} as User; // inicializar el objeto primero
+        this.user.name = data.data.empleado;
+        this.user.rol = data.data.rolDescripcion;    
+        this.user.idRol = data.data.idRol;  
+        this.user.id = data.data.idUsuario;  
+        this.user.numeroDocumento = data.data.numeroDocumento;  
+        this.user.idEmpleado = data.data.idEmpleado;  
+
+        
+        localStorage.setItem('userSesion', JSON.stringify(this.user)); // <-- aquí
+
+    }
+   
+        /*empleado
+   : 
+   "VEGA SALVADOR JULIO ARMANDO"
+   idEmpleado
+   : 
+   2888
+   idRol
+   : 
+   153
+   idUsuario
+   : 
+   3063
+   numeroDocumento
+   : 
+   "48400113"
+   rolDescripcion
+   : 
+   "PLAT-GESTOR-PIA-DIRESA-LORETO" */
+   
 }
