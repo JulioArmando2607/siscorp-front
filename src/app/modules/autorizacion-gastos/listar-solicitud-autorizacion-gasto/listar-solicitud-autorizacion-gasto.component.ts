@@ -313,7 +313,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
   }
 
   registrarSolicitudAutorizacionGasto() {
-    this._router.navigate(['autorizacion-gastos/registrar-autorizacion-gasto/', this.id]);
+    this._router.navigate(['autorizacion-gastos/registar-autorizacion-gasto-tabla/', this.id]);
   }
 
   filtrarPartidas(value: any): any[] {

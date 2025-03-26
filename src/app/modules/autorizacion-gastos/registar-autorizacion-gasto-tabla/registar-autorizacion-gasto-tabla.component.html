@@ -1,0 +1,126 @@
+<div class="flex min-w-0 flex-auto flex-col bg-card p-10">
+ 
+    <!-- Contenedor de título y botón alineados -->
+    <div class="flex justify-center relative items-center mb-4">
+        <!-- Título centrado -->
+        <div class="text-2xl font-bold text-center flex-1">
+           REGISTRAR AUTORIZACIÓN DE GASTO {{titulo}}
+        </div>
+        <!-- Botón de salida alineado a la derecha -->
+        <div class="absolute right-0">
+            <button mat-flat-button style="background-color: red; color: white;" (click)="salir()">
+                <mat-icon>exit_to_app</mat-icon> Salir
+            </button>
+        </div>
+    </div>
+   
+    <!-- Tabla de proyectos registrados -->
+    <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
+        <!-- Contenedor de botones flotantes -->
+        <div class="botones-flotantes">
+
+            <!-- Botón -->
+            <!-- Botón mejorado -->
+            <button [disabled]="getTotalCost() <= 0"  mat-flat-button style="background-color: #0056b3; color: white;" (click)="solicitarAutorizacion()">
+                <mat-icon>send</mat-icon>
+                <span class="ml-2">SOLICITAR AUTORIZACIÓN DE GASTO</span>
+            </button>
+
+        </div>
+        <mat-table [dataSource]="dataSource" matSort class="w-full">
+            <!-- item Column -->
+            <ng-container matColumnDef="item">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> ITEM </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.item }} </mat-cell>
+            </ng-container>
+          
+
+            <!-- CUI Column -->
+            <ng-container matColumnDef="recurso">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> RECURSO </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.nombreRecurso }} </mat-cell>
+            </ng-container>
+
+            <!-- CUI Column -->
+            <ng-container matColumnDef="und">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> UND </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.unidad }} </mat-cell>
+            </ng-container>
+
+              <!-- Distrito Column -->
+              <ng-container matColumnDef="cantidad_total_asignada">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD TOTAL ASIGNADA </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.descripcionPartida }} </mat-cell>
+            </ng-container>
+
+            <!-- Departamento Column -->
+            <ng-container matColumnDef="cantidad_restante">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.cantidad }} </mat-cell>
+            </ng-container>
+
+              <!-- Departamento Column -->
+              <ng-container matColumnDef="cantidad">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.cantidad }} </mat-cell>
+            </ng-container>
+
+            <!-- Provincia Column -->
+            <ng-container matColumnDef="precio_unitario">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> PRECIO UNITARIO </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.precio }} </mat-cell>
+            </ng-container>
+
+            <!-- Provincia Column -->
+            <ng-container matColumnDef="precio_cantidad">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> TOTAL </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.precioCantidad }} </mat-cell>
+            </ng-container>
+
+            <!-- Botón de acciones -->
+            <ng-container matColumnDef="acciones">
+                <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    <!-- Botón Editar -->
+                    <button mat-icon-button color="primary" (click)="editar(row)" matTooltip="Editar Proyecto">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+
+                    <!-- Botón Eliminar -->
+                    <button mat-icon-button color="warn" (click)="eliminar(row)" matTooltip="Eliminar Proyecto">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+
+
+                </mat-cell>
+            </ng-container>
+
+            <!-- Encabezado de la tabla -->
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <!-- Filas de datos -->
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+            <!-- Fila de total -->
+            <mat-footer-row *matFooterRowDef="footerColumns"></mat-footer-row>
+
+            <ng-container matColumnDef="totalLabel">
+                <mat-footer-cell *matFooterCellDef colspan="5" align="right">
+                    <strong>TOTAL</strong>
+                </mat-footer-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="totalValue">
+                <mat-footer-cell style="font-weight: 600;" *matFooterCellDef align="lefth">
+                    S/{{ getTotalCost()}}
+                </mat-footer-cell>
+            </ng-container>
+
+        </mat-table>
+
+        <!--
+        <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+            (page)="onPaginateChange($event)" showFirstLastButtons>
+        </mat-paginator>-->
+    </div>
+
+</div>
