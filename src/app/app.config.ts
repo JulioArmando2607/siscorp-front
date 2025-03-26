@@ -3,6 +3,7 @@ import {
     ApplicationConfig,
     inject,
     isDevMode,
+    LOCALE_ID,
     provideAppInitializer,
 } from '@angular/core';
 import { LuxonDateAdapter } from '@angular/material-luxon-adapter';
@@ -22,6 +23,8 @@ export const appConfig: ApplicationConfig = {
     providers: [
         provideAnimations(),
         provideHttpClient(),
+        { provide: LOCALE_ID, useValue: 'es' },
+
         provideRouter(
             appRoutes,
             withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })

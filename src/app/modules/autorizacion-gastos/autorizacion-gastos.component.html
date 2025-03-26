@@ -22,13 +22,7 @@
             <mat-label>UBIGEO CP</mat-label>
             <input matInput type="text" formControlName="ubigeoCp">
           </mat-form-field>
-  
-          <!-- UBIGEO DISTRITO -->
-          <!---   <mat-form-field appearance="outline" class="w-full">
-          <mat-label>UBIGEO DISTRITO</mat-label>
-          <input matInput type="text">
-        </mat-form-field>
-  -->
+   
           <!-- DEPARTAMENTO -->
           <mat-form-field appearance="fill" class="w-full">
             <mat-label>DEPARTAMENTO</mat-label>
@@ -87,7 +81,7 @@
             <mat-label>ESTADO</mat-label>
             <mat-select formControlName="estado">
               <mat-option [value]="0">Todos</mat-option>
-              <mat-option *ngFor="let item of estados" [value]="item">{{ item }}</mat-option>
+              <mat-option *ngFor="let item of estados" [value]="item.idCodigo">{{ item.cidNombre }}</mat-option>
             </mat-select>
           </mat-form-field>
   

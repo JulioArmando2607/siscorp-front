@@ -87,7 +87,7 @@
           <mat-label>ESTADO</mat-label>
           <mat-select formControlName="estado">
             <mat-option [value]="0">Todos</mat-option>
-            <mat-option *ngFor="let item of estados" [value]="item">{{ item }}</mat-option>
+            <mat-option *ngFor="let item of estados" [value]="item.idCodigo">{{ item.cidNombre }}</mat-option>
           </mat-select>
         </mat-form-field>
 

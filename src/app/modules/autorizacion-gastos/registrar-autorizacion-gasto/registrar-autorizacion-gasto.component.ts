@@ -504,7 +504,9 @@ export class RegistrarAutorizacionGastoComponent {
     const confirmado = await this.dataModal(600, 'Solicitar Autorización de Gasto', '¿Deseas solicitar la autorización de gasto?', 'approve');
     if (confirmado) {
       const data = {
-        idAutorizacionGasto:this.idAutorizacionGasto
+        idAutorizacionGasto:this.idAutorizacionGasto,
+        cidEstadoAG: "002",
+        observacion: "Solicitar Autorización de Gasto desde el Residente"
       }    
       const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();     
       if (response) {

@@ -39,11 +39,6 @@ import { lastValueFrom } from 'rxjs';
 })
 export class RegistroPartidasComponent {
   FormRegistro: UntypedFormGroup;
-  //departamentos: string[] = ['Lima', 'Arequipa', 'Cusco'];
-  //provincias: string[] = ['Provincia 1', 'Provincia 2', 'Provincia 3'];
-  //distritos: string[] = ['Distrito 1', 'Distrito 2', 'Distrito 3'];
-  //centrosPoblados: string[] = ['CP 1', 'CP 2', 'CP 3'];
-  //  estados: string[] = ['Activo', 'Inactivo'];
   isMasivo: boolean = false;
   selectedFile: File | null = null; // Para almacenar el archivo seleccionado
   estados: any[];

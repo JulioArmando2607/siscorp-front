@@ -98,6 +98,7 @@ export class AutorizacionGastosComponent {
     this.dataSource.sort = this.sort;
     this.getDepartamentos()
     this.getFiltrarProyectos(true)
+    this.getEstadosProyecto()
   }
 
   async eliminarProyecto(proyecto: any) {
@@ -238,6 +239,14 @@ export class AutorizacionGastosComponent {
     );
     this.centrosPoblados = oRespL.data
   }
+  async getEstadosProyecto() {
+    this.estados = []
+    const oRespL = await lastValueFrom(
+      this.maestraService.getEstados()
+    );
+    this.estados = oRespL.data
+  }
+  
 
   filtrar() {
     const filtros = this.filterForm.getRawValue();
@@ -300,6 +309,7 @@ export class AutorizacionGastosComponent {
   */
 
   async getFiltrarProyectos(resetPage: boolean = false) {
+    this.proyectos = []
     try {
       if (resetPage) {
         this.pageIndex = 0; // 🔥 Reinicia la página al filtrar

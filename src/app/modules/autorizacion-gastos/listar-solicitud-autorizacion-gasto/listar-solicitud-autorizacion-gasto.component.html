@@ -12,12 +12,8 @@
                 <mat-icon>exit_to_app</mat-icon> Salir
             </button>
         </div>
-    </div>
-    <!-- Título   <div class="text-center text-2xl font-bold mb-4">
-        LISTA DE SOLICITUDES DE AUTORIZACION DE GASTO {{titulo}}
-    </div>-->
-
-    <!---BANDEJA PROYECTOS DEL TAMBO REGISTRADOS - AUTORIZACION DE GASTOS-->
+    </div> 
+    
     <form [formGroup]="filterForm">
         <!-- Contenedor de formulario -->
         <div class="border p-6 rounded-lg shadow-lg">
@@ -28,29 +24,27 @@
                 <!-- PARTIDA -->
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>CODIGO</mat-label>
-                    <input type="text" matInput formControlName="partidaControl">                   
+                    <input type="text" matInput formControlName="codigo">
                 </mat-form-field>
 
 
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>FECHA</mat-label>
-                    <input matInput [matDatepicker]="picker" formControlName="partidaControl">
+                    <input matInput [matDatepicker]="picker" formControlName="fecha">
                     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                     <mat-datepicker #picker></mat-datepicker>
-                  </mat-form-field>
-                  
-  
+                </mat-form-field>
+
+
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>ESTADO</mat-label>
                     <mat-select formControlName="estado">
-                      <mat-option [value]="0">Todos</mat-option>
-                      <mat-option *ngFor="let item of estados" [value]="item.idEstado">{{ item.nombreEstado
-                        }}</mat-option>
+                        <mat-option [value]="0">Todos</mat-option>
+                        <mat-option *ngFor="let item of estados" [value]="item.idEstado">{{ item.nombreEstado
+                            }}</mat-option>
                     </mat-select>
-                  </mat-form-field>
-  
-                  
-                <!-- Actions -->
+                </mat-form-field>
+
                 <!-- Actions -->
                 <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
                     <button mat-flat-button color="accent" (click)="getFiltrarProyectos(true)">
@@ -76,7 +70,7 @@
 
             <!-- Botón -->
             <!-- Botón mejorado -->
-            <button mat-flat-button style="background-color: #0056b3; color: white;"
+            <button *ngIf="isResidente" mat-flat-button style="background-color: #0056b3; color: white;"
                 (click)="registrarSolicitudAutorizacionGasto()">
                 <mat-icon>add</mat-icon>
                 <span class="ml-2">REGISTRAR SOLICITUD AUTORIZACIÓN DE GASTO</span>
@@ -109,13 +103,13 @@
             <!-- Departamento Column -->
             <ng-container matColumnDef="cantidadRecursos">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD RECURSOS </mat-header-cell>
-                <mat-cell *matCellDef="let row" > {{ row.cantidadRecursos }} </mat-cell>
+                <mat-cell *matCellDef="let row"> {{ row.cantidadRecursos }} </mat-cell>
             </ng-container>
 
             <!-- Estado Column -->
             <ng-container matColumnDef="estado">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> ESTADO </mat-header-cell>
-                <mat-cell *matCellDef="let row"  [matTooltip]="row.observacion"> {{ row.nombreEstado }} </mat-cell>
+                <mat-cell *matCellDef="let row" [matTooltip]="row.observacion"> {{ row.nombreEstado }} </mat-cell>
             </ng-container>
 
             <!-- Estado Column -->
@@ -129,30 +123,30 @@
                 <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
                 <mat-cell *matCellDef="let row">
                     <!-- Botón Editar -->
-                    <button *ngIf="row.cidEstado!=='002' && row.cidEstado!=='004'" mat-icon-button color="primary" (click)="editar(row)"
-                        matTooltip="Editar">
+                    <button *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003')" mat-icon-button
+                        color="primary" (click)="editar(row)" matTooltip="Editar">
                         <mat-icon>edit</mat-icon>
                     </button>
 
                     <!-- Botón Eliminar -->
-                    <button *ngIf="row.cidEstado!=='002' && row.cidEstado!=='004'" mat-icon-button color="warn"
-                        (click)="eliminarAutorizacion(row)" matTooltip="Eliminar">
+                    <button *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003') " mat-icon-button
+                        color="warn" (click)="eliminarAutorizacion(row)" matTooltip="Eliminar">
                         <mat-icon>delete</mat-icon>
                     </button>
 
                     <!-- Botón Solicitar -->
-                    <button *ngIf="row.cidEstado!=='002' && isResidente && row.cidEstado!=='004'" mat-icon-button color="accent"
-                        (click)="solicitarAutorizacion(row)" matTooltip="Solicitar Autorizacion de Gasto"
+                    <button *ngIf="row.cidEstado!=='002' && isResidente && row.cidEstado!=='004'" mat-icon-button
+                        color="accent" (click)="solicitarAutorizacion(row)" matTooltip="Solicitar Autorizacion de Gasto"
                         matTooltipPosition="above">
                         <mat-icon>send</mat-icon>
                     </button>
 
-                    <button *ngIf="isSupervisor && row.cidEstado!=='004' && row.cidEstado!=='003'" mat-icon-button color="primary" (click)="aprobarSupervisor(row)"
-                        matTooltip="Aprobar" matTooltipPosition="above">
+                    <button *ngIf="isSupervisor && row.cidEstado=='002'" mat-icon-button color="primary"
+                        (click)="aprobarSupervisor(row)" matTooltip="Aprobar" matTooltipPosition="above">
                         <mat-icon>check</mat-icon>
                     </button>
 
-                    <button *ngIf="isSupervisor && row.cidEstado!=='004' && row.cidEstado!=='003' " mat-icon-button color="primary"
+                    <button *ngIf="isSupervisor && row.cidEstado=='002'" mat-icon-button color="primary"
                         (click)="observarAutorizacionGasto(row)" matTooltip="Observar Autorización de Gasto"
                         matTooltipPosition="above">
                         <mat-icon>visibility</mat-icon>
