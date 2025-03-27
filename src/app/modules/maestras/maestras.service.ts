@@ -128,6 +128,10 @@ export class MaestrasService {
   getEstadosAutorizacion(): Observable<any> {
     return this.http.get(`${this.getUrlMaestras()}estado-autorizacion`);
   }
+  listaRecursosAutorizacionGastoProyecto(data): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}lista-recursos-autorizacion-gasto-proyecto`,data);
+  }
+  //
 }
 
 export function Headers(isJson = true): HttpHeaders {

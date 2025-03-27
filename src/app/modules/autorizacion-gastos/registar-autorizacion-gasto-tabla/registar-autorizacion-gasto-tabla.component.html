@@ -1,10 +1,10 @@
 <div class="flex min-w-0 flex-auto flex-col bg-card p-10">
- 
+
     <!-- Contenedor de título y botón alineados -->
     <div class="flex justify-center relative items-center mb-4">
         <!-- Título centrado -->
         <div class="text-2xl font-bold text-center flex-1">
-           REGISTRAR AUTORIZACIÓN DE GASTO {{titulo}}
+            REGISTRAR AUTORIZACIÓN DE GASTO {{titulo}}
         </div>
         <!-- Botón de salida alineado a la derecha -->
         <div class="absolute right-0">
@@ -13,29 +13,23 @@
             </button>
         </div>
     </div>
-   
+
     <!-- Tabla de proyectos registrados -->
     <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
         <!-- Contenedor de botones flotantes -->
         <div class="botones-flotantes">
 
-            <!-- Botón -->
-            <!-- Botón mejorado -->
-            <button [disabled]="getTotalCost() <= 0"  mat-flat-button style="background-color: #0056b3; color: white;" (click)="solicitarAutorizacion()">
-                <mat-icon>send</mat-icon>
-                <span class="ml-2">SOLICITAR AUTORIZACIÓN DE GASTO</span>
-            </button>
-
         </div>
-        <mat-table [dataSource]="dataSource" matSort class="w-full">
-            <!-- item Column -->
-            <ng-container matColumnDef="item">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> ITEM </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.item }} </mat-cell>
-            </ng-container>
-          
 
-            <!-- CUI Column -->
+        <div class="mb-4 flex justify-end">
+            <mat-form-field appearance="outline">
+              <mat-label>Buscar recurso</mat-label>
+              <input matInput (keyup)="aplicarFiltro($event)" placeholder="Escribe el nombre del recurso">
+            </mat-form-field>
+          </div>
+          
+        <mat-table [dataSource]="dataSource" matSort class="w-full table-fixed">
+
             <ng-container matColumnDef="recurso">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> RECURSO </mat-header-cell>
                 <mat-cell *matCellDef="let row"> {{ row.nombreRecurso }} </mat-cell>
@@ -47,35 +41,70 @@
                 <mat-cell *matCellDef="let row"> {{ row.unidad }} </mat-cell>
             </ng-container>
 
-              <!-- Distrito Column -->
-              <ng-container matColumnDef="cantidad_total_asignada">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD TOTAL ASIGNADA </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.descripcionPartida }} </mat-cell>
+            
+            <ng-container matColumnDef="monto_total_asignada">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> MONTO TOTAL ASIGNADO</mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.montoAsignado }} </mat-cell>
+            </ng-container>
+            <!-- Distrito Column -->
+            <ng-container matColumnDef="cantidad_total_asignada">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD TOTAL ASIGNADO</mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.montoAsignado }} </mat-cell>
             </ng-container>
 
-            <!-- Departamento Column -->
+                <!-- Distrito Column -->
+                <ng-container matColumnDef="monto_restante">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> MONTO TOTAL RESTANTE</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.montoAsignado }} </mat-cell>
+                </ng-container>
+
             <ng-container matColumnDef="cantidad_restante">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.cantidad }} </mat-cell>
+                <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD TOTAL RESTANTE </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.montoRestante }} </mat-cell>
             </ng-container>
 
-              <!-- Departamento Column -->
-              <ng-container matColumnDef="cantidad">
+            <!-- cantidad Column -->
+            <ng-container matColumnDef="cantidad">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.cantidad }} </mat-cell>
+                <mat-cell *matCellDef="let row; let i = index">
+                    <input matInput type="number" [(ngModel)]="row.cantidad" (ngModelChange)="recalcularTotal(i)">
+                </mat-cell>
             </ng-container>
 
-            <!-- Provincia Column -->
+            <!-- precio_unitario Column -->
             <ng-container matColumnDef="precio_unitario">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> PRECIO UNITARIO </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.precio }} </mat-cell>
+                <mat-cell *matCellDef="let row; let i = index">
+                    <input matInput type="number" [(ngModel)]="row.precio" (ngModelChange)="recalcularTotal(i)">
+                </mat-cell>
             </ng-container>
 
-            <!-- Provincia Column -->
+            <!-- total Column -->
+            <ng-container matColumnDef="monto_utilizado">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> MONTO UTILIZADO </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    {{ row.montoUtilizado | number: '1.2-2' }}
+                </mat-cell>
+            </ng-container>
+
+            <!-- total Column -->
             <ng-container matColumnDef="precio_cantidad">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> TOTAL </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.precioCantidad }} </mat-cell>
+                <mat-cell *matCellDef="let row">
+                    {{ row.total | number: '1.2-2' }}
+                </mat-cell>
             </ng-container>
+
+            <ng-container matColumnDef="porcentaje">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> PORCENTAJE %</mat-header-cell>
+                <mat-cell *matCellDef="let row" [ngStyle]="{
+                  'font-weight': 'bold',
+                  'color': getTextColor(row.colorEstado)
+                }">
+                    {{ row.porcentajeUso }} %
+                </mat-cell>
+            </ng-container>
+
 
             <!-- Botón de acciones -->
             <ng-container matColumnDef="acciones">
@@ -109,11 +138,11 @@
                 </mat-footer-cell>
             </ng-container>
 
-            <ng-container matColumnDef="totalValue">
+            <!---   <ng-container matColumnDef="totalValue">
                 <mat-footer-cell style="font-weight: 600;" *matFooterCellDef align="lefth">
                     S/{{ getTotalCost()}}
                 </mat-footer-cell>
-            </ng-container>
+            </ng-container>-->
 
         </mat-table>
 

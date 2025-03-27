@@ -21,7 +21,7 @@ import { BehaviorSubject, lastValueFrom, map, Observable, startWith, switchMap }
 @Component({
   selector: 'app-registar-autorizacion-gasto-tabla',
   imports: [
-    ReactiveFormsModule, // <== Agregar esta línea
+  //  ReactiveFormsModule, // <== Agregar esta línea
     CommonModule,
     MatTableModule, // <== Agregar la importación de MatTableModule
     MatSortModule,  // <== Agregar la importación de MatSortModule
@@ -55,8 +55,8 @@ export class RegistarAutorizacionGastoTablaComponent {
     console.log(roresp)
     this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");
   }
-  displayedColumns: string[] = ['item','recurso', 'und', 'cantidad_total_asignada', 'cantidad_restante','cantidad', 'precio_unitario', 'precio_cantidad', 'acciones'];
-  footerColumns: string[] = ['totalLabel', 'totalValue'];
+  displayedColumns: string[] =/*item */ ['recurso', 'und', 'monto_total_asignada','cantidad_total_asignada', 'cantidad_restante','monto_restante','cantidad', 'precio_unitario', 'precio_cantidad' ,'monto_utilizado','porcentaje'];// 'acciones'
+  footerColumns: string[] = ['totalLabel'];//, 'totalValue' 
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -111,13 +111,18 @@ export class RegistarAutorizacionGastoTablaComponent {
 
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    this.getFiltraRecursosAturorizacionGasto(true)
 
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
     this.titulo = "PROYECTO TAMBO: NAYAP"
     this.verProyecto(this.id)
-    this.getPartidas(this.id);
+    this.getFiltraRecursosAturorizacionGasto(true)
 
+    this.dataSource.filterPredicate = (data: any, filter: string) => {
+      return data.nombreRecurso?.toLowerCase().includes(filter);
+    };
+    
+    //this.getPartidas(this.id);
+   // this.getRecursosProyecto(this.id);
     // 🔥 Monitorear el input de partidas y actualizar el filtrado en tiempo real
     this.filterForm.controls['partidaControl'].valueChanges.pipe(
       startWith(''),
@@ -238,17 +243,19 @@ export class RegistarAutorizacionGastoTablaComponent {
         idProyecto: this.id
       }
       const oRespL = await lastValueFrom(
-        this.maestraService.getlistarRecursosAturorizacionGasto(
+        this.maestraService.listaRecursosAutorizacionGastoProyecto(
           data
         )
       );
 
       console.log(oRespL)
       if (oRespL?.data) {
-        this.proyectos = oRespL.data;
+        this.proyectos = oRespL.data.response;
         this.totalElements = oRespL.data.length;
+        console.log(this.proyectos)
 
         this.dataSource = new MatTableDataSource(this.proyectos);
+        console.log(this.dataSource)
         this.dataSource.sort = this.sort; // 🔥 Habilitar ordenación
         this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
 
@@ -290,6 +297,22 @@ export class RegistarAutorizacionGastoTablaComponent {
       this.partidasSubject.next([]);
     }
   }
+
+/*   async getRecursosProyecto(id) {
+    try {
+      const data ={
+        idAutorizacionGasto:"",
+        idProyecto:id
+      }
+      const response = await this.maestraService.listaRecursosAutorizacionGastoProyecto(data).toPromise();
+      this.partidas = response.data || [];
+      this.partidasSubject.next(this.partidas); // Guardamos los datos en el Subject
+    } catch (error) {
+      console.error('Error al cargar partidas:', error);
+      this.partidas = [];
+      this.partidasSubject.next([]);
+    }
+  } */
 
   // Obtener recursos según la partida seleccionada
   async getRecursos(idPartida: number) {
@@ -458,9 +481,6 @@ export class RegistarAutorizacionGastoTablaComponent {
     this.filterForm.reset();
   } */
 
-  getTotalCost(): number {
-    return this.dataSource.data.reduce((acc, row) => acc + row.precioCantidad, 0);
-  }
   editar(row) {
     this.idAutorizacionGastoRecurso = row.idAutorizacionGastoRecurso
     console.log(row.idAutorizacionGastoRecurso)
@@ -593,5 +613,49 @@ export class RegistarAutorizacionGastoTablaComponent {
       });
     });
   }
+  recalcularTotal(index: number): void {
+    const row = this.dataSource[index];
+    row.total = (row.cantidad || 0) * (row.precio || 0);
+  }
+  getColor(estado: string): string {
+    switch (estado.toUpperCase()) {
+      case 'VERDE': return '#d4edda';
+      case 'AMARILLO': return '#fff3cd';
+      case 'ROJO': return '#f8d7da';
+      case 'GRIS': return '#e2e3e5';
+      default: return 'transparent';
+    }
+  }
+  
+  getTextColor(estado: string): string {
+    switch (estado?.toUpperCase()) {
+      case 'VERDE':
+        return '#155724';
+      case 'AMARILLO':
+        return '#856404';
+      case 'ROJO':
+        return '#721c24';
+      case 'GRIS':
+        return '#383d41';
+      default:
+        return '#000';
+    }
+  }
+  
+
+  aplicarFiltro(event: Event) {
+    const filtroValor = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filtroValor.trim().toLowerCase();
+  }
+  
+  
+/*  getTotalCost(): number {
+    return this.dataSource.reduce((acc, row) => acc + (row.total || 0), 0);
+  }
+   */
+  
+/*  getTotalCost(): number {
+    return this.dataSource.data.reduce((acc, row) => acc + row.precioCantidad, 0);
+  } */
 }
 
