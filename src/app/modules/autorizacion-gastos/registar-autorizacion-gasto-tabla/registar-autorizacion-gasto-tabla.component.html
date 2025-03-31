@@ -62,7 +62,7 @@
 
                 <ng-container matColumnDef="cantidad_restante">
                     <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD TOTAL RESTANTE </mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ cantidadRestante }} </mat-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.cantidadRestante }} </mat-cell>
                 </ng-container>
 
                 <!-- cantidad Column -->
