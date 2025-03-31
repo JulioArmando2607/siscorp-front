@@ -1,17 +1,31 @@
-.botones-flotantes {
-    position: absolute;
-    top: -30px;  /* Coloca los botones encima de la tabla */
-    right: 10px; /* Mueve los botones hacia la izquierda */
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    z-index: 100; /* Asegura que estén sobre la tabla */
-}
-mat-cell input {
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 6px 8px;
-    width: 100%;
-    box-sizing: border-box;
+ 
+  .table-container {
+    max-height: 400px; /* Ajusta según necesidad */
+    overflow-y: auto;
+    display: block;
   }
   
+  .mat-table {
+    width: 100% !important;
+    display: block;
+  }
+  .mat-header {
+    position: sticky;
+    top: 0;
+    background: white; /* Asegura que el header tenga fondo */
+    z-index: 1000; /* Evita que se superponga el contenido */
+  }
+
+
+  .mat-header-cell,
+.mat-cell {
+  min-width: 150px;
+  white-space: nowrap;
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+}
+
+.mat-table {
+  width: 100%;
+  display: table;
+}

@@ -255,14 +255,10 @@ export class RegistarAutorizacionGastoTablaComponent {
       if (oRespL?.data) {
         this.proyectos = oRespL.data.response;
         this.totalElements = oRespL.data.length;
-        console.log(this.proyectos)
-
-        this.dataSource = new MatTableDataSource(this.proyectos);
-        console.log(this.dataSource)
-        this.dataSource.sort = this.sort; // 🔥 Habilitar ordenación
-        this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
-
-        this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
+        this.dataSource.data = this.proyectos;
+        console.log(this.dataSource.data)
+        this.dataSource._updateChangeSubscription();
+        this.cdr.detectChanges();
       }
     } catch (error) {
       console.error('Error al obtener proyectos:', error);
@@ -425,7 +421,8 @@ export class RegistarAutorizacionGastoTablaComponent {
       idRecurso: row.idRecurso,
       cantidad: row.cantidad,
       precio: row.precio,
-      precioCantidad: row.total
+      precioCantidad: row.total,
+      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso
     }
 
     const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
@@ -491,7 +488,7 @@ export class RegistarAutorizacionGastoTablaComponent {
 
   async eliminar(row) {
     console.log(row)
- 
+
     const confirmado = await this.dataModal(522, 'Eliminar recurso', 'Deseas eliminar este recurso?', "warning");
     if (confirmado) {
       const data = {
@@ -606,27 +603,37 @@ export class RegistarAutorizacionGastoTablaComponent {
 
   recalcularTotal(index: number): void {
     const row = this.dataSource.filteredData[index]; // <- CAMBIADO AQUÍ
-  
+
     console.log(row);
     row.total = (row.cantidad || 0) * (row.precio || 0);
     this.dataSource._updateChangeSubscription();
-  
+
     const data = {
       cantidad: row.cantidad,
       precio: row.precio,
       total: row.total,
-      idRecurso: row.idRecurso
+      idRecurso: row.idRecurso,
+      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso
     };
-  
+
     setTimeout(() => {
-      if (data.total > row.montoRestante) {
-        alert('El monto no puede ser mayor al monto restante.');
+      if (
+        data.total > row.montoRestante ||
+        row.montoRestante < 0 ||
+        row.cantidadRestante < 0 ||
+        data.total < 0 ||
+        row.cantidad < 0 ||
+        row.precio < 0
+      ) {
+        alert('Verifica los valores: no pueden ser negativos ni mayores al monto restante.');
       } else {
         this.guardarActulizar(data);
       }
     }, 100);
+
+
   }
-  
+
   /*
   recalcularTotal(index: number): void {
     
