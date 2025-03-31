@@ -49,35 +49,49 @@
             <!-- Distrito Column -->
             <ng-container matColumnDef="cantidad_total_asignada">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD TOTAL ASIGNADO</mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.montoAsignado }} </mat-cell>
+                <mat-cell *matCellDef="let row"> {{ row.cantidadAsignado }} </mat-cell>
             </ng-container>
 
                 <!-- Distrito Column -->
                 <ng-container matColumnDef="monto_restante">
                     <mat-header-cell *matHeaderCellDef mat-sort-header> MONTO TOTAL RESTANTE</mat-header-cell>
-                    <mat-cell *matCellDef="let row"> {{ row.montoAsignado }} </mat-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.montoRestante }} </mat-cell>
                 </ng-container>
 
             <ng-container matColumnDef="cantidad_restante">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD TOTAL RESTANTE </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.montoRestante }} </mat-cell>
+                <mat-cell *matCellDef="let row"> {{ row.cantidadRestante }} </mat-cell>
             </ng-container>
 
             <!-- cantidad Column -->
             <ng-container matColumnDef="cantidad">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD </mat-header-cell>
                 <mat-cell *matCellDef="let row; let i = index">
-                    <input matInput type="number" [(ngModel)]="row.cantidad" (ngModelChange)="recalcularTotal(i)">
+                    <input matInput type="number" [(ngModel)]="row.cantidad" [ngModelOptions]="{standalone: true}">
                 </mat-cell>
             </ng-container>
 
-            <!-- precio_unitario Column -->
+            <!-- precio_unitario Column  (blur)="recalcularTotal(i)"  -->
             <ng-container matColumnDef="precio_unitario">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> PRECIO UNITARIO </mat-header-cell>
                 <mat-cell *matCellDef="let row; let i = index">
-                    <input matInput type="number" [(ngModel)]="row.precio" (ngModelChange)="recalcularTotal(i)">
+                    <input matInput type="number" [(ngModel)]="row.precio" (blur)="recalcularTotal(i)" [ngModelOptions]="{standalone: true}">
                 </mat-cell>
             </ng-container>
+
+            <ng-container matColumnDef="total_calculado">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> TOTAL CALCULADO </mat-header-cell>
+                <mat-cell *matCellDef="let row; let i = index">
+                  <input
+                    matInput
+                    type="number"
+                    [value]="row.total"
+                    disabled
+                    class="input-total-calculado"
+                  />
+                </mat-cell>
+              </ng-container>
+              
 
             <!-- total Column -->
             <ng-container matColumnDef="monto_utilizado">
@@ -85,15 +99,16 @@
                 <mat-cell *matCellDef="let row">
                     {{ row.montoUtilizado | number: '1.2-2' }}
                 </mat-cell>
+            </ng-container> 
+                     <!-- total Column -->
+            <ng-container matColumnDef="cantidad_utilizado">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD UTILIZADO </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            {{ row.montoUtilizado}}
+                        </mat-cell>
             </ng-container>
+ 
 
-            <!-- total Column -->
-            <ng-container matColumnDef="precio_cantidad">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> TOTAL </mat-header-cell>
-                <mat-cell *matCellDef="let row">
-                    {{ row.total | number: '1.2-2' }}
-                </mat-cell>
-            </ng-container>
 
             <ng-container matColumnDef="porcentaje">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> PORCENTAJE %</mat-header-cell>
@@ -110,13 +125,13 @@
             <ng-container matColumnDef="acciones">
                 <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
                 <mat-cell *matCellDef="let row">
-                    <!-- Botón Editar -->
-                    <button mat-icon-button color="primary" (click)="editar(row)" matTooltip="Editar Proyecto">
-                        <mat-icon>edit</mat-icon>
-                    </button>
+                  <!-- Botón Editar  
+             <button mat-icon-button color="primary" (click)="editar(row)" matTooltip="Editar Proyecto">
+              <mat-icon>edit</mat-icon>
+          </button>-->
 
                     <!-- Botón Eliminar -->
-                    <button mat-icon-button color="warn" (click)="eliminar(row)" matTooltip="Eliminar Proyecto">
+                    <button mat-icon-button color="warn" (click)="eliminar(row)" matTooltip="Eliminar Recurso">
                         <mat-icon>delete</mat-icon>
                     </button>
 
@@ -137,19 +152,9 @@
                     <strong>TOTAL</strong>
                 </mat-footer-cell>
             </ng-container>
-
-            <!---   <ng-container matColumnDef="totalValue">
-                <mat-footer-cell style="font-weight: 600;" *matFooterCellDef align="lefth">
-                    S/{{ getTotalCost()}}
-                </mat-footer-cell>
-            </ng-container>-->
-
+  
         </mat-table>
-
-        <!--
-        <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
-            (page)="onPaginateChange($event)" showFirstLastButtons>
-        </mat-paginator>-->
+ 
     </div>
 
 </div>

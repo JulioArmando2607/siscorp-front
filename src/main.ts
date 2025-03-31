@@ -7,6 +7,9 @@ import localeEs from '@angular/common/locales/es';
 // 👇 Registrar el locale antes del bootstrap
 registerLocaleData(localeEs);
 
-bootstrapApplication(AppComponent, appConfig).catch((err) =>
-    console.error(err)
-);
+bootstrapApplication(AppComponent, appConfig)
+  .then(() => {
+    // ✅ Solucionar sticky headers: habilitar scroll global
+    document.body.classList.add('fuse-splash-screen-hidden');
+  })
+  .catch((err) => console.error(err));

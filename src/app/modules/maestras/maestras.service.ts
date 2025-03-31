@@ -92,6 +92,9 @@ export class MaestrasService {
   setRegistrarAutorizacionGasto(formData): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}registrar-autorizacion-gasto`,formData);
   }
+  setRegistrarAutorizacionGastoTabla(formData): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}registrar-autorizacion-gasto-tabla`,formData);
+  }
   setEditarAutorizacionGasto(formData): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}editar-autorizacion-gasto`,formData);
   }
