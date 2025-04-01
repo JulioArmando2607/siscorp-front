@@ -58,13 +58,18 @@ export class RegistarAutorizacionGastoTablaComponent {
     console.log(roresp)
     this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");
   }
-  displayedColumns: string[] =/*item */['recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada', 'monto_restante', 'cantidad_restante', 'cantidad', 'precio_unitario', 'total_calculado', 'monto_utilizado', 'cantidad_utilizado', 'porcentaje', 'acciones'];
+  displayedColumns = [
+    'recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada',
+    'monto_restante', 'cantidad_restante', 'cantidad', 'precio_unitario',
+    'total_calculado', 'monto_utilizado', 'cantidad_utilizado', 'porcentaje', 'acciones'
+  ];
+  
   footerColumns: string[] = ['totalLabel'];//, 'totalValue' 
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
-  dataSource: MatTableDataSource<any> = new MatTableDataSource();
+  dataSource:  MatTableDataSource<any>;
 
   estados: any[]
   centrosPoblados: any[]
@@ -111,18 +116,16 @@ export class RegistarAutorizacionGastoTablaComponent {
       cantidad: ["", [Validators.required, Validators.min(1)]],  // ✅ Mayor a 0
       precio: ["", [Validators.required, Validators.min(0.01)]]  // ✅ Mayor a 0.01
     });
-
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+ 
 
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
     this.titulo = "PROYECTO TAMBO: NAYAP"
     this.verProyecto(this.id)
     this.getFiltraRecursosAturorizacionGasto(true)
 
-    this.dataSource.filterPredicate = (data: any, filter: string) => {
+/*    this.dataSource.filterPredicate = (data: any, filter: string) => {
       return data.nombreRecurso?.toLowerCase().includes(filter);
-    };
+    }; */
 
     //this.getPartidas(this.id);
     // this.getRecursosProyecto(this.id);
@@ -255,10 +258,10 @@ export class RegistarAutorizacionGastoTablaComponent {
       if (oRespL?.data) {
         this.proyectos = oRespL.data.response;
         this.totalElements = oRespL.data.length;
-        this.dataSource.data = this.proyectos;
-        console.log(this.dataSource.data)
-        this.dataSource._updateChangeSubscription();
-        this.cdr.detectChanges();
+        this.dataSource = new MatTableDataSource<any>(this.proyectos);
+        console.log(this.dataSource)
+        this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
+
       }
     } catch (error) {
       console.error('Error al obtener proyectos:', error);

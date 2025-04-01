@@ -1,31 +1,29 @@
- 
-  .table-container {
-    max-height: 400px; /* Ajusta según necesidad */
+.table-container {
+    max-height: 600px;
+    overflow-x: auto;
     overflow-y: auto;
-    display: block;
+    width: 100%;
   }
   
   .mat-table {
-    width: 100% !important;
-    display: block;
+    width: 100%;
+    min-width: 1200px; /* Puedes ajustar este valor */
+    table-layout: auto; /* Permite que las columnas se ajusten mejor */
   }
+  
   .mat-header {
     position: sticky;
     top: 0;
-    background: white; /* Asegura que el header tenga fondo */
-    z-index: 1000; /* Evita que se superponga el contenido */
+    background: white;
+    z-index: 1000;
   }
-
-
-  .mat-header-cell,
-.mat-cell {
-  min-width: 150px;
-  white-space: nowrap;
-  padding: 8px;
-  border-bottom: 1px solid #ccc;
-}
-
-.mat-table {
-  width: 100%;
-  display: table;
-}
+  
+  /* Scroll bonito opcional */
+  .table-container::-webkit-scrollbar {
+    height: 6px;
+  }
+  .table-container::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 3px;
+  }
+  
