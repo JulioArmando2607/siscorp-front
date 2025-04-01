@@ -18,32 +18,28 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { ExcelService } from 'app/modules/maestras/excel.service';
 import { MaestrasService } from 'app/modules/maestras/maestras.service';
 import { BehaviorSubject, lastValueFrom, map, Observable, startWith, switchMap } from 'rxjs';
-
 @Component({
-  selector: 'app-registar-autorizacion-gasto-tabla',
-  imports: [
-    //  ReactiveFormsModule, // <== Agregar esta línea
-    CommonModule,
-    MatTableModule, // <== Agregar la importación de MatTableModule
-    MatSortModule,  // <== Agregar la importación de MatSortModule
-    MatPaginatorModule, // <== Agregar la importación de MatPaginatorModule
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressBarModule,
-    MatAutocompleteModule,
-    FormsModule,
-    MatTooltipModule
-  ],
-  standalone: true, // Declarar como componente standalone
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './registar-autorizacion-gasto-tabla.component.html',
-  styleUrl: './registar-autorizacion-gasto-tabla.component.scss'
+  selector: 'app-editar-autorizacion-gasto-tabla',
+   imports: [
+      //  ReactiveFormsModule, // <== Agregar esta línea
+      CommonModule,
+      MatTableModule, // <== Agregar la importación de MatTableModule
+      MatSortModule,  // <== Agregar la importación de MatSortModule
+      MatPaginatorModule, // <== Agregar la importación de MatPaginatorModule
+      MatFormFieldModule,
+      MatInputModule,
+      MatSelectModule,
+      MatButtonModule,
+      MatIconModule,
+      MatProgressBarModule,
+      MatAutocompleteModule,
+      FormsModule,
+      MatTooltipModule
+    ],
+  templateUrl: './editar-autorizacion-gasto-tabla.component.html',
+  styleUrl: './editar-autorizacion-gasto-tabla.component.scss'
 })
-export class RegistarAutorizacionGastoTablaComponent {
+export class EditarAutorizacionGastoTablaComponent {
 
   idPartidaSeleccionada: any;
   idRecursoSeleccionado: any;
@@ -61,8 +57,8 @@ export class RegistarAutorizacionGastoTablaComponent {
   displayedColumns = [
     'recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada',
     'monto_restante', 'cantidad_restante', 'cantidad', 'precio_unitario',
-    'total_calculado', 'monto_utilizado',// 'cantidad_utilizado',
-     'porcentaje', 'acciones'
+    'total_calculado', 'monto_utilizado', //'cantidad_utilizado', 
+    'porcentaje', 'acciones'
   ];
   
   footerColumns: string[] = ['totalLabel'];//, 'totalValue' 
@@ -120,8 +116,9 @@ export class RegistarAutorizacionGastoTablaComponent {
  
 
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
-    this.titulo = "PROYECTO TAMBO: NAYAP"
     this.verProyecto(this.id)
+    this.idAutorizacionGasto = this.route.snapshot.paramMap.get('ag'); // Obtiene el ID de la URL
+ 
     this.getFiltraRecursosAturorizacionGasto(true)
 
 /*    this.dataSource.filterPredicate = (data: any, filter: string) => {
@@ -426,7 +423,8 @@ export class RegistarAutorizacionGastoTablaComponent {
       cantidad: row.cantidad,
       precio: row.precio,
       precioCantidad: row.total,
-      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso
+      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
+      idHistorialPrecio:row.idHistorialPrecio
     }
 
     const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
@@ -617,7 +615,8 @@ export class RegistarAutorizacionGastoTablaComponent {
       precio: row.precio,
       total: row.total,
       idRecurso: row.idRecurso,
-      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso
+      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
+      idHistorialPrecio:row.idHistorialPrecio
     };
 
     setTimeout(() => {
@@ -705,4 +704,3 @@ export class RegistarAutorizacionGastoTablaComponent {
       return this.dataSource.data.reduce((acc, row) => acc + row.precioCantidad, 0);
     } */
 }
-

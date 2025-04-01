@@ -332,7 +332,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
 
   editar(row) {
     console.log(row)
-    this._router.navigate(['autorizacion-gastos/editar-autorizacion-gasto/', this.id, row.idAutorizacionGasto]);
+    this._router.navigate(['autorizacion-gastos/editar-autorizacion-gasto-tabla/', this.id, row.idAutorizacionGasto]);
   }
 
   async descargarAutorizacion(row) {
