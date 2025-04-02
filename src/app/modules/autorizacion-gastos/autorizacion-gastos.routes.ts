@@ -5,6 +5,7 @@ import { ListarSolicitudAutorizacionGastoComponent } from './listar-solicitud-au
 import { EditarAutorizacionGastoComponent } from './editar-autorizacion-gasto/editar-autorizacion-gasto.component';
 import { RegistarAutorizacionGastoTablaComponent } from './registar-autorizacion-gasto-tabla/registar-autorizacion-gasto-tabla.component';
 import { EditarAutorizacionGastoTablaComponent } from './editar-autorizacion-gasto-tabla/editar-autorizacion-gasto-tabla.component';
+import { AnalizarAutorizacionGastoComponent } from './analizar-autorizacion-gasto/analizar-autorizacion-gasto.component';
 
 export default [
     {
@@ -32,4 +33,9 @@ export default [
         path: 'editar-autorizacion-gasto-tabla/:id/:ag',
         component: EditarAutorizacionGastoTablaComponent,
     },
+    {
+        path: 'analizar-autorizacion-gasto/:id/:ag',
+        component: AnalizarAutorizacionGastoComponent,
+    },
+    
 ] as Routes;

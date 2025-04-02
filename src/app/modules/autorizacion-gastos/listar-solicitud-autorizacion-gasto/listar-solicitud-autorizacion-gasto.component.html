@@ -151,9 +151,13 @@
                         matTooltipPosition="above">
                         <mat-icon>visibility</mat-icon>
                     </button>
-
+                <!---*ngIf="isSupervisor && row.cidEstado=='002'"-->
+                    <button  mat-icon-button color="primary" class="ml-2" (click)="analizarAutorizacionGasto(row)" matTooltip="Analizar Autorización de Gasto">
+                        <mat-icon>analytics</mat-icon>
+                    </button>
+                  
                     <!-- Botón para Cargar Partidas y Precios Unitarios -->
-                    <button mat-icon-button color="accent" (click)="descargarAutorizacion(row)"
+                    <button mat-icon-button color="accent"  class="ml-2" (click)="descargarAutorizacion(row)"
                         matTooltip="Descargar Autorizacion de Gasto">
                         <mat-icon>download</mat-icon>
                     </button>

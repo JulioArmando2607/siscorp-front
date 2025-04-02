@@ -403,5 +403,9 @@ export class AutorizacionGastosComponent {
           }
         } 
       }
+
+      yourFunction() {
+        
+      }
 }
 

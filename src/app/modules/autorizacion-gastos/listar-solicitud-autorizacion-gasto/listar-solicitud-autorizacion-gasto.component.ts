@@ -368,7 +368,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
     console.log(roresp)
 
     if (roresp) {
-      this.titulo = "PROYECTO TAMBO:" + roresp.data[0].tambo
+      this.titulo = "PROYECTO TAMBO " + roresp.data[0].tambo
       console.log(this.titulo)
     }
   }
@@ -488,6 +488,10 @@ export class ListarSolicitudAutorizacionGastoComponent {
     }
 
 
+  }
+
+  analizarAutorizacionGasto(row) {
+    this._router.navigate(['autorizacion-gastos/analizar-autorizacion-gasto', this.id, row.idAutorizacionGasto]);
   }
 
 }

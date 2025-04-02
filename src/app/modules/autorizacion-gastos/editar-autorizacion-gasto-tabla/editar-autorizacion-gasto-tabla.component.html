@@ -3,7 +3,7 @@
     <!-- Título y botón de salir -->
     <div class="flex justify-center relative items-center mb-4">
       <div class="text-2xl font-bold text-center flex-1">
-        EDITAR AUTORIZACIÓN DE GASTO {{ titulo }}
+        EDITAR AUTORIZACIÓN DE GASTO [{{idAutorizacionGasto}}] - {{ titulo }}
       </div>
       <div class="absolute right-0">
         <button mat-flat-button style="background-color: red; color: white;" (click)="salir()">
@@ -14,17 +14,22 @@
   
     <!-- Filtro -->
     <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
-      <div class="mb-4 flex justify-end">
+      <div class="mb-4 flex justify-between">
         <mat-form-field appearance="outline">
-          <mat-label>Buscar recurso</mat-label>
-          <input matInput (keyup)="aplicarFiltro($event)" placeholder="Escribe el nombre del recurso" />
+            <mat-label>Buscar recurso</mat-label>
+            <input matInput (keyup)="aplicarFiltro($event)" placeholder="Escribe el nombre del recurso">
         </mat-form-field>
-      </div>
+     
+        <button mat-flat-button color="primary" (click)="solicitarAutorizacion()">
+            <mat-icon>check_circle</mat-icon>
+            <span class="ml-2">Solicitar Autorización</span>
+        </button>
+    </div>
   
       <!-- Tabla -->
       <div class="table-container">
        <!-- <table mat-table [dataSource]="dataSource" multiTemplateDataRows style="table-layout: fixed; width: 100%;" class="mat-elevation-z1">-->
-            <table mat-table [dataSource]="dataSource" class="mat-table">
+        <table mat-table [dataSource]="dataSource" class="mat-table">
           <!-- RECURSO -->
           <ng-container matColumnDef="recurso">
             <th mat-header-cell *matHeaderCellDef> RECURSO </th>
@@ -125,6 +130,18 @@
     <tbody mat-row *matRowDef="let row; columns: displayedColumns;"></tbody>-->
         </table>
       </div>
+          <!-- Linear Totals Section -->
+          <div class="linear-totals mt-4">
+            <div class="flex flex-wrap gap-4">
+        <!---        <div>TOTAL MONTO ASIGNADO: {{ calcularTotalMontoAsignado() | number:'1.2-2' }}</div>
+                <div>TOTAL CANTIDAD ASIGNADA: {{ calcularTotalCantidadAsignada() }}</div>
+                <div>TOTAL MONTO RESTANTE: {{ calcularTotalMontoRestante() | number:'1.2-2' }}</div>
+                <div>TOTAL CANTIDAD RESTANTE: {{ calcularTotalCantidadRestante() }}</div>-->
+                <div>TOTAL CALCULADO: {{ calcularTotalCalculado() | number:'1.2-2' }}</div>
+            <!---    <div>TOTAL MONTO UTILIZADO: {{ calcularTotalMontoUtilizado() | number:'1.2-2' }}</div>
+           -->
+              </div>
+        </div>
     </div>
   </div>
   

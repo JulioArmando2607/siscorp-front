@@ -26,4 +26,14 @@
     background: #bbb;
     border-radius: 3px;
   }
+  .linear-totals {
+    background-color: #f5f5f5;
+    padding: 12px;
+    border-top: 2px solid #ddd;
+    font-weight: bold;
   
+    div {
+        display: inline-block;
+        margin-right: 20px;
+    }
+  }

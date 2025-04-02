@@ -20,7 +20,8 @@ import { MaestrasService } from 'app/modules/maestras/maestras.service';
 import { BehaviorSubject, lastValueFrom, map, Observable, startWith, switchMap } from 'rxjs';
 
 @Component({
-  selector: 'app-registar-autorizacion-gasto-tabla',
+  selector: 'app-analizar-autorizacion-gasto',
+  standalone: true,
   imports: [
     //  ReactiveFormsModule, // <== Agregar esta línea
     CommonModule,
@@ -37,13 +38,12 @@ import { BehaviorSubject, lastValueFrom, map, Observable, startWith, switchMap }
     FormsModule,
     MatTooltipModule
   ],
-  standalone: true, // Declarar como componente standalone
+  templateUrl: './analizar-autorizacion-gasto.component.html',
+  styleUrls: ['./analizar-autorizacion-gasto.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './registar-autorizacion-gasto-tabla.component.html',
-  styleUrl: './registar-autorizacion-gasto-tabla.component.scss'
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RegistarAutorizacionGastoTablaComponent {
+export class AnalizarAutorizacionGastoComponent {
 
   idPartidaSeleccionada: any;
   idRecursoSeleccionado: any;
@@ -60,17 +60,17 @@ export class RegistarAutorizacionGastoTablaComponent {
   }
   displayedColumns = [
     'recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada',
+    'cantidad_solicitada', 'parcial_segun_cotizacion',
     'monto_restante', 'cantidad_restante', 'cantidad', 'precio_unitario',
-    'total_calculado', 'monto_utilizado',// 'cantidad_utilizado',
-     'porcentaje', 'acciones'
+    'total_calculado', 'monto_utilizado', 'porcentaje', 'acciones'
   ];
-  
+
   footerColumns: string[] = ['totalLabel'];//, 'totalValue' 
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
-  dataSource:  MatTableDataSource<any>;
+  dataSource: MatTableDataSource<any>;
 
   estados: any[]
   centrosPoblados: any[]
@@ -117,16 +117,17 @@ export class RegistarAutorizacionGastoTablaComponent {
       cantidad: ["", [Validators.required, Validators.min(1)]],  // ✅ Mayor a 0
       precio: ["", [Validators.required, Validators.min(0.01)]]  // ✅ Mayor a 0.01
     });
- 
+
 
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
-    this.titulo = "PROYECTO TAMBO: NAYAP"
     this.verProyecto(this.id)
+    this.idAutorizacionGasto = this.route.snapshot.paramMap.get('ag'); // Obtiene el ID de la URL
+
     this.getFiltraRecursosAturorizacionGasto(true)
 
-/*    this.dataSource.filterPredicate = (data: any, filter: string) => {
-      return data.nombreRecurso?.toLowerCase().includes(filter);
-    }; */
+    /*    this.dataSource.filterPredicate = (data: any, filter: string) => {
+          return data.nombreRecurso?.toLowerCase().includes(filter);
+        }; */
 
     //this.getPartidas(this.id);
     // this.getRecursosProyecto(this.id);
@@ -250,7 +251,7 @@ export class RegistarAutorizacionGastoTablaComponent {
         idProyecto: this.id
       }
       const oRespL = await lastValueFrom(
-        this.maestraService.listaRecursosAutorizacionGastoProyecto(
+        this.maestraService.listaRecursosAutorizacionGastoProyectoAnalisis(
           data
         )
       );
@@ -426,7 +427,8 @@ export class RegistarAutorizacionGastoTablaComponent {
       cantidad: row.cantidad,
       precio: row.precio,
       precioCantidad: row.total,
-      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso
+      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
+      idHistorialPrecio: row.idHistorialPrecio
     }
 
     const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
@@ -617,23 +619,24 @@ export class RegistarAutorizacionGastoTablaComponent {
       precio: row.precio,
       total: row.total,
       idRecurso: row.idRecurso,
-      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso
+      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
+      idHistorialPrecio: row.idHistorialPrecio
     };
     this.guardarActulizar(data);
-/*    setTimeout(() => {
-      if (
-        data.total > row.montoRestante ||
-        row.montoRestante < 0 ||
-        row.cantidadRestante < 0 ||
-        data.total < 0 ||
-        row.cantidad < 0 ||
-        row.precio < 0
-      ) {
-        alert('Verifica los valores: no pueden ser negativos ni mayores al monto restante.');
-      } else {
-       
-      }
-    }, 100); */
+    /*  setTimeout(() => {
+        if (
+          data.total > row.montoRestante ||
+          row.montoRestante < 0 ||
+          row.cantidadRestante < 0 ||
+          data.total < 0 ||
+          row.cantidad < 0 ||
+          row.precio < 0
+        ) {
+          alert('Verifica los valores: no pueden ser negativos ni mayores al monto restante.');
+        } else {
+          this.guardarActulizar(data);
+        }
+      }, 100); */
 
 
   }
@@ -694,10 +697,79 @@ export class RegistarAutorizacionGastoTablaComponent {
     const filtroValor = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filtroValor.trim().toLowerCase();
   }
+
+
+  async aprobarAutorizacion() {
+    const confirmado = await this.mostrarDialogoConfirmacion();
+    if (confirmado) {
+      const data = {
+        idAutorizacionGasto: this.idAutorizacionGasto,
+        cidEstadoAG: "004", // Estado de aprobación
+        observacion: "Autorización de Gasto Aprobada"
+      };
+
+      const response = await lastValueFrom(
+        this.maestraService.solicitarAutorizacionGastoResidente(data)
+      );
+
+      if (response) {
+        this.salir();
+      }
+    }
+  }
+
+
+  private async mostrarDialogoConfirmacion(): Promise<boolean> {
+    const dialogRef = this._fuseConfirmationService.open({
+      title: 'Aprobar Autorización de Gasto',
+      message: '¿Está seguro de aprobar esta autorización de gasto?',
+      icon: {
+        show: true,
+        name: 'heroicons_outline:check-circle',
+        color: 'success'
+      },
+      actions: {
+        confirm: {
+          show: true,
+          label: 'Aprobar',
+          color: 'primary'
+        },
+        cancel: {
+          show: true,
+          label: 'Cancelar'
+        }
+      },
+      dismissible: true
+    });
+
+    return await lastValueFrom(dialogRef.afterClosed())
+      .then(result => result === 'confirmed');
+  }
   calcularTotalCalculado(): number {
     return this.dataSource?.data
       .reduce((sum, row) => sum + (Number(row.total) || 0), 0) || 0;
   }
+
+  calcularTotalMontoAsignado(): number {
+    return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.montoAsignado) || 0), 0) || 0;
+}
+
+calcularTotalCantidadAsignada(): number {
+    return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.cantidadAsignado) || 0), 0) || 0;
+}
+
+calcularTotalMontoRestante(): number {
+    return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.montoRestante) || 0), 0) || 0;
+}
+
+calcularTotalCantidadRestante(): number {
+    return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.cantidadRestante) || 0), 0) || 0;
+}
+ 
+
+calcularTotalMontoUtilizado(): number {
+    return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.montoUtilizado) || 0), 0) || 0;
+}
 
   /*  getTotalCost(): number {
       return this.dataSource.reduce((acc, row) => acc + (row.total || 0), 0);
@@ -708,4 +780,3 @@ export class RegistarAutorizacionGastoTablaComponent {
       return this.dataSource.data.reduce((acc, row) => acc + row.precioCantidad, 0);
     } */
 }
-

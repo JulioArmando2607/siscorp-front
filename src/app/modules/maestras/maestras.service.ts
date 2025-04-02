@@ -134,6 +134,11 @@ export class MaestrasService {
   listaRecursosAutorizacionGastoProyecto(data): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}lista-recursos-autorizacion-gasto-proyecto`,data);
   }
+  listaRecursosAutorizacionGastoProyectoAnalisis(data): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}lista-recursos-autorizacion-gasto-analisis`,data);
+  }
+
+
   //
 }
 

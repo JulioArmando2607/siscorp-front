@@ -20,22 +20,22 @@ import { MaestrasService } from 'app/modules/maestras/maestras.service';
 import { BehaviorSubject, lastValueFrom, map, Observable, startWith, switchMap } from 'rxjs';
 @Component({
   selector: 'app-editar-autorizacion-gasto-tabla',
-   imports: [
-      //  ReactiveFormsModule, // <== Agregar esta línea
-      CommonModule,
-      MatTableModule, // <== Agregar la importación de MatTableModule
-      MatSortModule,  // <== Agregar la importación de MatSortModule
-      MatPaginatorModule, // <== Agregar la importación de MatPaginatorModule
-      MatFormFieldModule,
-      MatInputModule,
-      MatSelectModule,
-      MatButtonModule,
-      MatIconModule,
-      MatProgressBarModule,
-      MatAutocompleteModule,
-      FormsModule,
-      MatTooltipModule
-    ],
+  imports: [
+    //  ReactiveFormsModule, // <== Agregar esta línea
+    CommonModule,
+    MatTableModule, // <== Agregar la importación de MatTableModule
+    MatSortModule,  // <== Agregar la importación de MatSortModule
+    MatPaginatorModule, // <== Agregar la importación de MatPaginatorModule
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressBarModule,
+    MatAutocompleteModule,
+    FormsModule,
+    MatTooltipModule
+  ],
   templateUrl: './editar-autorizacion-gasto-tabla.component.html',
   styleUrl: './editar-autorizacion-gasto-tabla.component.scss'
 })
@@ -60,13 +60,13 @@ export class EditarAutorizacionGastoTablaComponent {
     'total_calculado', 'monto_utilizado', //'cantidad_utilizado', 
     'porcentaje', 'acciones'
   ];
-  
+
   footerColumns: string[] = ['totalLabel'];//, 'totalValue' 
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
-  dataSource:  MatTableDataSource<any>;
+  dataSource: MatTableDataSource<any>;
 
   estados: any[]
   centrosPoblados: any[]
@@ -113,17 +113,17 @@ export class EditarAutorizacionGastoTablaComponent {
       cantidad: ["", [Validators.required, Validators.min(1)]],  // ✅ Mayor a 0
       precio: ["", [Validators.required, Validators.min(0.01)]]  // ✅ Mayor a 0.01
     });
- 
+
 
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
     this.verProyecto(this.id)
     this.idAutorizacionGasto = this.route.snapshot.paramMap.get('ag'); // Obtiene el ID de la URL
- 
+
     this.getFiltraRecursosAturorizacionGasto(true)
 
-/*    this.dataSource.filterPredicate = (data: any, filter: string) => {
-      return data.nombreRecurso?.toLowerCase().includes(filter);
-    }; */
+    /*    this.dataSource.filterPredicate = (data: any, filter: string) => {
+          return data.nombreRecurso?.toLowerCase().includes(filter);
+        }; */
 
     //this.getPartidas(this.id);
     // this.getRecursosProyecto(this.id);
@@ -424,7 +424,7 @@ export class EditarAutorizacionGastoTablaComponent {
       precio: row.precio,
       precioCantidad: row.total,
       idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
-      idHistorialPrecio:row.idHistorialPrecio
+      idHistorialPrecio: row.idHistorialPrecio
     }
 
     const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
@@ -616,23 +616,23 @@ export class EditarAutorizacionGastoTablaComponent {
       total: row.total,
       idRecurso: row.idRecurso,
       idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
-      idHistorialPrecio:row.idHistorialPrecio
+      idHistorialPrecio: row.idHistorialPrecio
     };
-
-    setTimeout(() => {
-      if (
-        data.total > row.montoRestante ||
-        row.montoRestante < 0 ||
-        row.cantidadRestante < 0 ||
-        data.total < 0 ||
-        row.cantidad < 0 ||
-        row.precio < 0
-      ) {
-        alert('Verifica los valores: no pueden ser negativos ni mayores al monto restante.');
-      } else {
-        this.guardarActulizar(data);
-      }
-    }, 100);
+    this.guardarActulizar(data);
+    /*  setTimeout(() => {
+        if (
+          data.total > row.montoRestante ||
+          row.montoRestante < 0 ||
+          row.cantidadRestante < 0 ||
+          data.total < 0 ||
+          row.cantidad < 0 ||
+          row.precio < 0
+        ) {
+          alert('Verifica los valores: no pueden ser negativos ni mayores al monto restante.');
+        } else {
+          this.guardarActulizar(data);
+        }
+      }, 100); */
 
 
   }
@@ -694,7 +694,30 @@ export class EditarAutorizacionGastoTablaComponent {
     this.dataSource.filter = filtroValor.trim().toLowerCase();
   }
 
+  calcularTotalCalculado(): number {
+    return this.dataSource?.data
+      .reduce((sum, row) => sum + (Number(row.total) || 0), 0) || 0;
+  }
+  calcularTotalMontoAsignado(): number {
+    return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.montoAsignado) || 0), 0) || 0;
+  }
 
+  calcularTotalCantidadAsignada(): number {
+    return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.cantidadAsignado) || 0), 0) || 0;
+  }
+
+  calcularTotalMontoRestante(): number {
+    return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.montoRestante) || 0), 0) || 0;
+  }
+
+  calcularTotalCantidadRestante(): number {
+    return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.cantidadRestante) || 0), 0) || 0;
+  }
+
+
+  calcularTotalMontoUtilizado(): number {
+    return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.montoUtilizado) || 0), 0) || 0;
+  }
   /*  getTotalCost(): number {
       return this.dataSource.reduce((acc, row) => acc + (row.total || 0), 0);
     }
