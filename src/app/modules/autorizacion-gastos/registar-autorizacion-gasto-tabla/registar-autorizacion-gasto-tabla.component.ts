@@ -60,7 +60,8 @@ export class RegistarAutorizacionGastoTablaComponent {
   }
   displayedColumns = [
     'recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada',
-    'monto_restante', 'cantidad_restante', 'cantidad', 'precio_unitario',
+    'cantidad_solicitada', 'parcial_segun_cotizacion',
+    'monto_restante', 'cantidad_restante', 'precio_unitario','cantidad', 
     'total_calculado', 'monto_utilizado',// 'cantidad_utilizado',
      'porcentaje', 'acciones'
   ];
@@ -123,13 +124,7 @@ export class RegistarAutorizacionGastoTablaComponent {
     this.titulo = "PROYECTO TAMBO: NAYAP"
     this.verProyecto(this.id)
     this.getFiltraRecursosAturorizacionGasto(true)
-
-/*    this.dataSource.filterPredicate = (data: any, filter: string) => {
-      return data.nombreRecurso?.toLowerCase().includes(filter);
-    }; */
-
-    //this.getPartidas(this.id);
-    // this.getRecursosProyecto(this.id);
+ 
     // 🔥 Monitorear el input de partidas y actualizar el filtrado en tiempo real
     this.filterForm.controls['partidaControl'].valueChanges.pipe(
       startWith(''),
@@ -238,13 +233,10 @@ export class RegistarAutorizacionGastoTablaComponent {
     const distritoSeleccionado = event.value;
     this.getCentrosPoblados(distritoSeleccionado);
   }
-
-
-
-
-  async getFiltraRecursosAturorizacionGasto(resetPage: boolean = false) {
+  
+  async getFiltraRecursosAturorizacionGasto(mantenerFiltro: boolean = true) {
     try {
-
+      const currentFilter = mantenerFiltro ? this.dataSource?.filter : '';
       const data = {
         idAutorizacionGasto: this.idAutorizacionGasto,
         idProyecto: this.id
@@ -261,6 +253,17 @@ export class RegistarAutorizacionGastoTablaComponent {
         this.totalElements = oRespL.data.length;
         this.dataSource = new MatTableDataSource<any>(this.proyectos);
         console.log(this.dataSource)
+
+        // Restore filter if needed
+        if (mantenerFiltro && currentFilter) {
+          this.dataSource.filter = currentFilter;
+        }
+        // Set up filter predicate if not already set
+        if (!this.dataSource.filterPredicate) {
+          this.dataSource.filterPredicate = (data: any, filter: string) => {
+            return data.nombreRecurso?.toLowerCase().includes(filter.toLowerCase());
+          };
+        }
         this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
 
       }
@@ -273,7 +276,7 @@ export class RegistarAutorizacionGastoTablaComponent {
     console.log(event.pageIndex)
     this.pageIndex = event.pageIndex;  // Actualizar página actual
     this.pageSize = event.pageSize;    // Actualizar tamaño de página
-    this.getFiltraRecursosAturorizacionGasto();        // Recargar datos con nueva paginación
+    this.getFiltraRecursosAturorizacionGasto(true);        // Recargar datos con nueva paginación
   }
 
   openConfirmationDialog(codigo): void {
@@ -426,14 +429,17 @@ export class RegistarAutorizacionGastoTablaComponent {
       cantidad: row.cantidad,
       precio: row.precio,
       precioCantidad: row.total,
-      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso
+      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
+     /// idHistorialPrecio: row.idHistorialPrecio,
+      montoRestante: row.montoRestante - row.total,
+      cantidadRestante: row.cantidadRestante - row.cantidad
     }
 
     const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
     this.idAutorizacionGasto = response.data.response
     console.log(response.data.response);
     if (response) {
-      this.getFiltraRecursosAturorizacionGasto()
+      this.getFiltraRecursosAturorizacionGasto(true);        // Recargar datos con nueva paginación
     }
 
   }
@@ -441,38 +447,7 @@ export class RegistarAutorizacionGastoTablaComponent {
   validarRecursoSeleccionado(): boolean {
     return this.proyectos.some(proyecto => proyecto.idRecurso === this.idRecursoSeleccionado);
   }
-
-  /*  async setRegistrarAutorizacionGasto() {
-      console.log(this.id)
-      console.log(this.idPartidaSeleccionada)
-      console.log(this.idRecursoSeleccionado)
-      console.log(this.filterForm.get("cantidad").value)
-      console.log(this.filterForm.get("precio").value)
-  
-  
-      const data = {
-        idProyecto: this.id,
-        idAutorizacionGasto: this.idAutorizacionGasto,
-        idPartida: this.idPartidaSeleccionada,
-        idRecurso: this.idRecursoSeleccionado,
-        cantidad: this.filterForm.get("cantidad").value,
-        precio: this.filterForm.get("precio").value,
-        precioCantidad: this.filterForm.get("cantidad").value * this.filterForm.get("precio").value
-      }
-  
-      const response = await this.maestraService.setRegistrarAutorizacionGasto(data).toPromise();
-      this.idAutorizacionGasto = response.data.response
-      console.log(response.data.response);
-      //this.partidas = response.data || [];
-      if (response) {
-        this.getFiltraRecursosAturorizacionGasto()
-      }
-  
-      this.idPartidaSeleccionada = 0
-      this.idRecursoSeleccionado = 0
-      this.filterForm.reset();
-    } */
-
+ 
   editar(row) {
     this.idAutorizacionGastoRecurso = row.idAutorizacionGastoRecurso
     console.log(row.idAutorizacionGastoRecurso)
@@ -502,7 +477,7 @@ export class RegistarAutorizacionGastoTablaComponent {
       const response = await this.maestraService.setEliminarAutorizacionGastoRecurso(data).toPromise();
       console.log(response);
       if (response) {
-        this.getFiltraRecursosAturorizacionGasto()
+        this.getFiltraRecursosAturorizacionGasto(true);        // Recargar datos con nueva paginación
       }
     }
 
@@ -617,7 +592,9 @@ export class RegistarAutorizacionGastoTablaComponent {
       precio: row.precio,
       total: row.total,
       idRecurso: row.idRecurso,
-      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso
+      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
+      montoRestante: row.montoRestante,
+      cantidadRestante: row.cantidadRestante
     };
     this.guardarActulizar(data);
 /*    setTimeout(() => {
@@ -661,8 +638,7 @@ export class RegistarAutorizacionGastoTablaComponent {
   guardarActulizar(data) {
     console.log(data)
     this.setRegistrarAutorizacionGasto(data)
-    // this.getFiltraRecursosAturorizacionGasto(true)
-  }
+   }
 
   getColor(estado: string): string {
     switch (estado.toUpperCase()) {
@@ -698,14 +674,6 @@ export class RegistarAutorizacionGastoTablaComponent {
     return this.dataSource?.data
       .reduce((sum, row) => sum + (Number(row.total) || 0), 0) || 0;
   }
-
-  /*  getTotalCost(): number {
-      return this.dataSource.reduce((acc, row) => acc + (row.total || 0), 0);
-    }
-     */
-
-  /*  getTotalCost(): number {
-      return this.dataSource.data.reduce((acc, row) => acc + row.precioCantidad, 0);
-    } */
+ 
 }
 

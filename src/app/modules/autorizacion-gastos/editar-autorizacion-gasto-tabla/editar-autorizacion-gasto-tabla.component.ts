@@ -7,7 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -47,6 +47,7 @@ export class EditarAutorizacionGastoTablaComponent {
   isEditar: boolean;
   idAutorizacionGastoRecurso: any;
   idHistorialPrecio: any;
+  autorizacionGasto: any;
   async descargarExcelProyecto() {
     const roresp = await lastValueFrom(this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(),
     ))
@@ -56,7 +57,8 @@ export class EditarAutorizacionGastoTablaComponent {
   }
   displayedColumns = [
     'recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada',
-    'monto_restante', 'cantidad_restante', 'cantidad', 'precio_unitario',
+    'parcial_segun_cotizacion', 'cantidad_solicitada',
+    'monto_restante', 'cantidad_restante', 'precio_unitario', 'cantidad',
     'total_calculado', 'monto_utilizado', //'cantidad_utilizado', 
     'porcentaje', 'acciones'
   ];
@@ -67,12 +69,7 @@ export class EditarAutorizacionGastoTablaComponent {
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
   dataSource: MatTableDataSource<any>;
-
-  estados: any[]
-  centrosPoblados: any[]
-  distritos: any[]
-  provincias: any[]
-  departamentos: any[] = []
+ 
   proyectos: any[]
   configForm: UntypedFormGroup;
   id: string | null = null;
@@ -121,12 +118,6 @@ export class EditarAutorizacionGastoTablaComponent {
 
     this.getFiltraRecursosAturorizacionGasto(true)
 
-    /*    this.dataSource.filterPredicate = (data: any, filter: string) => {
-          return data.nombreRecurso?.toLowerCase().includes(filter);
-        }; */
-
-    //this.getPartidas(this.id);
-    // this.getRecursosProyecto(this.id);
     // 🔥 Monitorear el input de partidas y actualizar el filtrado en tiempo real
     this.filterForm.controls['partidaControl'].valueChanges.pipe(
       startWith(''),
@@ -161,58 +152,7 @@ export class EditarAutorizacionGastoTablaComponent {
       this.titulo = "PROYECTO TAMBO: " + roresp.data[0].tambo
       console.log(this.titulo)
     }
-  }
-
-  async eliminarProyecto(proyecto: any) {
-    const confirmado = await this.dataModal(522, 'Eliminar proyecto', 'Deseas eliminar este proyecto?', "warning");
-
-    if (confirmado) {
-      console.log('Eliminando proyecto:', proyecto);
-      const oRespL = await lastValueFrom(this.maestraService.getEliminar(proyecto.idProyecto));
-
-      if (oRespL) {
-        this.getFiltraRecursosAturorizacionGasto();
-      }
-    } else {
-      console.log('Eliminación cancelada.');
-    }
-  }
-
-
-  descargarProyectos() { }
-
-  async getDepartamentos() {
-    this.departamentos = []
-    const oRespL = await lastValueFrom(
-      this.maestraService.getDepartamentos()
-    );
-    this.departamentos = oRespL.data
-  }
-
-  async getProvincia(departamentoUbigeo) {
-    this.provincias = []
-    this.distritos = []
-    this.centrosPoblados = []
-    const oRespL = await lastValueFrom(
-      this.maestraService.getProvincias(departamentoUbigeo)
-    );
-    this.provincias = oRespL.data
-  }
-  async getDistrito(provinciaUbigeo) {
-    this.distritos = []
-    this.centrosPoblados = []
-    const oRespL = await lastValueFrom(
-      this.maestraService.getDistrito(provinciaUbigeo)
-    );
-    this.distritos = oRespL.data
-  }
-  async getCentrosPoblados(distritoUbigeo) {
-    this.centrosPoblados = []
-    const oRespL = await lastValueFrom(
-      this.maestraService.getCentrosPoblados(distritoUbigeo)
-    );
-    this.centrosPoblados = oRespL.data
-  }
+  } 
 
   filtrar() {
     const filtros = this.filterForm.getRawValue();
@@ -222,26 +162,10 @@ export class EditarAutorizacionGastoTablaComponent {
   limpiar() {
     this.filterForm.reset()
   }
-
-  onDepartamentoChange(event) {
-    const departamentoSeleccionado = event.value;
-    this.getProvincia(departamentoSeleccionado);
-  }
-  onProvinciaChange(event) {
-    const provinciaSeleccionado = event.value;
-    this.getDistrito(provinciaSeleccionado);
-  }
-  onDistritoChange(event) {
-    const distritoSeleccionado = event.value;
-    this.getCentrosPoblados(distritoSeleccionado);
-  }
-
-
-
-
-  async getFiltraRecursosAturorizacionGasto(resetPage: boolean = false) {
+   
+  async getFiltraRecursosAturorizacionGasto(mantenerFiltro: boolean = true) {
     try {
-
+      const currentFilter = mantenerFiltro ? this.dataSource?.filter : '';
       const data = {
         idAutorizacionGasto: this.idAutorizacionGasto,
         idProyecto: this.id
@@ -258,6 +182,17 @@ export class EditarAutorizacionGastoTablaComponent {
         this.totalElements = oRespL.data.length;
         this.dataSource = new MatTableDataSource<any>(this.proyectos);
         console.log(this.dataSource)
+
+        // Restore filter if needed
+        if (mantenerFiltro && currentFilter) {
+          this.dataSource.filter = currentFilter;
+        }
+        // Set up filter predicate if not already set
+        if (!this.dataSource.filterPredicate) {
+          this.dataSource.filterPredicate = (data: any, filter: string) => {
+            return data.nombreRecurso?.toLowerCase().includes(filter.toLowerCase());
+          };
+        }
         this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
 
       }
@@ -265,14 +200,7 @@ export class EditarAutorizacionGastoTablaComponent {
       console.error('Error al obtener proyectos:', error);
     }
   }
-
-  onPaginateChange(event: PageEvent) {
-    console.log(event.pageIndex)
-    this.pageIndex = event.pageIndex;  // Actualizar página actual
-    this.pageSize = event.pageSize;    // Actualizar tamaño de página
-    this.getFiltraRecursosAturorizacionGasto();        // Recargar datos con nueva paginación
-  }
-
+ 
   openConfirmationDialog(codigo): void {
     // Open the dialog and save the reference of it
     const dialogRef = this._fuseConfirmationService.open(
@@ -297,23 +225,7 @@ export class EditarAutorizacionGastoTablaComponent {
       this.partidasSubject.next([]);
     }
   }
-
-  /*   async getRecursosProyecto(id) {
-      try {
-        const data ={
-          idAutorizacionGasto:"",
-          idProyecto:id
-        }
-        const response = await this.maestraService.listaRecursosAutorizacionGastoProyecto(data).toPromise();
-        this.partidas = response.data || [];
-        this.partidasSubject.next(this.partidas); // Guardamos los datos en el Subject
-      } catch (error) {
-        console.error('Error al cargar partidas:', error);
-        this.partidas = [];
-        this.partidasSubject.next([]);
-      }
-    } */
-
+ 
   // Obtener recursos según la partida seleccionada
   async getRecursos(idPartida: number) {
     try {
@@ -376,46 +288,6 @@ export class EditarAutorizacionGastoTablaComponent {
   }
 
   async setRegistrarAutorizacionGasto(row) {
-
-
-    /*     if (this.isEditar) {
-    
-          console.log(this.id)
-          console.log(this.idPartidaSeleccionada)
-          console.log(this.idRecursoSeleccionado)
-          console.log(this.idAutorizacionGastoRecurso)
-          console.log(this.filterForm.get("cantidad").value)
-          console.log(this.filterForm.get("precio").value)
-    
-          const data = {
-            idHistorialPrecio: this.idHistorialPrecio,
-            idAutorizacionGastoRecurso: this.idAutorizacionGastoRecurso,
-            idProyecto: this.id,
-            idAutorizacionGasto: this.idAutorizacionGasto,
-            idPartida: this.idPartidaSeleccionada,
-            idRecurso: this.idRecursoSeleccionado,
-            cantidad: this.filterForm.get("cantidad").value,
-            precio: this.filterForm.get("precio").value,
-            precioCantidad: this.filterForm.get("cantidad").value * this.filterForm.get("precio").value
-          }
-    
-          const response = await this.maestraService.setRegistrarAutorizacionGasto(data).toPromise();
-          // this.idAutorizacionGasto = response.data.response
-          console.log(response.data.response);
-          //this.partidas = response.data || [];
-          if (response) {
-            this.getFiltraRecursosAturorizacionGasto()
-          }
-    
-          this.idPartidaSeleccionada = 0
-          this.idRecursoSeleccionado = 0
-          this.filterForm.reset();
-        } else { */
-    /*     if (this.validarRecursoSeleccionado()) {
-          alert('Este recurso ya ha sido seleccionado en el proyecto.');
-          return; // Sale de la función y evita el registro duplicado
-        } */
-
     const data = {
       idProyecto: this.id,
       idAutorizacionGasto: this.idAutorizacionGasto,
@@ -424,14 +296,16 @@ export class EditarAutorizacionGastoTablaComponent {
       precio: row.precio,
       precioCantidad: row.total,
       idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
-      idHistorialPrecio: row.idHistorialPrecio
+      idHistorialPrecio: row.idHistorialPrecio,
+      montoRestante: row.montoAsignado - (row.montoUtilizado + row.total),
+      cantidadRestante: row.cantidadAsignado - (row.cantidadRestante + row.cantidad)
     }
 
     const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
     this.idAutorizacionGasto = response.data.response
     console.log(response.data.response);
     if (response) {
-      this.getFiltraRecursosAturorizacionGasto()
+      this.getFiltraRecursosAturorizacionGasto(true)
     }
 
   }
@@ -439,37 +313,7 @@ export class EditarAutorizacionGastoTablaComponent {
   validarRecursoSeleccionado(): boolean {
     return this.proyectos.some(proyecto => proyecto.idRecurso === this.idRecursoSeleccionado);
   }
-
-  /*  async setRegistrarAutorizacionGasto() {
-      console.log(this.id)
-      console.log(this.idPartidaSeleccionada)
-      console.log(this.idRecursoSeleccionado)
-      console.log(this.filterForm.get("cantidad").value)
-      console.log(this.filterForm.get("precio").value)
-  
-  
-      const data = {
-        idProyecto: this.id,
-        idAutorizacionGasto: this.idAutorizacionGasto,
-        idPartida: this.idPartidaSeleccionada,
-        idRecurso: this.idRecursoSeleccionado,
-        cantidad: this.filterForm.get("cantidad").value,
-        precio: this.filterForm.get("precio").value,
-        precioCantidad: this.filterForm.get("cantidad").value * this.filterForm.get("precio").value
-      }
-  
-      const response = await this.maestraService.setRegistrarAutorizacionGasto(data).toPromise();
-      this.idAutorizacionGasto = response.data.response
-      console.log(response.data.response);
-      //this.partidas = response.data || [];
-      if (response) {
-        this.getFiltraRecursosAturorizacionGasto()
-      }
-  
-      this.idPartidaSeleccionada = 0
-      this.idRecursoSeleccionado = 0
-      this.filterForm.reset();
-    } */
+ 
 
   editar(row) {
     this.idAutorizacionGastoRecurso = row.idAutorizacionGastoRecurso
@@ -609,58 +453,14 @@ export class EditarAutorizacionGastoTablaComponent {
     console.log(row);
     row.total = (row.cantidad || 0) * (row.precio || 0);
     this.dataSource._updateChangeSubscription();
-
-    const data = {
-      cantidad: row.cantidad,
-      precio: row.precio,
-      total: row.total,
-      idRecurso: row.idRecurso,
-      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
-      idHistorialPrecio: row.idHistorialPrecio
-    };
-    this.guardarActulizar(data);
-    /*  setTimeout(() => {
-        if (
-          data.total > row.montoRestante ||
-          row.montoRestante < 0 ||
-          row.cantidadRestante < 0 ||
-          data.total < 0 ||
-          row.cantidad < 0 ||
-          row.precio < 0
-        ) {
-          alert('Verifica los valores: no pueden ser negativos ni mayores al monto restante.');
-        } else {
-          this.guardarActulizar(data);
-        }
-      }, 100); */
-
-
-  }
-
-  /*
-  recalcularTotal(index: number): void {
+ 
+    this.guardarActulizar(row);
     
-    const row = this.dataSource.data[index];
-    console.log(row);
-    row.total = (row.cantidad || 0) * (row.precio || 0);
-    this.dataSource._updateChangeSubscription(); // refresca la tabla
-    const data = { cantidad: row.cantidad, precio: row.precio, total: row.total, idRecurso: row.idRecurso }
-
-    setTimeout(() => {
-      if (data.total > row.montoRestante) {
-        alert('El monto no puede ser mayor al monto restante.');
-      } else {
-        this.guardarActulizar(data)
-      }
-    }, 100);
-    //primero que data.total tenga el valor
-
   }
-*/
+
   guardarActulizar(data) {
     console.log(data)
     this.setRegistrarAutorizacionGasto(data)
-    // this.getFiltraRecursosAturorizacionGasto(true)
   }
 
   getColor(estado: string): string {
@@ -718,12 +518,23 @@ export class EditarAutorizacionGastoTablaComponent {
   calcularTotalMontoUtilizado(): number {
     return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.montoUtilizado) || 0), 0) || 0;
   }
-  /*  getTotalCost(): number {
-      return this.dataSource.reduce((acc, row) => acc + (row.total || 0), 0);
-    }
-     */
 
-  /*  getTotalCost(): number {
-      return this.dataSource.data.reduce((acc, row) => acc + row.precioCantidad, 0);
-    } */
+
+  async getAutorizacionGastos() {
+    const data = {
+      idProyecto: this.id,
+      idAutorizacionGasto: this.idAutorizacionGasto
+    }
+    const oRespL = await lastValueFrom(
+      this.maestraService.getAutorizacionGasto(
+        data
+      )
+    );
+    console.log(oRespL.data[0])
+    this.autorizacionGasto = oRespL.data[0];
+    if (oRespL?.data?.content) {
+
+    }
+  }
+
 }

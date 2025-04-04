@@ -19,9 +19,14 @@
         <input matInput (keyup)="aplicarFiltro($event)" placeholder="Escribe el nombre del recurso">
       </mat-form-field>
 
-      <button mat-flat-button color="primary" (click)="aprobarAutorizacion()">
+      <button *ngIf="!isResidente" mat-flat-button color="primary" (click)="aprobarAutorizacion()">
         <mat-icon>check_circle</mat-icon>
         <span class="ml-2">Aprobar Autorización</span>
+      </button>
+
+      <button *ngIf="isResidente && autorizacionGasto.cidEstado == '001'" mat-flat-button color="primary" (click)="solicitarAutorizacion()">
+        <mat-icon>check_circle</mat-icon>
+        <span class="ml-2">Solicitar Autorización de Gasto</span>
       </button>
     </div>
 
@@ -67,22 +72,15 @@
           <td mat-cell *matCellDef="let row"> {{ row.cantidadAsignado }} </td>
 
         </ng-container>
-
-        <!-- CANT. SOLIC. -->
+ 
         <ng-container matColumnDef="cantidad_solicitada">
-          <th mat-header-cell *matHeaderCellDef> CANTIDAD SOLICITADA ACUMULADO</th>
-          <td mat-cell *matCellDef="let row"> {{ row.cantidadSolicitada }}
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="costo_unitario_cotizado">
-          <th mat-header-cell *matHeaderCellDef> C.U. COTIZADO </th>
-          <td mat-cell *matCellDef="let row"> {{ row.costoUnitarioCotizado | number:'1.2-2' }} </td>
+          <th mat-header-cell *matHeaderCellDef> CANTIDAD SOLICITADA ACUMULADO </th>
+          <td mat-cell *matCellDef="let row"> {{ row.cantidadUtilizadoAcumulado }} </td>
         </ng-container>
 
         <ng-container matColumnDef="parcial_segun_cotizacion">
-          <th mat-header-cell *matHeaderCellDef> PARCIAL SEGUN COTIZACION ACUMULADO</th>
-          <td mat-cell *matCellDef="let row"> {{ row.parcialSegunCotizacion | number:'1.2-2' }} </td>
+          <th mat-header-cell *matHeaderCellDef> PARCIAL SEGUN COTIZACION ACUMULADO </th>
+          <td mat-cell *matCellDef="let row"> {{ row.montoUtilizadoAcumulado }} </td>
         </ng-container>
  
         <!-- MONTO RESTANTE -->
@@ -103,7 +101,7 @@
         <ng-container matColumnDef="cantidad">
           <th mat-header-cell *matHeaderCellDef> CANTIDAD </th>
           <td mat-cell *matCellDef="let row; let i = index">
-            <input matInput type="number" [(ngModel)]="row.cantidad" [ngModelOptions]="{standalone: true}"
+            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.cantidad" [ngModelOptions]="{standalone: true}"
               class="w-full px-2 py-1 border rounded" />
           </td>
 
@@ -113,7 +111,7 @@
         <ng-container matColumnDef="precio_unitario">
           <th mat-header-cell *matHeaderCellDef> PRECIO UNITARIO </th>
           <td mat-cell *matCellDef="let row; let i = index">
-            <input matInput type="number" [(ngModel)]="row.precio" (blur)="recalcularTotal(i)"
+            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.precio" (blur)="recalcularTotal(i)"
               [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded" />
           </td>
 

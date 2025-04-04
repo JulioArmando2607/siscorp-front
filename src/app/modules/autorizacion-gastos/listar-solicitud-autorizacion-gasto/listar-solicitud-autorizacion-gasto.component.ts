@@ -124,8 +124,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
     this.getEstados()
     this.filterForm.reset()
     this.getFiltrarProyectos(true)
-
-  }
+   }
 
   async eliminarProyecto(proyecto: any) {
     const confirmado = await this.dataModal(522, 'Eliminar proyecto', 'Deseas eliminar este proyecto?', 'warning');
@@ -292,7 +291,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
       console.error('Error al obtener proyectos:', error);
     }
   }
-
+  
   onPaginateChange(event: PageEvent) {
     console.log(event.pageIndex)
     this.pageIndex = event.pageIndex;  // Actualizar página actual

@@ -107,6 +107,9 @@ export class MaestrasService {
   getListarAutorizacionGasto(rawValue,pageIndex , pageSize): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}listar-autorizacion-gasto?page=${pageIndex}&size=${pageSize}&sort=idAutorizacionGasto,desc`,rawValue);
   }
+  getAutorizacionGasto(rawValue): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}dato-autorizacion-gasto`,rawValue);
+  }
 
   getConsultaUsuarioDni(dni): Observable<any> {
     return this.http.get(`${this.getUrlMaestras()}consulta-usuario-dni/${dni}`);
