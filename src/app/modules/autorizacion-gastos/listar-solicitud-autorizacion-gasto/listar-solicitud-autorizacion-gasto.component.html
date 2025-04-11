@@ -12,8 +12,8 @@
                 <mat-icon>exit_to_app</mat-icon> Salir
             </button>
         </div>
-    </div> 
-    
+    </div>
+
     <form [formGroup]="filterForm">
         <!-- Contenedor de formulario -->
         <div class="border p-6 rounded-lg shadow-lg">
@@ -135,9 +135,10 @@
                     </button>
 
                     <!-- Botón Solicitar -->
-                    <button *ngIf="row.cidEstado!=='002' && isResidente && row.cidEstado!=='004'" mat-icon-button
-                        color="accent" (click)="solicitarAutorizacion(row)" matTooltip="Solicitar Autorizacion de Gasto"
-                        matTooltipPosition="above">
+                    <button
+                        *ngIf="row.cidEstado!=='002' && isResidente && row.cidEstado!=='004' && row.cidEstado!=='005' "
+                        mat-icon-button color="accent" (click)="solicitarAutorizacion(row)"
+                        matTooltip="Solicitar Autorizacion de Gasto" matTooltipPosition="above">
                         <mat-icon>send</mat-icon>
                     </button>
 
@@ -151,16 +152,31 @@
                         matTooltipPosition="above">
                         <mat-icon>visibility</mat-icon>
                     </button>
-                <!---*ngIf="isSupervisor && row.cidEstado=='002'"-->
-                    <button  mat-icon-button color="primary" class="ml-2" (click)="analizarAutorizacionGasto(row)" matTooltip="Analizar Autorización de Gasto">
+
+                    <button *ngIf="isAdministrador && row.cidEstado=='004'" mat-icon-button color="primary"
+                        (click)="observarAutorizacionGasto(row)" matTooltip="Observar Autorización de Gasto"
+                        matTooltipPosition="above">
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+
+                    <!---*ngIf="isSupervisor && row.cidEstado=='002'"-->
+                    <button mat-icon-button color="primary" class="ml-2" (click)="analizarAutorizacionGasto(row)"
+                        matTooltip="Analizar Autorización de Gasto">
                         <mat-icon>analytics</mat-icon>
                     </button>
-                  
-                    <!-- Botón para Cargar Partidas y Precios Unitarios -->
-                    <button mat-icon-button color="accent"  class="ml-2" (click)="descargarAutorizacion(row)"
+
+                    <!-- Botón para Cargar Partidas y Precios Unitarios   <button mat-icon-button color="accent" class="ml-2" (click)="descargarAutorizacion(row)"
                         matTooltip="Descargar Autorizacion de Gasto">
                         <mat-icon>download</mat-icon>
+                    </button>-->
+                  
+
+                    <!-- Botón para Cargar Partidas y Precios Unitarios -->
+                    <button mat-icon-button color="accent" class="ml-2" (click)="descargarAutorizacionAuditado(row)"
+                        matTooltip="Descargar Autorizacion de Gasto Auditado">
+                        <mat-icon>download</mat-icon>
                     </button>
+
 
                 </mat-cell>
             </ng-container>

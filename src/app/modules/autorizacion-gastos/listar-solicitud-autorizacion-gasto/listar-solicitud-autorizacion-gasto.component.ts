@@ -26,7 +26,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 @Component({
   selector: 'app-listar-solicitud-autorizacion-gasto',
   imports: [
-    ReactiveFormsModule, 
+    ReactiveFormsModule,
     CommonModule,
     MatTableModule, // <== Agregar la importación de MatTableModule
     MatSortModule,  // <== Agregar la importación de MatSortModule
@@ -51,6 +51,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
   recursos: any;
   recursosSubject: any;
   Sess
+  isAdministrador: boolean;
   async descargarExcelProyecto() {
     const roresp = await lastValueFrom(this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(),
     ))
@@ -110,7 +111,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
       codigo: [''],
       estado: [''],
       fecha: [""],
-      idEstado:['']
+      idEstado: ['']
     });
 
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
@@ -124,7 +125,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
     this.getEstados()
     this.filterForm.reset()
     this.getFiltrarProyectos(true)
-   }
+  }
 
   async eliminarProyecto(proyecto: any) {
     const confirmado = await this.dataModal(522, 'Eliminar proyecto', 'Deseas eliminar este proyecto?', 'warning');
@@ -265,9 +266,9 @@ export class ListarSolicitudAutorizacionGastoComponent {
       }
       const data = {
         idProyecto: this.id,
-        idEstado:this.filterForm.get("estado").value,
-        fecha:this.filterForm.get("fecha").value,
-        codigo:this.filterForm.get("codigo").value
+        idEstado: this.filterForm.get("estado").value,
+        fecha: this.filterForm.get("fecha").value,
+        codigo: this.filterForm.get("codigo").value
       }
       const oRespL = await lastValueFrom(
         this.maestraService.getListarAutorizacionGasto(
@@ -291,7 +292,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
       console.error('Error al obtener proyectos:', error);
     }
   }
-  
+
   onPaginateChange(event: PageEvent) {
     console.log(event.pageIndex)
     this.pageIndex = event.pageIndex;  // Actualizar página actual
@@ -454,30 +455,28 @@ export class ListarSolicitudAutorizacionGastoComponent {
       }
     }
   }
-
   validarusuario() {
+    // Reiniciamos todos los roles
+    this.isAdministrador = false;
+    this.isSupervisor = false;
+    this.isResidente = false;
+
+    // Validar Residente
     if (Session.identity.rol == 'UPS-RESIDENTE-PROYECTO') {
-      this.isSupervisor = false;
-      this.isResidente = true
-
-    }
-    // this.isBotonesGestion= false;
-
-    if (Session.identity.rol == 'UPS-SUPERVISOR-PROYECTO') {
-      this.isResidente = false
-      this.isSupervisor = true
-
+      this.isResidente = true;
     }
 
-    if (
-      Session.identity.rol !== 'UPS-RESIDENTE-PROYECTO' &&
-      Session.identity.rol !== 'UPS-SUPERVISOR-PROYECTO'
-    ) {
-      this.isSupervisor = false;
-      this.isResidente = false;
+    // Validar Supervisor
+    else if (Session.identity.rol == 'UPS-SUPERVISOR-PROYECTO') {
+      this.isSupervisor = true;
     }
 
+    // Si no es ninguno de los anteriores, es Administrador (o cualquier otro rol general)
+    else {
+      this.isAdministrador = true;
+    }
   }
+
 
   async getEstados() {
 
@@ -493,5 +492,15 @@ export class ListarSolicitudAutorizacionGastoComponent {
     this._router.navigate(['autorizacion-gastos/analizar-autorizacion-gasto', this.id, row.idAutorizacionGasto]);
   }
 
+  async descargarAutorizacionAuditado(row) {
+    console.log(row)
+    const data = {
+      idAutorizacionGasto: row.idAutorizacionGasto,
+      idProyecto: row.idProyecto
+    }
+    const response = await this.maestraService.anexo23AutorizacionGasto(data).toPromise();
+    console.log(response.data.response)
+    this.excelService.exportGastoAutorizacion(response.data.response)
+  }
 }
 

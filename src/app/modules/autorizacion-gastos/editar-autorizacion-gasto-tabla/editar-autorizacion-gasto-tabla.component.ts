@@ -452,8 +452,7 @@ export class EditarAutorizacionGastoTablaComponent {
 
     console.log(row);
     row.total = (row.cantidad || 0) * (row.precio || 0);
-    this.dataSource._updateChangeSubscription();
- 
+    this.dataSource._updateChangeSubscription(); 
     this.guardarActulizar(row);
     
   }
@@ -488,7 +487,6 @@ export class EditarAutorizacionGastoTablaComponent {
     }
   }
 
-
   aplicarFiltro(event: Event) {
     const filtroValor = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filtroValor.trim().toLowerCase();
@@ -513,7 +511,6 @@ export class EditarAutorizacionGastoTablaComponent {
   calcularTotalCantidadRestante(): number {
     return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.cantidadRestante) || 0), 0) || 0;
   }
-
 
   calcularTotalMontoUtilizado(): number {
     return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.montoUtilizado) || 0), 0) || 0;

@@ -19,7 +19,14 @@
         <input matInput (keyup)="aplicarFiltro($event)" placeholder="Escribe el nombre del recurso">
       </mat-form-field>
 
-      <button *ngIf="!isResidente" mat-flat-button color="primary" (click)="aprobarAutorizacion()">
+      <button *ngIf="!isResidente && isSupervisor" mat-flat-button color="primary" (click)="aprobarAutorizacion()">
+        <mat-icon>check_circle</mat-icon>
+        <span class="ml-2">Aprobar Autorización</span>
+      </button>
+
+      
+
+      <button *ngIf="isAdmin" mat-flat-button color="primary" (click)="aprobarAutorizacionAdmin()">
         <mat-icon>check_circle</mat-icon>
         <span class="ml-2">Aprobar Autorización</span>
       </button>

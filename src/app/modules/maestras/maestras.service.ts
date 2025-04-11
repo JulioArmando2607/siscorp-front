@@ -141,6 +141,9 @@ export class MaestrasService {
     return this.http.post(`${this.getUrlAutorizacionGasto()}lista-recursos-autorizacion-gasto-analisis`,data);
   }
 
+  anexo23AutorizacionGasto(data): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}anexo23-autorizacion-gasto`,data);
+  }
 
   //
 }

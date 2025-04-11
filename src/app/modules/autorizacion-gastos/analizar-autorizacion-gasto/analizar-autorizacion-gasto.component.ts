@@ -351,6 +351,24 @@ export class AnalizarAutorizacionGastoComponent {
     }
   }
 
+  async aprobarAutorizacionAdmin() {
+    const confirmado = await this.mostrarDialogoConfirmacion();
+    if (confirmado) {
+      const data = {
+        idAutorizacionGasto: this.idAutorizacionGasto,
+        cidEstadoAG: "005", // Estado de aprobación
+        observacion: "Autorización de Gasto Aprobada"
+      };
+
+      const response = await lastValueFrom(
+        this.maestraService.solicitarAutorizacionGastoResidente(data)
+      );
+
+      if (response) {
+        this.salir();
+      }
+    }
+  }
 
   private async mostrarDialogoConfirmacion(): Promise<boolean> {
     const dialogRef = this._fuseConfirmationService.open({
