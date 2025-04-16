@@ -60,8 +60,9 @@ export class RegistarAutorizacionGastoTablaComponent {
   }
   displayedColumns = [
     'recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada',
-    'cantidad_solicitada', 'parcial_segun_cotizacion',
-    'monto_restante', 'cantidad_restante', 'precio_unitario','cantidad', 
+    'parcial_segun_cotizacion', 'cantidad_solicitada',
+    'cantidad_restante',  'monto_restante',
+    'cantidad', 'precio_unitario',
     'total_calculado', 'monto_utilizado',// 'cantidad_utilizado',
      'porcentaje', 'acciones'
   ];

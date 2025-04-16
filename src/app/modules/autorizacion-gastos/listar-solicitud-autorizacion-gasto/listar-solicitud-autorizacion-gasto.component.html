@@ -122,62 +122,69 @@
             <ng-container matColumnDef="acciones">
                 <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
                 <mat-cell *matCellDef="let row">
-                    <!-- Botón Editar -->
-                    <button *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003')" mat-icon-button
-                        color="primary" (click)="editar(row)" matTooltip="Editar">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-
-                    <!-- Botón Eliminar -->
-                    <button *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003') " mat-icon-button
-                        color="warn" (click)="eliminarAutorizacion(row)" matTooltip="Eliminar">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-
-                    <!-- Botón Solicitar -->
-                    <button
-                        *ngIf="row.cidEstado!=='002' && isResidente && row.cidEstado!=='004' && row.cidEstado!=='005' "
-                        mat-icon-button color="accent" (click)="solicitarAutorizacion(row)"
-                        matTooltip="Solicitar Autorizacion de Gasto" matTooltipPosition="above">
-                        <mat-icon>send</mat-icon>
-                    </button>
-
-                    <button *ngIf="isSupervisor && row.cidEstado=='002'" mat-icon-button color="primary"
-                        (click)="aprobarSupervisor(row)" matTooltip="Aprobar" matTooltipPosition="above">
-                        <mat-icon>check</mat-icon>
-                    </button>
-
-                    <button *ngIf="isSupervisor && row.cidEstado=='002'" mat-icon-button color="primary"
-                        (click)="observarAutorizacionGasto(row)" matTooltip="Observar Autorización de Gasto"
-                        matTooltipPosition="above">
-                        <mat-icon>visibility</mat-icon>
-                    </button>
-
-                    <button *ngIf="isAdministrador && row.cidEstado=='004'" mat-icon-button color="primary"
-                        (click)="observarAutorizacionGasto(row)" matTooltip="Observar Autorización de Gasto"
-                        matTooltipPosition="above">
-                        <mat-icon>visibility</mat-icon>
-                    </button>
-
-                    <!---*ngIf="isSupervisor && row.cidEstado=='002'"-->
-                    <button mat-icon-button color="primary" class="ml-2" (click)="analizarAutorizacionGasto(row)"
-                        matTooltip="Analizar Autorización de Gasto">
-                        <mat-icon>analytics</mat-icon>
-                    </button>
-
-                    <!-- Botón para Cargar Partidas y Precios Unitarios   <button mat-icon-button color="accent" class="ml-2" (click)="descargarAutorizacion(row)"
-                        matTooltip="Descargar Autorizacion de Gasto">
-                        <mat-icon>download</mat-icon>
-                    </button>-->
-                  
-
-                    <!-- Botón para Cargar Partidas y Precios Unitarios -->
-                    <button mat-icon-button color="accent" class="ml-2" (click)="descargarAutorizacionAuditado(row)"
-                        matTooltip="Descargar Autorizacion de Gasto Auditado">
-                        <mat-icon>download</mat-icon>
-                    </button>
+                    <div style="display: flex; flex-wrap: wrap;">
 
 
+                        <!-- Botón Editar -->
+                        <button *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003')" mat-icon-button
+                            color="primary" (click)="editar(row)" matTooltip="Editar">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+
+                        <!-- Botón Eliminar -->
+                        <button *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003') " mat-icon-button
+                            color="warn" (click)="eliminarAutorizacion(row)" matTooltip="Eliminar">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+
+                        <!-- Botón Solicitar -->
+                        <button
+                            *ngIf="row.cidEstado!=='002' && isResidente && row.cidEstado!=='004' && row.cidEstado!=='005' "
+                            mat-icon-button color="accent" (click)="solicitarAutorizacion(row)"
+                            matTooltip="Solicitar Autorizacion de Gasto" matTooltipPosition="above">
+                            <mat-icon>send</mat-icon>
+                        </button>
+
+                        <button *ngIf="isSupervisor && row.cidEstado=='002'" mat-icon-button color="primary"
+                            (click)="aprobarSupervisor(row)" matTooltip="Aprobar" matTooltipPosition="above">
+                            <mat-icon>check</mat-icon>
+                        </button>
+
+                        <button *ngIf="isSupervisor && row.cidEstado=='002'" mat-icon-button color="primary"
+                            (click)="observarAutorizacionGasto(row)" matTooltip="Observar Autorización de Gasto"
+                            matTooltipPosition="above">
+                            <mat-icon>visibility</mat-icon>
+                        </button>
+
+                        <button *ngIf="isAdministrador && row.cidEstado=='004'" mat-icon-button color="primary"
+                            (click)="observarAutorizacionGasto(row)" matTooltip="Observar Autorización de Gasto"
+                            matTooltipPosition="above">
+                            <mat-icon>visibility</mat-icon>
+                        </button>
+
+                        <!---*ngIf="isSupervisor && row.cidEstado=='002'"-->
+                        <button mat-icon-button color="primary" class="ml-2" (click)="analizarAutorizacionGasto(row)"
+                            matTooltip="Analizar Autorización de Gasto">
+                            <mat-icon>analytics</mat-icon>
+                        </button>
+
+                        <button mat-icon-button color="accent" class="ml-2" (click)="descargarAutorizacionAuditado(row)"
+                            matTooltip="Descargar anexo 23">
+                            <mat-icon>download</mat-icon>
+                        </button>
+
+                        <button mat-icon-button color="primary" class="ml-2" (click)="descargarAnexo24(row)"
+                            matTooltip="Descargar anexo 24 Autorización de Gasto">
+                            <mat-icon>download</mat-icon>
+                        </button>
+
+                        <button mat-icon-button color="primary" class="ml-2" (click)="exportAnexo25(row)"
+                            matTooltip="Descargar anexo 25 Autorización de Gasto">
+                            <mat-icon>download</mat-icon>
+                        </button>
+
+
+                    </div>
                 </mat-cell>
             </ng-container>
 

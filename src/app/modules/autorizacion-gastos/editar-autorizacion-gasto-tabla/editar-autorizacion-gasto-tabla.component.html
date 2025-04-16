@@ -79,7 +79,7 @@
           <ng-container matColumnDef="cantidad">
             <th mat-header-cell *matHeaderCellDef> CANTIDAD </th>
             <td mat-cell *matCellDef="let row; let i = index">
-              <input matInput type="number" [(ngModel)]="row.cantidad"  (blur)="recalcularTotal(i)" [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded" />
+              <input matInput type="number" [(ngModel)]="row.cantidad" [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded" />
             </td>
           </ng-container>
   
@@ -87,7 +87,7 @@
           <ng-container matColumnDef="precio_unitario">
             <th mat-header-cell *matHeaderCellDef> PRECIO UNITARIO </th>
             <td mat-cell *matCellDef="let row; let i = index">
-              <input matInput type="number" [(ngModel)]="row.precio" [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded" />
+              <input matInput type="number" [(ngModel)]="row.precio"  (blur)="recalcularTotal(i)" [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded" />
             </td>
           </ng-container>
   

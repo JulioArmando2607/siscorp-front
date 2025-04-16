@@ -58,7 +58,8 @@ export class EditarAutorizacionGastoTablaComponent {
   displayedColumns = [
     'recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada',
     'parcial_segun_cotizacion', 'cantidad_solicitada',
-    'monto_restante', 'cantidad_restante', 'precio_unitario', 'cantidad',
+    'cantidad_restante', 'monto_restante', 
+    'cantidad', 'precio_unitario',
     'total_calculado', 'monto_utilizado', //'cantidad_utilizado', 
     'porcentaje', 'acciones'
   ];
