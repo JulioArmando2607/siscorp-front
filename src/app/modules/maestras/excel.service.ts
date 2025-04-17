@@ -492,7 +492,7 @@ export class ExcelService {
     const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
     worksheet['!cols'] = Array(11).fill({ wch: 18 });
-
+    console.log(worksheetData.length)
     worksheet['!merges'] = [
       { s: { r: 1, c: 3 }, e: { r: 1, c: 9 } },//ANEXO N° 25: CONTROL Y MONITOREO DEL MOVIMIENTO FINANCIERO						
       { s: { r: 3, c: 0 }, e: { r: 3, c: 9 } },//CONTROL Y MONITOREO DEL MOVIMIENTO FINANCIERO DEL NE
@@ -510,7 +510,11 @@ export class ExcelService {
       { s: { r: 20, c: 5 }, e: { r: 20, c: 6 } },
       { s: { r: 20, c: 0 }, e: { r: 21, c: 0} },
       { s: { r: 20, c: 1 }, e: { r: 21, c: 1} },
-      { s: { r: 20, c: 2 }, e: { r: 21, c: 2} }
+      { s: { r: 20, c: 2 }, e: { r: 21, c: 2} },
+
+   //   { s: { r: worksheetData.length - 1, c: 5 }, e: { r: worksheetData.length - 1, c: 6 } },
+      { s: { r: worksheetData.length, c: 0 }, e: { r: worksheetData.length, c: 5 } }
+
     ];
 
     const range = XLSX.utils.decode_range(worksheet['!ref']!);
