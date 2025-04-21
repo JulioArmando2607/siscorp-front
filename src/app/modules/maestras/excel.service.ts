@@ -73,7 +73,7 @@ export class ExcelService {
     const worksheetData: any[][] = [];
 
     // ---------------- CABECERA PRINCIPAL ----------------
-    worksheetData.push(["ANEXO N° 23:"]);
+    worksheetData.push(["ANEXO N° 23: AUTORIZACIÓN DE GASTO"]);
     worksheetData.push([`N°: ${response.response.total}`]);
     //worksheetData.push([]);
     worksheetData.push(["N° CONVENIO COOPERACIÓN", "", "", `FECHA: ${fechaFormateada}`, "", "", ""]);
@@ -230,7 +230,7 @@ export class ExcelService {
       type: 'application/octet-stream'
     });
 
-    saveAs(blob, 'Autorizacion_Gasto.xlsx');
+    saveAs(blob, 'ANEXO N° 23 AUTORIZACIÓN DE GASTO.xlsx');
   }
 
   exportControlAutorizaciones(response: any): void {
@@ -398,7 +398,7 @@ export class ExcelService {
       type: 'application/octet-stream'
     });
 
-    saveAs(blob, 'Control_Autorizaciones.xlsx');
+    saveAs(blob, 'ANEXO N° 24 CONTROL DE AUTORIZACIONES PARA ADQUISICIÓN DE INSUMOS.xlsx');
   }
 
   exportAnexo25(response): void {
@@ -419,13 +419,13 @@ export class ExcelService {
     worksheetData.push([""]);
     worksheetData.push(["", "", "MONTO DE CONVENIO", "", "", "S/.", ""]);
     worksheetData.push(["", "", "MONTO AMPLIACIÓN PRESUPUESTAL", "", "", "S/.", "", "", "Entidad"]);
-    worksheetData.push(["", "", "MONTO TOTAL FINANCIADO", "", "", "S/.", "", "",""]);
+    worksheetData.push(["", "", "MONTO TOTAL FINANCIADO", "", "", "S/.", "", "", ""]);
     // ---------- CUADRO DE AUTORIZACIONES ----------
     worksheetData.push(["", "AUTORIZACIÓN", "FECHA", "MONTO PARCIAL (S/.)", "MONTO ACUMULADO (S/.)", "SALDO ANTES DE ESTA AUTORIZACIÓN"]);
     worksheetData.push(["", "1º", "", "", "", "", "", "", "Número de Cuenta de Ahorros"]);
     worksheetData.push(["", "2º", "", "", "", "", "", "", "",]);
     worksheetData.push(["", "3º", "", "", "", ""]);
-    worksheetData.push(["","","", "Total Autorizado (S/.)", "",""]);
+    worksheetData.push(["", "", "", "Total Autorizado (S/.)", "", ""]);
     worksheetData.push(["", "", "", "", "", "", ""]);
 
     // ---------- ENCABEZADO TABLA PRINCIPAL ----------
@@ -442,10 +442,10 @@ export class ExcelService {
       "ACUMULADO (S/)", "(%)",
       ""
     ]);
- 
+
     // ---------- RUBROS DINÁMICOS ----------
     const rubros = response;
- 
+
     response.rubros.forEach(rubro => {
       worksheetData.push([
         rubro.item,
@@ -463,30 +463,37 @@ export class ExcelService {
     worksheetData.push([
       "SUB TOTAL INVERSION", "", 1909814.13, "", "", 1910298.08, 100.02, "", "", "", ""
     ]);
-    
+
     worksheetData.push([
       "7.0", "GASTOS DE SUPERVISION", 50561.79, 208.41, 0.41, 49936.94, 98.76, "Menor al proyectado por descuento por días no lab.", "", "", ""
     ]);
-    
+
     worksheetData.push([
       "TOTAL INVERSION - MONTO DESEMBOLSADO (autorizado)", "", 1960375.92, 16900.62, 0.86, 1960235.02, 99.99, "", "", "", ""
     ]);
-    
+
     worksheetData.push([
       "MONTO DEVUELTO A LA CUENTA BANCARIA", "", "", "", "", 25.99, "", "", "", "", ""
     ]);
-    
+
     worksheetData.push([
       "TOTAL INVERSION - MONTO DESEMBOLSADO (retirado)", "", 1960375.92, 16900.62, 0.86, 1960209.03, 99.99, "", "", "", ""
     ]);
-    
+
     // ---------- NOTAS Y FIRMAS ----------
     worksheetData.push(["Comentario del PEP: ..."]);
     worksheetData.push([]);
-    worksheetData.push(["(1) Deberá contener los montos rendidos según la", "última Pre liquidación presentada más las", "autorizaciones pendientes de rendir"]);
     worksheetData.push([]);
-    worksheetData.push(["", "", "", "", "", "", "", "", "", "Vo.Bo. PROFESIONAL EN GERENCIA DE PROYECTOS", "CONFORMIDAD PROFESIONAL EN EJECUCIÓN DE PROYECTOS"]);
-    worksheetData.push(["", "", "", "", "", "", "", "", "", "Fecha:", "Fecha:"]);
+    worksheetData.push(["(1) Deberá contener los montos rendidos según la última Pre liquidación presentada más las autorizaciones pendientes de rendir"]);
+    worksheetData.push([]);
+    worksheetData.push([]);
+    worksheetData.push([]);
+    worksheetData.push([]);
+    worksheetData.push([]);
+    worksheetData.push([]);
+ 
+    worksheetData.push(["", "", "", "Vo.Bo. PROFESIONAL EN GERENCIA DE PROYECTOS", "", "", "", "CONFORMIDAD PROFESIONAL EN EJECUCIÓN DE PROYECTOS"]);
+    worksheetData.push(["", "", "", "Fecha:", "", "", "", "Fecha:"]);
 
     // ---------- CONVERSIÓN Y ESTILO ----------
     const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(worksheetData);
@@ -498,22 +505,26 @@ export class ExcelService {
       { s: { r: 3, c: 0 }, e: { r: 3, c: 9 } },//CONTROL Y MONITOREO DEL MOVIMIENTO FINANCIERO DEL NE
       { s: { r: 4, c: 0 }, e: { r: 4, c: 9 } },//(El presente formato debe ser presentado por el Profesional en Ejecución de Proyectos en cada Autorización de Gasto)
       { s: { r: 5, c: 2 }, e: { r: 5, c: 8 } },//proyecto
-      { s: { r: 8, c: 2 }, e: { r: 8, c: 4} },//
-      { s: { r: 6, c: 0 }, e: { r: 6, c: 1} },//
-      { s: { r: 7, c: 0 }, e: { r: 7, c: 1} },//
-      { s: { r: 8, c: 0 }, e: { r: 8, c: 1} },//
-      { s: { r: 9, c: 0 }, e: { r: 9, c: 1} },//
+      { s: { r: 8, c: 2 }, e: { r: 8, c: 4 } },//
+      { s: { r: 6, c: 0 }, e: { r: 6, c: 1 } },//
+      { s: { r: 7, c: 0 }, e: { r: 7, c: 1 } },//
+      { s: { r: 8, c: 0 }, e: { r: 8, c: 1 } },//
+      { s: { r: 9, c: 0 }, e: { r: 9, c: 1 } },//
       { s: { r: 11, c: 2 }, e: { r: 11, c: 3 } },//MONTO
       { s: { r: 12, c: 2 }, e: { r: 12, c: 3 } },//MONTO
       { s: { r: 13, c: 2 }, e: { r: 13, c: 3 } },//MONTO
       { s: { r: 20, c: 3 }, e: { r: 20, c: 4 } },
       { s: { r: 20, c: 5 }, e: { r: 20, c: 6 } },
-      { s: { r: 20, c: 0 }, e: { r: 21, c: 0} },
-      { s: { r: 20, c: 1 }, e: { r: 21, c: 1} },
-      { s: { r: 20, c: 2 }, e: { r: 21, c: 2} },
+      { s: { r: 20, c: 0 }, e: { r: 21, c: 0 } },
+      { s: { r: 20, c: 1 }, e: { r: 21, c: 1 } },
+      { s: { r: 20, c: 2 }, e: { r: 21, c: 2 } },
 
-   //   { s: { r: worksheetData.length - 1, c: 5 }, e: { r: worksheetData.length - 1, c: 6 } },
-      { s: { r: worksheetData.length, c: 0 }, e: { r: worksheetData.length, c: 5 } }
+      //   { s: { r: worksheetData.length - 1, c: 5 }, e: { r: worksheetData.length - 1, c: 6 } },
+      { s: { r: worksheetData.length - 17, c: 0 }, e: { r: worksheetData.length - 17, c: 1 } },
+      { s: { r: worksheetData.length - 15, c: 0 }, e: { r: worksheetData.length - 15, c: 1 } },
+      { s: { r: worksheetData.length - 14, c: 0 }, e: { r: worksheetData.length - 14, c: 1 } },
+      { s: { r: worksheetData.length - 13, c: 0 }, e: { r: worksheetData.length - 13, c: 1 } },
+      { s: { r: worksheetData.length - 12, c: 0 }, e: { r: worksheetData.length - 12, c: 7 } },
 
     ];
 
@@ -525,28 +536,28 @@ export class ExcelService {
         if (!cell) continue;
 
         const isTitle = R === 1;
-     
+
         const isHeader = R === 20 || R === 21;
 
         const celdasConBorde = new Set([
-         "5-2", "5-3", "5-4" ,"5-5", "5-6", "5-7", "5-8", "5-9", 
-         "6-2",
-         "7-2","7-4", 
-         "8-2", "8-3", "8-4",
-         "9-2",
-         "10-2",
-         "13-8",
-         "16-8",
-         "14-1", "14-2", "14-3","14-4","14-5",
-         "15-1", "15-2", "15-3","15-4","15-5",
-         "16-1", "16-2", "16-3","16-4","16-5", 
-         "17-1", "17-2", "17-3","17-4","17-5",
-         "18-3", "18-4", "18-5",
-         "20-0","20-1", "20-2", "20-3", "20-4", "20-5", "20-6", "20-7", "20-8", "20-9",
-         "21-0","21-1", "21-2", "21-3", "21-4", "21-5", "21-6", "21-7", "21-8", "21-9",
+          "5-2", "5-3", "5-4", "5-5", "5-6", "5-7", "5-8", "5-9",
+          "6-2",
+          "7-2", "7-4",
+          "8-2", "8-3", "8-4",
+          "9-2",
+          "10-2",
+          "13-8",
+          "16-8",
+          "14-1", "14-2", "14-3", "14-4", "14-5",
+          "15-1", "15-2", "15-3", "15-4", "15-5",
+          "16-1", "16-2", "16-3", "16-4", "16-5",
+          "17-1", "17-2", "17-3", "17-4", "17-5",
+          "18-3", "18-4", "18-5",
+          "20-0", "20-1", "20-2", "20-3", "20-4", "20-5", "20-6", "20-7", "20-8", "20-9",
+          "21-0", "21-1", "21-2", "21-3", "21-4", "21-5", "21-6", "21-7", "21-8", "21-9",
 
         ]);
-  
+
         const tieneBorde = (fila: number, col: number) =>
           celdasConBorde.has(`${fila}-${col}`);
 
@@ -589,7 +600,7 @@ export class ExcelService {
       type: 'application/octet-stream'
     });
 
-    saveAs(blob, 'Anexo25_MovimientoFinanciero.xlsx');
+    saveAs(blob, 'ANEXO N° 25 CONTROL Y MONITOREO DEL MOVIMIENTO FINANCIERO.xlsx');
   }
 
 }

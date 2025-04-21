@@ -664,17 +664,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
             gastoEfectuadoAcumulado: 2000,
             gastoEfectuadoPorcentaje: 66.7,
             observaciones: "Créditos adquiridos"
-          },
-          {
-            item: "7.0",
-            rubro: "Gastos de Supervisión",
-            valorFinanciado: 4000,
-            gastoAutorizadoActual: 1000,
-            gastoAutorizadoPorcentaje: 25,
-            gastoEfectuadoAcumulado: 3000,
-            gastoEfectuadoPorcentaje: 75,
-            observaciones: "Supervisión externa"
-          }
+          }        
         ]
       }
       
