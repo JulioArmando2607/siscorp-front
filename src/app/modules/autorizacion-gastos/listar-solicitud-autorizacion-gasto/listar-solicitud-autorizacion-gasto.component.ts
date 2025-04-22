@@ -527,7 +527,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
       idProyecto: row.idProyecto
     }
     const oRespL = await lastValueFrom(
-      this.maestraService.listaRecursosAutorizacionGastoProyectoAnalisis(
+      this.maestraService.anexo25AutorizacionGasto(
         data
       )
     );
@@ -668,7 +668,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
         ]
       }
       
-      this.excelService.exportAnexo25(data)
+      this.excelService.exportAnexo25(oRespL)
     }
   }
 

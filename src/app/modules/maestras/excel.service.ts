@@ -402,7 +402,8 @@ export class ExcelService {
   }
 
   exportAnexo25(response): void {
-    console.log(response)
+    console.log(response.data.response.detalle)
+    
     const worksheetData: any[][] = [];
     // ---------- TÍTULO PRINCIPAL ----------
     worksheetData.push([]);
@@ -422,11 +423,25 @@ export class ExcelService {
     worksheetData.push(["", "", "MONTO TOTAL FINANCIADO", "", "", "S/.", "", "", ""]);
     // ---------- CUADRO DE AUTORIZACIONES ----------
     worksheetData.push(["", "AUTORIZACIÓN", "FECHA", "MONTO PARCIAL (S/.)", "MONTO ACUMULADO (S/.)", "SALDO ANTES DE ESTA AUTORIZACIÓN"]);
-    worksheetData.push(["", "1º", "", "", "", "", "", "", "Número de Cuenta de Ahorros"]);
-    worksheetData.push(["", "2º", "", "", "", "", "", "", "",]);
-    worksheetData.push(["", "3º", "", "", "", ""]);
-    worksheetData.push(["", "", "", "Total Autorizado (S/.)", "", ""]);
-    worksheetData.push(["", "", "", "", "", "", ""]);
+    let totalMontoAcumulado = 0;
+    response.data.response.listaAutorizacionesGasto.forEach(rubro => {
+      worksheetData.push([
+       "",
+        rubro.item,
+        rubro.fechaRegistro,
+        rubro.montoParcial,
+        rubro.montoAcumuladoR,
+        rubro.saldoAntesDeAG 
+      ]);
+      totalMontoAcumulado += rubro.montoAcumuladoR;//`FECHA: ${fechaFormateada}`
+    });
+   
+    worksheetData.push(["", "", "", "Total Autorizado (S/.)", totalMontoAcumulado, ""]);
+    worksheetData.push([]);
+    const startEncabezado = worksheetData.length;
+
+    console.log(startEncabezado)
+ 
 
     // ---------- ENCABEZADO TABLA PRINCIPAL ----------
     worksheetData.push([
@@ -442,46 +457,43 @@ export class ExcelService {
       "ACUMULADO (S/)", "(%)",
       ""
     ]);
-
-    // ---------- RUBROS DINÁMICOS ----------
-    const rubros = response;
-
-    response.rubros.forEach(rubro => {
+ 
+    response.data.response.rubro.forEach((rubro: any, index: number)  => {
       worksheetData.push([
         rubro.item,
-        rubro.rubro,
+        rubro.nombreRubro,
         rubro.valorFinanciado,
         rubro.gastoAutorizadoActual,
         rubro.gastoAutorizadoPorcentaje,
         rubro.gastoEfectuadoAcumulado,
         rubro.gastoEfectuadoPorcentaje,
-        rubro.observaciones,
-        "", "", "", "" // Espacios extra que estés agregando
-      ]);
+        "",
+        ]);
+
     });
 
     worksheetData.push([
-      "SUB TOTAL INVERSION", "", 1909814.13, "", "", 1910298.08, 100.02, "", "", "", ""
+      "SUB TOTAL INVERSION", "", 1909814.13, "", "", 1910298.08, 100.02, ""
     ]);
 
     worksheetData.push([
-      "7.0", "GASTOS DE SUPERVISION", 50561.79, 208.41, 0.41, 49936.94, 98.76, "Menor al proyectado por descuento por días no lab.", "", "", ""
+      "7.0", "GASTOS DE SUPERVISION", 50561.79, 208.41, 0.41, 49936.94, 98.76, ""
     ]);
 
     worksheetData.push([
-      "TOTAL INVERSION - MONTO DESEMBOLSADO (autorizado)", "", 1960375.92, 16900.62, 0.86, 1960235.02, 99.99, "", "", "", ""
+      "TOTAL INVERSION - MONTO DESEMBOLSADO (autorizado)", "", 1960375.92, 16900.62, 0.86, 1960235.02, 99.99, ""
     ]);
 
     worksheetData.push([
-      "MONTO DEVUELTO A LA CUENTA BANCARIA", "", "", "", "", 25.99, "", "", "", "", ""
+      "MONTO DEVUELTO A LA CUENTA BANCARIA", "", "", "", "", 25.99, "", ""
     ]);
 
     worksheetData.push([
-      "TOTAL INVERSION - MONTO DESEMBOLSADO (retirado)", "", 1960375.92, 16900.62, 0.86, 1960209.03, 99.99, "", "", "", ""
+      "TOTAL INVERSION - MONTO DESEMBOLSADO (retirado)", "", 1960375.92, 16900.62, 0.86, 1960209.03, 99.99, ""
     ]);
 
     // ---------- NOTAS Y FIRMAS ----------
-    worksheetData.push(["Comentario del PEP: ..."]);
+    worksheetData.push(["Comentario del PEP: ...", "", "", "", "", "", "", ""]);
     worksheetData.push([]);
     worksheetData.push([]);
     worksheetData.push(["(1) Deberá contener los montos rendidos según la última Pre liquidación presentada más las autorizaciones pendientes de rendir"]);
@@ -513,13 +525,13 @@ export class ExcelService {
       { s: { r: 11, c: 2 }, e: { r: 11, c: 3 } },//MONTO
       { s: { r: 12, c: 2 }, e: { r: 12, c: 3 } },//MONTO
       { s: { r: 13, c: 2 }, e: { r: 13, c: 3 } },//MONTO
-      { s: { r: 20, c: 3 }, e: { r: 20, c: 4 } },
-      { s: { r: 20, c: 5 }, e: { r: 20, c: 6 } },
-      { s: { r: 20, c: 0 }, e: { r: 21, c: 0 } },
-      { s: { r: 20, c: 1 }, e: { r: 21, c: 1 } },
-      { s: { r: 20, c: 2 }, e: { r: 21, c: 2 } },
 
-      //   { s: { r: worksheetData.length - 1, c: 5 }, e: { r: worksheetData.length - 1, c: 6 } },
+      { s: { r: startEncabezado, c: 3 }, e: { r: startEncabezado, c: 4 } },
+      { s: { r: startEncabezado, c: 5 }, e: { r: startEncabezado, c: 6 } },
+      { s: { r: startEncabezado, c: 0 }, e: { r: startEncabezado + 1, c: 0 } },
+      { s: { r: startEncabezado, c: 1 }, e: { r: startEncabezado + 1, c: 1 } },
+      { s: { r: startEncabezado, c: 2 }, e: { r: startEncabezado + 1, c: 2 } },
+ 
       { s: { r: worksheetData.length - 17, c: 0 }, e: { r: worksheetData.length - 17, c: 1 } },
       { s: { r: worksheetData.length - 15, c: 0 }, e: { r: worksheetData.length - 15, c: 1 } },
       { s: { r: worksheetData.length - 14, c: 0 }, e: { r: worksheetData.length - 14, c: 1 } },
@@ -537,7 +549,8 @@ export class ExcelService {
 
         const isTitle = R === 1;
 
-        const isHeader = R === 20 || R === 21;
+      //  const isHeader = R === 20 || R === 21;
+        const isHeader = R === startEncabezado || R === startEncabezado + 1;
 
         const celdasConBorde = new Set([
           "5-2", "5-3", "5-4", "5-5", "5-6", "5-7", "5-8", "5-9",
@@ -549,17 +562,28 @@ export class ExcelService {
           "13-8",
           "16-8",
           "14-1", "14-2", "14-3", "14-4", "14-5",
-          "15-1", "15-2", "15-3", "15-4", "15-5",
-          "16-1", "16-2", "16-3", "16-4", "16-5",
+        /*  "15-1", "15-2", "15-3", "15-4", "15-5",*/
+         /* "16-1", "16-2", "16-3", "16-4", "16-5",
           "17-1", "17-2", "17-3", "17-4", "17-5",
           "18-3", "18-4", "18-5",
           "20-0", "20-1", "20-2", "20-3", "20-4", "20-5", "20-6", "20-7", "20-8", "20-9",
-          "21-0", "21-1", "21-2", "21-3", "21-4", "21-5", "21-6", "21-7", "21-8", "21-9",
+          "21-0", "21-1", "21-2", "21-3", "21-4", "21-5", "21-6", "21-7", "21-8", "21-9",*/
 
         ]);
 
-        const tieneBorde = (fila: number, col: number) =>
-          celdasConBorde.has(`${fila}-${col}`);
+        const tieneBorde = (fila: number, col: number) => {
+          const esEncabezado = fila === startEncabezado || fila === startEncabezado + 1;
+          const esParteInterna = fila >= startEncabezado + 2 && fila < worksheetData.length - 13;
+          const esTotales = fila === worksheetData.length - 13 || fila === worksheetData.length - 12;
+        
+          return (
+            celdasConBorde.has(`${fila}-${col}`) ||
+            esEncabezado ||
+            esParteInterna ||
+            esTotales
+          );
+        };
+       
 
         cell.s = {
           font: {

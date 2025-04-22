@@ -23,12 +23,6 @@
           <input matInput type="text" formControlName="ubigeoCp">
         </mat-form-field>
 
-        <!-- UBIGEO DISTRITO -->
-        <!---   <mat-form-field appearance="outline" class="w-full">
-        <mat-label>UBIGEO DISTRITO</mat-label>
-        <input matInput type="text">
-      </mat-form-field>
--->
         <!-- DEPARTAMENTO -->
         <mat-form-field appearance="fill" class="w-full">
           <mat-label>DEPARTAMENTO</mat-label>
@@ -126,15 +120,16 @@
     <mat-table [dataSource]="dataSource" matSort class="w-full table-auto">
       <!-- item Column -->
       <ng-container matColumnDef="item">
-        <mat-header-cell *matHeaderCellDef mat-sort-header style="width: 50px; min-width: 50px; max-width: 60px; text-align: center;"> 
-          ITEM 
+        <mat-header-cell *matHeaderCellDef mat-sort-header
+          style="width: 50px; min-width: 50px; max-width: 60px; text-align: center;">
+          ITEM
         </mat-header-cell>
-        <mat-cell *matCellDef="let row" style="width: 50px; min-width: 50px; max-width: 60px; text-align: center;"> 
-          {{ row.item }} 
+        <mat-cell *matCellDef="let row" style="width: 50px; min-width: 50px; max-width: 60px; text-align: center;">
+          {{ row.item }}
         </mat-cell>
       </ng-container>
       <!-- CUI Column -->
-      <ng-container matColumnDef="cui"> 
+      <ng-container matColumnDef="cui">
         <mat-header-cell *matHeaderCellDef mat-sort-header> CUI </mat-header-cell>
         <mat-cell *matCellDef="let row"> {{ row.cui }} </mat-cell>
       </ng-container>
@@ -182,35 +177,40 @@
         <mat-cell *matCellDef="let row"> {{ row.estado }} </mat-cell>
       </ng-container>
 
-      <!-- Botón de acciones -->
       <ng-container matColumnDef="acciones">
         <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
         <mat-cell *matCellDef="let row">
-          <!-- Botón Editar -->
-          <button *ngIf="isBotonesGestion" mat-icon-button color="primary" (click)="editar(row)" matTooltip="Editar Proyecto">
-            <mat-icon>edit</mat-icon>
-          </button>
+          <div style="display: flex; flex-wrap: wrap;">
+            <!-- Botón Editar -->
+            <button *ngIf="isBotonesGestion" mat-icon-button color="primary" (click)="editar(row)"
+              matTooltip="Editar Proyecto">
+              <mat-icon>edit</mat-icon>
+            </button>
 
-          <!-- Botón Eliminar -->
-          <button *ngIf="isBotonesGestion"  mat-icon-button color="warn" (click)="eliminarProyecto(row)" matTooltip="Eliminar Proyecto">
-            <mat-icon>delete</mat-icon>
-          </button>
+            <!-- Botón Eliminar -->
+            <button *ngIf="isBotonesGestion" mat-icon-button color="warn" (click)="eliminarProyecto(row)"
+              matTooltip="Eliminar Proyecto">
+              <mat-icon>delete</mat-icon>
+            </button>
 
-          <!-- Botón para configurar usuarios -->
-          <button *ngIf="isBotonesGestion"  mat-icon-button color="accent" (click)="configurarUsuarios(row)"
-            matTooltip="Configurar Residente y Supervisor" matTooltipPosition="above">
-            <mat-icon>manage_accounts</mat-icon>
-          </button>
+            <!-- Botón para configurar usuarios -->
+            <button *ngIf="isBotonesGestion" mat-icon-button color="accent" (click)="configurarUsuarios(row)"
+              matTooltip="Configurar Residente y Supervisor" matTooltipPosition="above">
+              <mat-icon>manage_accounts</mat-icon>
+            </button>
 
-          <!-- Botón para Cargar Partidas y Precios Unitarios -->
-          <button *ngIf="isBotonesGestion"  mat-icon-button color="accent" (click)="cargarPartidas(row)"
-            matTooltip="Cargar Partidas y Precios Unitarios">
-            <mat-icon>attach_money</mat-icon>
-          </button>
+            <!-- Botón para Cargar Partidas y Precios Unitarios -->
+            <button *ngIf="isBotonesGestion" mat-icon-button color="accent" (click)="cargarPartidas(row)"
+              matTooltip="Cargar Partidas y Precios Unitarios">
+              <mat-icon>attach_money</mat-icon>
+            </button>
 
+            <button *ngIf="isBotonesGestion" mat-icon-button color="accent" (click)="agregarGastosAdicionales(row)"
+              matTooltip="Agregar Gastos adicionales">
+              <mat-icon>settings</mat-icon>
+            </button>
+          </div>
         </mat-cell>
-
-
       </ng-container>
 
       <!-- Encabezado de la tabla -->
@@ -218,9 +218,6 @@
       <!-- Filas de datos -->
       <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
     </mat-table>
-
-    <!-- Paginador  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
--->
 
     <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
       (page)="onPaginateChange($event)" showFirstLastButtons>

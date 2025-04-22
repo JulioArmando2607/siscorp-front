@@ -58,10 +58,16 @@ export class EditarAutorizacionGastoTablaComponent {
   displayedColumns = [
     'recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada',
     'parcial_segun_cotizacion', 'cantidad_solicitada',
-    'cantidad_restante', 'monto_restante', 
+    'cantidad_restante', 'monto_restante',
     'cantidad', 'precio_unitario',
     'total_calculado', 'monto_utilizado', //'cantidad_utilizado', 
     'porcentaje', 'acciones'
+  ];
+
+  displayedColumns2 = [
+    'recurso', 'valor_financiado', 'actual', 'porcentaje_actual',
+    'acumulado', 'acumulado_porcentaje',
+    'observaciones', 'acciones'
   ];
 
   footerColumns: string[] = ['totalLabel'];//, 'totalValue' 
@@ -70,7 +76,7 @@ export class EditarAutorizacionGastoTablaComponent {
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
   dataSource: MatTableDataSource<any>;
- 
+
   proyectos: any[]
   configForm: UntypedFormGroup;
   id: string | null = null;
@@ -86,6 +92,9 @@ export class EditarAutorizacionGastoTablaComponent {
   totalElements = 0;
   pageSize = 10;
   pageIndex = 0; // Página actual
+
+  rubrosAdicionales: any[] = [];
+
   constructor(
     private cdr: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService,
@@ -111,8 +120,20 @@ export class EditarAutorizacionGastoTablaComponent {
       cantidad: ["", [Validators.required, Validators.min(1)]],  // ✅ Mayor a 0
       precio: ["", [Validators.required, Validators.min(0.01)]]  // ✅ Mayor a 0.01
     });
-
-
+    //GASTOS DE RESIDENTE
+    this.rubrosAdicionales = [{
+      rubro: "GASTOS GENERALES"
+    }, {
+      rubro: "GASTOS DE RESIDENTE"
+    }, {
+      rubro: "COSTOS FINANCIEROS u OTROS (*)"
+    }, {
+      rubro: "GASTOS DE N.E."
+    }, {
+      rubro: "INTERESES"
+    }, {
+      rubro: "GASTOS DE SUPERVISION"
+    },]
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
     this.verProyecto(this.id)
     this.idAutorizacionGasto = this.route.snapshot.paramMap.get('ag'); // Obtiene el ID de la URL
@@ -153,7 +174,7 @@ export class EditarAutorizacionGastoTablaComponent {
       this.titulo = "PROYECTO TAMBO: " + roresp.data[0].tambo
       console.log(this.titulo)
     }
-  } 
+  }
 
   filtrar() {
     const filtros = this.filterForm.getRawValue();
@@ -163,7 +184,7 @@ export class EditarAutorizacionGastoTablaComponent {
   limpiar() {
     this.filterForm.reset()
   }
-   
+
   async getFiltraRecursosAturorizacionGasto(mantenerFiltro: boolean = true) {
     try {
       const currentFilter = mantenerFiltro ? this.dataSource?.filter : '';
@@ -201,7 +222,7 @@ export class EditarAutorizacionGastoTablaComponent {
       console.error('Error al obtener proyectos:', error);
     }
   }
- 
+
   openConfirmationDialog(codigo): void {
     // Open the dialog and save the reference of it
     const dialogRef = this._fuseConfirmationService.open(
@@ -226,7 +247,7 @@ export class EditarAutorizacionGastoTablaComponent {
       this.partidasSubject.next([]);
     }
   }
- 
+
   // Obtener recursos según la partida seleccionada
   async getRecursos(idPartida: number) {
     try {
@@ -314,7 +335,7 @@ export class EditarAutorizacionGastoTablaComponent {
   validarRecursoSeleccionado(): boolean {
     return this.proyectos.some(proyecto => proyecto.idRecurso === this.idRecursoSeleccionado);
   }
- 
+
 
   editar(row) {
     this.idAutorizacionGastoRecurso = row.idAutorizacionGastoRecurso
@@ -453,9 +474,9 @@ export class EditarAutorizacionGastoTablaComponent {
 
     console.log(row);
     row.total = (row.cantidad || 0) * (row.precio || 0);
-    this.dataSource._updateChangeSubscription(); 
+    this.dataSource._updateChangeSubscription();
     this.guardarActulizar(row);
-    
+
   }
 
   guardarActulizar(data) {

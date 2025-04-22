@@ -27,6 +27,7 @@ import { RegistroPartidasComponent } from './registro-partidas/registro-partidas
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfigurarPlataformaComponent } from './configurar-plataforma/configurar-plataforma.component';
 import { Session } from 'app/core/auth/Session';
+import { AgregarGastosAdicionalesComponent } from './agregar-gastos-adicionales/agregar-gastos-adicionales.component';
 
 @Component({
   selector: 'gestion-plataformas',
@@ -398,5 +399,24 @@ export class GestionPlataformasComponent implements OnInit {
     this.estados = oRespL.data
   }
   
+  agregarGastosAdicionales(data){
+    console.log('Ver detalles de: ',data);
+     const dialogRef = this._matDialog.open(AgregarGastosAdicionalesComponent, {
+      autoFocus: false,
+      data: {
+        proyecto: cloneDeep(data),
+        title: "CONFIGURAR RESIDENTE Y SUPERVISOR",
+        type: 'create'
+      },
+
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log("Diálogo cerrado con resultado:", result);
+
+      if (result === 'success') {
+        this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
+      }
+    });
+  }
 }
 

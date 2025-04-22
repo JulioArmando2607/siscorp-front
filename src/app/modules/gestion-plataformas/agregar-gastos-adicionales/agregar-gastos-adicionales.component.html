@@ -1,0 +1,57 @@
+<div class="flex min-w-0 flex-auto flex-col bg-card p-10">
+
+    <!-- Título y botón de salir -->
+    <div class="flex justify-center relative items-center mb-4">
+      <div class="text-2xl font-bold text-center flex-1">
+        CONTROL Y MONITOREO DEL MOVIMIENTO FINANCIERO
+      </div>
+      
+    </div>
+   
+    <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
+  
+      <!-- Tabla -->
+      <div class="table-container">
+        <table mat-table [dataSource]="rubrosAdicionales" class="mat-table">
+  
+          <!-- Column headers -->
+          <ng-container matColumnDef="recurso">
+            <th mat-header-cell *matHeaderCellDef> MONTO/RUBRO </th>
+            <td mat-cell *matCellDef="let row"> {{ row.rubro }} </td>
+          </ng-container>
+  
+          <!-- UND -->
+          <ng-container matColumnDef="valor_financiado">
+            <th mat-header-cell *matHeaderCellDef> VALOR
+              FINANCIADO
+              S/
+            </th>
+            <td mat-cell *matCellDef="let row; let i = index">
+                <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.valorFinanciado"
+                  [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded" />
+              </td>  
+          </ng-container>    
+       
+
+          <!-- Encabezados y filas -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns2" class="mat-header"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns2"></tr>
+        </table>
+  
+        <!-- Totals Section -->
+  
+      </div>
+  
+    </div>
+
+ 
+  </div>   <!-- Botón de enviar -->
+  <div class="flex w-full items-center justify-end px-8 py-4">
+      <button mat-flat-button color="warn" type="button" (click)="cancelar()">
+          Cancelar
+      </button>
+      &nbsp;
+      <button mat-flat-button color="primary" type="button" (click)="save()">
+          Guardar
+      </button>
+  </div>

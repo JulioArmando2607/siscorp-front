@@ -108,8 +108,6 @@ export class ConfigurarPlataformaComponent {
 
       this.idRolResidente = oRespL.data[0]?.idRol
       this.idUsuarioResidente = oRespL.data[0]?.idUsuario
-
-
       this.residenteNombre = `Residente: ${oRespL.data[0]?.empleado || "No disponible"}`;
     } catch (error) {
       console.error("Error en la consulta del DNI:", error);
@@ -118,14 +116,31 @@ export class ConfigurarPlataformaComponent {
   }
 
 
-  eliminarResidente() {
-
-    this.residenteNombre = "";
+  async eliminarResidente() {
+    console.log("eliminar supervisor", this.idUsuarioSupervisor);
+    const data ={
+      idUsuario: this.idUsuarioResidente,
+      idProyecto: this.idProyecto,
+    }
+    const oRespL = await lastValueFrom(this.maestraService.eliminarUsuarioProyecto(data));
+    if (oRespL) {
+      this.FormRegistro.get("dniResidente").setValue("");
+      this.residenteNombre = "";  
+    } 
   }
 
-  eliminarSupervisor() {
-
-    this.SupervisorNombre = "";
+  async eliminarSupervisor() {
+    console.log("eliminar supervisor", this.idUsuarioSupervisor);
+    const data ={
+      idUsuario: this.idUsuarioSupervisor,
+      idProyecto: this.idProyecto,
+    }
+    const oRespL = await lastValueFrom(this.maestraService.eliminarUsuarioProyecto(data));
+    if (oRespL) {
+      this.FormRegistro.get("dniSupervisor").setValue("");
+      this.SupervisorNombre = "";  
+    }
+ 
   }
 
   async validarDniSupervisor() {
@@ -328,7 +343,7 @@ export class ConfigurarPlataformaComponent {
           this.idUsuarioResidente = residente.idUsuario;
           this.idRolResidente = residente.idRol;
           this.residenteNombre = `Residente: ${residente.empleado || "No disponible"}`;
-          
+          this.FormRegistro.get("dniResidente").setValue(residente.numeroDocumento);
         }
 
         // Filtrar Supervisor
@@ -337,10 +352,8 @@ export class ConfigurarPlataformaComponent {
           this.idUsuarioSupervisor = supervisor.idUsuario;
           this.idRolSupervisor = supervisor.idRol;
           this.SupervisorNombre = `Supervisor: ${supervisor.empleado || "No disponible"}`;
-        }
-
-        console.log("Residente:", this.idUsuarioResidente);
-        console.log("Supervisor:", this.idUsuarioSupervisor);
+          this.FormRegistro.get("dniSupervisor").setValue(supervisor.numeroDocumento);
+        } 
       }
     } catch (error) {
       console.error("Error al listar usuarios:", error);
@@ -348,8 +361,6 @@ export class ConfigurarPlataformaComponent {
   }
 
   cancelar() { this.matDialogRef.close() }
-
-
-
+ 
 
 }
