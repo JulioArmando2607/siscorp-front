@@ -235,7 +235,7 @@ export class EditarAutorizacionGastoTablaComponent {
     }
   }
 
-  // Obtener recursos según la partida seleccionada
+ /* // Obtener recursos según la partida seleccionada
   async getRecursos(idPartida: number) {
     try {
       const response = await this.maestraService.getRecursosxPartidas(idPartida).toPromise();
@@ -251,7 +251,7 @@ export class EditarAutorizacionGastoTablaComponent {
       console.error('Error al cargar recursos:', error);
       this.recursos = [];
     }
-  }
+  } */
 
   filtrarPartidas(value: any): any[] {
     const filterValue = (typeof value === 'string') ? value.toLowerCase() : '';
@@ -269,7 +269,7 @@ export class EditarAutorizacionGastoTablaComponent {
 
 
 
-  onPartidaSelected(event: any) {
+/*  onPartidaSelected(event: any) {
     const selectedPartida = this.partidas.find(partida => partida.idPartida === event.option.value);
 
     if (selectedPartida) {
@@ -285,7 +285,7 @@ export class EditarAutorizacionGastoTablaComponent {
 
     console.log('Partida seleccionada:', selectedPartida);
   }
-
+ */
 
   onRecursoSelected(event: any) {
     const selectedRecurso = this.recursos.find(recursos => recursos.idRecurso === event.option.value);
@@ -324,7 +324,7 @@ export class EditarAutorizacionGastoTablaComponent {
   }
 
 
-  editar(row) {
+  /*editar(row) {
     this.idAutorizacionGastoRecurso = row.idAutorizacionGastoRecurso
     console.log(row.idAutorizacionGastoRecurso)
     this.isEditar = true
@@ -340,7 +340,7 @@ export class EditarAutorizacionGastoTablaComponent {
     this.filterForm.get("recursoControl").setValue(row.nombreRecurso)
     this.onRecursoSelected({ option: { value: this.idRecursoSeleccionado } })
   }
-
+ */
   async eliminar(row) {
     console.log(row)
 
