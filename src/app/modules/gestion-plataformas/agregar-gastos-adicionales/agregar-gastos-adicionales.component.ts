@@ -46,6 +46,7 @@ export class AgregarGastosAdicionalesComponent {
   ];
 
   rubrosAdicionales: any[] = [];
+  idProyecto: any;
   constructor(
     private fb: FormBuilder,
     private maestraService: MaestrasService,
@@ -54,21 +55,26 @@ export class AgregarGastosAdicionalesComponent {
     public matDialogRef: MatDialogRef<RegistroComponent>,
     @Inject(MAT_DIALOG_DATA) private data: any
   ) {
-    //GASTOS DE RESIDENTE
-    this.rubrosAdicionales = [
-      { rubro: "MONTO DE CONVENIO", cidCodigo: "001" },
-      { rubro: "MONTO AMPLIACIÓN PRESUPUESTAL", cidCodigo: "002" },
-      { rubro: "MONTO TOTAL FINANCIADO", cidCodigo: "003" },
-      { rubro: "GASTOS GENERALES", cidCodigo: "004" },
-      { rubro: "GASTOS DE RESIDENTE", cidCodigo: "005" },
-      { rubro: "COSTOS FINANCIEROS u OTROS (*)", cidCodigo: "006" },
-      { rubro: "GASTOS DE N.E.", cidCodigo: "007" },
-      { rubro: "INTERESES", cidCodigo: "008" },
-      {
-        rubro: "GASTOS DE SUPERVISION", cidCodigo: "009"
-      }];
+    console.log(data.proyecto.idProyecto);
+    this.idProyecto = data.proyecto.idProyecto;
+    this.cargarRubrosAdicionales()    
+  }
+  cargarRubrosAdicionales() {
+    this.maestraService.getRubrosAdicionales(this.idProyecto).subscribe((res: any) => {
+      this.rubrosAdicionales = res.data;
+    });
   }
   salir() { }
-  cancelar() { }
-  save() { }
+  cancelar() { this.matDialogRef.close(); }
+  save() {
+    console.log(this.rubrosAdicionales)
+
+    this.maestraService.crearRubrosProyecto(this.rubrosAdicionales).subscribe((res: any) => {
+      console.log(res);
+      this.cargarRubrosAdicionales()
+    //  this.rubrosAdicionales = res.data;
+    });
+
+    /*crear-monitoreo-proyecto */
+  }
 }

@@ -151,7 +151,16 @@ export class MaestrasService {
     return this.http.post(`${this.getUrlAutorizacionGasto()}anexo23-autorizacion-gasto`, data);
   }
 
-  //
+  getRubrosAdicionales(idProyecto): Observable<any> {
+    return this.http.get(`${this.getUrlPlataforma()}control-monitoreo-proyecto/${idProyecto}`);
+  }
+  
+  crearRubrosProyecto(data): Observable<any> {
+    return this.http.post(`${this.getUrlPlataforma()}crear-monitoreo-proyecto`, data);
+  }
+  getRubrosAdicionalesAG(data): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}control-monitoreo-proyecto-ag`,data);
+  }
 }
 
 export function Headers(isJson = true): HttpHeaders {

@@ -121,23 +121,10 @@ export class EditarAutorizacionGastoTablaComponent {
       precio: ["", [Validators.required, Validators.min(0.01)]]  // ✅ Mayor a 0.01
     });
     //GASTOS DE RESIDENTE
-    this.rubrosAdicionales = [{
-      rubro: "GASTOS GENERALES"
-    }, {
-      rubro: "GASTOS DE RESIDENTE"
-    }, {
-      rubro: "COSTOS FINANCIEROS u OTROS (*)"
-    }, {
-      rubro: "GASTOS DE N.E."
-    }, {
-      rubro: "INTERESES"
-    }, {
-      rubro: "GASTOS DE SUPERVISION"
-    },]
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
     this.verProyecto(this.id)
     this.idAutorizacionGasto = this.route.snapshot.paramMap.get('ag'); // Obtiene el ID de la URL
-
+    this.cargarRubrosAdicionales()
     this.getFiltraRecursosAturorizacionGasto(true)
 
     // 🔥 Monitorear el input de partidas y actualizar el filtrado en tiempo real
@@ -556,4 +543,14 @@ export class EditarAutorizacionGastoTablaComponent {
     }
   }
 
+  cargarRubrosAdicionales() {
+    const data = {
+      idProyecto: this.id,
+      idAutorizacionGasto: this.idAutorizacionGasto
+    }
+    this.maestraService.getRubrosAdicionalesAG(data).subscribe((res: any) => {
+      this.rubrosAdicionales = res.data;
+    });
+  }
+//control-monitoreo-proyecto-ag
 }
