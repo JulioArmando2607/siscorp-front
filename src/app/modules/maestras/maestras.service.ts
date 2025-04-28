@@ -95,6 +95,10 @@ export class MaestrasService {
   setRegistrarAutorizacionGastoTabla(formData): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}registrar-autorizacion-gasto-tabla`, formData);
   }
+
+  setRegistrarAGadicional(formData): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}registrar-ag-adicional`, formData);
+  }
   setEditarAutorizacionGasto(formData): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}editar-autorizacion-gasto`, formData);
   }
@@ -154,12 +158,12 @@ export class MaestrasService {
   getRubrosAdicionales(idProyecto): Observable<any> {
     return this.http.get(`${this.getUrlPlataforma()}control-monitoreo-proyecto/${idProyecto}`);
   }
-  
+
   crearRubrosProyecto(data): Observable<any> {
     return this.http.post(`${this.getUrlPlataforma()}crear-monitoreo-proyecto`, data);
   }
   getRubrosAdicionalesAG(data): Observable<any> {
-    return this.http.post(`${this.getUrlAutorizacionGasto()}control-monitoreo-proyecto-ag`,data);
+    return this.http.post(`${this.getUrlAutorizacionGasto()}control-monitoreo-proyecto-ag`, data);
   }
 }
 

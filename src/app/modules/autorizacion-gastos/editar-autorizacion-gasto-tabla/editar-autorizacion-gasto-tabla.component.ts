@@ -65,9 +65,10 @@ export class EditarAutorizacionGastoTablaComponent {
   ];
 
   displayedColumns2 = [
-    'recurso', 'valor_financiado', 'actual', 'porcentaje_actual',
+    'recurso', 'valor_financiado','restante', 'actual', 'porcentaje_actual',
     'acumulado', 'acumulado_porcentaje',
-    'observaciones', 'acciones'
+    //'observaciones',
+     'acciones'
   ];
 
   footerColumns: string[] = ['totalLabel'];//, 'totalValue' 
@@ -93,7 +94,7 @@ export class EditarAutorizacionGastoTablaComponent {
   pageSize = 10;
   pageIndex = 0; // Página actual
 
-  rubrosAdicionales: any[] = [];
+  rubrosAdicionales: MatTableDataSource<any>;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -296,6 +297,36 @@ export class EditarAutorizacionGastoTablaComponent {
     console.log('Partida seleccionada:', selectedRecurso);
   }
 
+  async guardarActulizarMontos(row) {
+    console.log(row)
+/*    const data = {
+      idProyecto: this.id,
+      idAutorizacionGasto: this.idAutorizacionGasto,
+      idRecurso: row.idRecurso,
+      cantidad: row.cantidad,
+      precio: row.precio,
+      precioCantidad: row.total,
+      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
+      idHistorialPrecio: row.idHistorialPrecio,
+      montoRestante: row.montoAsignado - (row.montoUtilizado + row.total),
+      cantidadRestante: row.cantidadAsignado - (row.cantidadRestante + row.cantidad),
+      codigoRecurso:row.codigoRecurso,
+    }
+
+    const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
+   // this.idAutorizacionGasto = response.data.response
+    console.log(response.data.response);
+    if (response) {
+      this.getFiltraRecursosAturorizacionGasto(true)
+    } */
+      const response = await this.maestraService.setRegistrarAGadicional(row).toPromise();
+      // this.idAutorizacionGasto = response.data.response
+       console.log(response.data.response);
+       if (response) {
+         this.cargarRubrosAdicionales()
+       }
+  }
+
   async setRegistrarAutorizacionGasto(row) {
     const data = {
       idProyecto: this.id,
@@ -307,11 +338,13 @@ export class EditarAutorizacionGastoTablaComponent {
       idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
       idHistorialPrecio: row.idHistorialPrecio,
       montoRestante: row.montoAsignado - (row.montoUtilizado + row.total),
-      cantidadRestante: row.cantidadAsignado - (row.cantidadRestante + row.cantidad)
+      cantidadRestante: row.cantidadAsignado - (row.cantidadRestante + row.cantidad),
+      codigoRecurso:row.codigoRecurso,
+
     }
 
     const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
-    this.idAutorizacionGasto = response.data.response
+   // this.idAutorizacionGasto = response.data.response
     console.log(response.data.response);
     if (response) {
       this.getFiltraRecursosAturorizacionGasto(true)
@@ -456,14 +489,31 @@ export class EditarAutorizacionGastoTablaComponent {
     });
   }
 
+/*  recalcularTotalmontos(index: number){
+    console.log(index)
+    const row = this.rubrosAdicionales.filteredData[index]; // <- CAMBIADO AQUÍ
+    console.log(row);
+    row.total = (row.cantidad || 0) * (row.precio || 0);
+    this.rubrosAdicionales._updateChangeSubscription();
+//    this.guardarActulizar(row);
+    this.guardarActulizarMontos(row);
+
+  } */
+
+  recalcularTotalmontos(row: any){
+    console.log(row);
+    row.total = (row.cantidad || 0) * (row.precio || 0);
+ //   this.rubrosAdicionales._updateChangeSubscription();
+    this.guardarActulizarMontos(row);
+  }
+  
+
   recalcularTotal(index: number): void {
     const row = this.dataSource.filteredData[index]; // <- CAMBIADO AQUÍ
-
     console.log(row);
     row.total = (row.cantidad || 0) * (row.precio || 0);
     this.dataSource._updateChangeSubscription();
     this.guardarActulizar(row);
-
   }
 
   guardarActulizar(data) {
@@ -547,10 +597,16 @@ export class EditarAutorizacionGastoTablaComponent {
     const data = {
       idProyecto: this.id,
       idAutorizacionGasto: this.idAutorizacionGasto
-    }
+    };
+  
     this.maestraService.getRubrosAdicionalesAG(data).subscribe((res: any) => {
-      this.rubrosAdicionales = res.data;
+      this.rubrosAdicionales = res.data.filter((item: any) => 
+        item.cidControlMonitoreo !== "001" &&
+        item.cidControlMonitoreo !== "002" &&
+        item.cidControlMonitoreo !== "003"
+      );
     });
   }
+  
 //control-monitoreo-proyecto-ag
 }

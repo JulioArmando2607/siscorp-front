@@ -383,50 +383,12 @@ export class RegistarAutorizacionGastoTablaComponent {
   }
 
   async setRegistrarAutorizacionGasto(row) {
-
-
-    /*     if (this.isEditar) {
-    
-          console.log(this.id)
-          console.log(this.idPartidaSeleccionada)
-          console.log(this.idRecursoSeleccionado)
-          console.log(this.idAutorizacionGastoRecurso)
-          console.log(this.filterForm.get("cantidad").value)
-          console.log(this.filterForm.get("precio").value)
-    
-          const data = {
-            idHistorialPrecio: this.idHistorialPrecio,
-            idAutorizacionGastoRecurso: this.idAutorizacionGastoRecurso,
-            idProyecto: this.id,
-            idAutorizacionGasto: this.idAutorizacionGasto,
-            idPartida: this.idPartidaSeleccionada,
-            idRecurso: this.idRecursoSeleccionado,
-            cantidad: this.filterForm.get("cantidad").value,
-            precio: this.filterForm.get("precio").value,
-            precioCantidad: this.filterForm.get("cantidad").value * this.filterForm.get("precio").value
-          }
-    
-          const response = await this.maestraService.setRegistrarAutorizacionGasto(data).toPromise();
-          // this.idAutorizacionGasto = response.data.response
-          console.log(response.data.response);
-          //this.partidas = response.data || [];
-          if (response) {
-            this.getFiltraRecursosAturorizacionGasto()
-          }
-    
-          this.idPartidaSeleccionada = 0
-          this.idRecursoSeleccionado = 0
-          this.filterForm.reset();
-        } else { */
-    /*     if (this.validarRecursoSeleccionado()) {
-          alert('Este recurso ya ha sido seleccionado en el proyecto.');
-          return; // Sale de la función y evita el registro duplicado
-        } */
-
+ 
     const data = {
       idProyecto: this.id,
       idAutorizacionGasto: this.idAutorizacionGasto,
       idRecurso: row.idRecurso,
+      codigoRecurso:row.codigoRecurso,
       cantidad: row.cantidad,
       precio: row.precio,
       precioCantidad: row.total,
@@ -587,7 +549,7 @@ export class RegistarAutorizacionGastoTablaComponent {
     console.log(row);
     row.total = (row.cantidad || 0) * (row.precio || 0);
     this.dataSource._updateChangeSubscription();
-
+/*
     const data = {
       cantidad: row.cantidad,
       precio: row.precio,
@@ -596,8 +558,8 @@ export class RegistarAutorizacionGastoTablaComponent {
       idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
       montoRestante: row.montoRestante,
       cantidadRestante: row.cantidadRestante
-    };
-    this.guardarActulizar(data);
+    }; */
+    this.guardarActulizar(row);
 /*    setTimeout(() => {
       if (
         data.total > row.montoRestante ||

@@ -286,14 +286,14 @@ export class ExcelService {
         //item.montoUtilizadoAcumulado/item.cantidadUtilizadoAcumulado, 
         item.montoUtilizadoAcumulado,
 
-        item.cantidad, item.precio, item.precioCantidad,
+        item.cantidad, item.precio, item.cantidad * item.precio,
         item.cantidad + item.cantidadUtilizadoAcumulado, item.precioCantidad + item.montoUtilizadoAcumulado,
         item.cantidadRestante, item.montoRestante
       ]);
       totalMontoAsignado += item.montoAsignado;
       totalMontoAcumulado += item.montoUtilizadoAcumulado;
       totalCUSolicitado += item.precio;
-      totalParcialCotizado += item.precioCantidad;
+      totalParcialCotizado += item.cantidad * item.precio;
       totalPrecioMontoActual += item.precioCantidad + item.montoUtilizadoAcumulado;
       totalSaldo += item.montoRestante;
     });
@@ -402,8 +402,14 @@ export class ExcelService {
   }
 
   exportAnexo25(response): void {
-    console.log(response.data.response.detalle)
-    
+    console.log(response.data.response.listamontosValorFinanciadoAG)
+    const v001 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "001");
+    const v002 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "002");
+    const v003 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "003");
+
+
+    console.log(v001);
+
     const worksheetData: any[][] = [];
     // ---------- TÍTULO PRINCIPAL ----------
     worksheetData.push([]);
@@ -418,30 +424,30 @@ export class ExcelService {
     worksheetData.push(["ELABORADO POR EL PEP (NOMBRE)", "", "", "", "", ""]);
     worksheetData.push(["FECHA DE PRESENTACIÓN", "", "", "", "", ""]);
     worksheetData.push([""]);
-    worksheetData.push(["", "", "MONTO DE CONVENIO", "", "", "S/.", ""]);
-    worksheetData.push(["", "", "MONTO AMPLIACIÓN PRESUPUESTAL", "", "", "S/.", "", "", "Entidad"]);
-    worksheetData.push(["", "", "MONTO TOTAL FINANCIADO", "", "", "S/.", "", "", ""]);
+    worksheetData.push(["", "", "MONTO DE CONVENIO", "", "", `S/. ${v001.monto}`, ""]);
+    worksheetData.push(["", "", "MONTO AMPLIACIÓN PRESUPUESTAL", "", "", `S/. ${v002.monto}`, "", "", "Entidad"]);
+    worksheetData.push(["", "", "MONTO TOTAL FINANCIADO", "", "", `S/. ${v003.monto}`, "", "", ""]);
     // ---------- CUADRO DE AUTORIZACIONES ----------
     worksheetData.push(["", "AUTORIZACIÓN", "FECHA", "MONTO PARCIAL (S/.)", "MONTO ACUMULADO (S/.)", "SALDO ANTES DE ESTA AUTORIZACIÓN"]);
     let totalMontoAcumulado = 0;
     response.data.response.listaAutorizacionesGasto.forEach(rubro => {
       worksheetData.push([
-       "",
+        "",
         rubro.item,
         rubro.fechaRegistro,
         rubro.montoParcial,
         rubro.montoAcumuladoR,
-        rubro.saldoAntesDeAG 
+        rubro.saldoAntesDeAG
       ]);
       totalMontoAcumulado += rubro.montoAcumuladoR;//`FECHA: ${fechaFormateada}`
     });
-   
+
     worksheetData.push(["", "", "", "Total Autorizado (S/.)", totalMontoAcumulado, ""]);
     worksheetData.push([]);
     const startEncabezado = worksheetData.length;
 
     console.log(startEncabezado)
- 
+
 
     // ---------- ENCABEZADO TABLA PRINCIPAL ----------
     worksheetData.push([
@@ -457,8 +463,8 @@ export class ExcelService {
       "ACUMULADO (S/)", "(%)",
       ""
     ]);
- 
-    response.data.response.rubro.forEach((rubro: any, index: number)  => {
+
+    response.data.response.rubro.forEach((rubro: any, index: number) => {
       worksheetData.push([
         rubro.item,
         rubro.nombreRubro,
@@ -468,7 +474,7 @@ export class ExcelService {
         rubro.gastoEfectuadoAcumulado,
         rubro.gastoEfectuadoPorcentaje,
         "",
-        ]);
+      ]);
 
     });
 
@@ -503,7 +509,7 @@ export class ExcelService {
     worksheetData.push([]);
     worksheetData.push([]);
     worksheetData.push([]);
- 
+
     worksheetData.push(["", "", "", "Vo.Bo. PROFESIONAL EN GERENCIA DE PROYECTOS", "", "", "", "CONFORMIDAD PROFESIONAL EN EJECUCIÓN DE PROYECTOS"]);
     worksheetData.push(["", "", "", "Fecha:", "", "", "", "Fecha:"]);
 
@@ -531,7 +537,7 @@ export class ExcelService {
       { s: { r: startEncabezado, c: 0 }, e: { r: startEncabezado + 1, c: 0 } },
       { s: { r: startEncabezado, c: 1 }, e: { r: startEncabezado + 1, c: 1 } },
       { s: { r: startEncabezado, c: 2 }, e: { r: startEncabezado + 1, c: 2 } },
- 
+
       { s: { r: worksheetData.length - 17, c: 0 }, e: { r: worksheetData.length - 17, c: 1 } },
       { s: { r: worksheetData.length - 15, c: 0 }, e: { r: worksheetData.length - 15, c: 1 } },
       { s: { r: worksheetData.length - 14, c: 0 }, e: { r: worksheetData.length - 14, c: 1 } },
@@ -549,7 +555,7 @@ export class ExcelService {
 
         const isTitle = R === 1;
 
-      //  const isHeader = R === 20 || R === 21;
+        //  const isHeader = R === 20 || R === 21;
         const isHeader = R === startEncabezado || R === startEncabezado + 1;
 
         const celdasConBorde = new Set([
@@ -562,12 +568,12 @@ export class ExcelService {
           "13-8",
           "16-8",
           "14-1", "14-2", "14-3", "14-4", "14-5",
-        /*  "15-1", "15-2", "15-3", "15-4", "15-5",*/
-         /* "16-1", "16-2", "16-3", "16-4", "16-5",
-          "17-1", "17-2", "17-3", "17-4", "17-5",
-          "18-3", "18-4", "18-5",
-          "20-0", "20-1", "20-2", "20-3", "20-4", "20-5", "20-6", "20-7", "20-8", "20-9",
-          "21-0", "21-1", "21-2", "21-3", "21-4", "21-5", "21-6", "21-7", "21-8", "21-9",*/
+          /*  "15-1", "15-2", "15-3", "15-4", "15-5",*/
+          /* "16-1", "16-2", "16-3", "16-4", "16-5",
+           "17-1", "17-2", "17-3", "17-4", "17-5",
+           "18-3", "18-4", "18-5",
+           "20-0", "20-1", "20-2", "20-3", "20-4", "20-5", "20-6", "20-7", "20-8", "20-9",
+           "21-0", "21-1", "21-2", "21-3", "21-4", "21-5", "21-6", "21-7", "21-8", "21-9",*/
 
         ]);
 
@@ -575,7 +581,7 @@ export class ExcelService {
           const esEncabezado = fila === startEncabezado || fila === startEncabezado + 1;
           const esParteInterna = fila >= startEncabezado + 2 && fila < worksheetData.length - 13;
           const esTotales = fila === worksheetData.length - 13 || fila === worksheetData.length - 12;
-        
+
           return (
             celdasConBorde.has(`${fila}-${col}`) ||
             esEncabezado ||
@@ -583,7 +589,7 @@ export class ExcelService {
             esTotales
           );
         };
-       
+
 
         cell.s = {
           font: {

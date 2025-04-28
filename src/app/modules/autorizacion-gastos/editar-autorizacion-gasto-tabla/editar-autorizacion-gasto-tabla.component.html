@@ -172,12 +172,12 @@
         <ng-container matColumnDef="actual">
           <th mat-header-cell *matHeaderCellDef> ACTUAL (S/)
           </th>
-
           <td mat-cell *matCellDef="let row; let i = index">
-            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.actual"
-              [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded" />
-          </td>
- 
+            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.actual" 
+            [ngModelOptions]="{standalone: true}" 
+            class="w-full px-2 py-1 border rounded" 
+            (blur)="recalcularTotalmontos(row)"/>
+          </td> 
         </ng-container>
  
         <!-- MONTO TOTAL ASIGNADO -->
@@ -210,14 +210,12 @@
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="observaciones">
-          <th mat-header-cell *matHeaderCellDef> PRONUNCIAMIENTO U
-            OBSERVACIONES DEL
-            PEP UPS-PNPAIS </th>
-          <td mat-cell *matCellDef="let row"> {{ row.observaciones }}
-            <input [disabled]="isResidente" matInput type="text" [(ngModel)]="row.observaciones"
-              [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded" />
-          </td>
+        <ng-container matColumnDef="restante">
+          <th mat-header-cell *matHeaderCellDef>  RESTANTE </th>
+          <td mat-cell *matCellDef="let row"> {{ row.restante | number:'1.2-2' }}
+            <input matInput type="number" [value]="row.restante" disabled
+              class="w-full px-2 py-1 border rounded bg-gray-100" />
+          </td> 
         </ng-container>
 
         <!-- ACCIONES -->
