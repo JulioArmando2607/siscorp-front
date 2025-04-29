@@ -79,17 +79,17 @@
         </div>
         <mat-table [dataSource]="dataSource" matSort class="w-full">
             <!-- item Column -->
-            <ng-container matColumnDef="item">
+          <!---  <ng-container matColumnDef="item">
                 <mat-header-cell *matHeaderCellDef mat-sort-header>
                     ITEM
                 </mat-header-cell>
                 <mat-cell *matCellDef="let row">
                     {{ row.item }}
                 </mat-cell>
-            </ng-container>
+            </ng-container>-->
             <!-- CUI Column -->
             <ng-container matColumnDef="cag">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> CODIGO AUTORIZACION GASTO </mat-header-cell>
+                <mat-header-cell *matHeaderCellDef mat-sort-header> NÚMERO AUTORIZACION GASTO </mat-header-cell>
                 <mat-cell *matCellDef="let row"> {{ row.codigoAutorizacionGasto }} </mat-cell>
             </ng-container>
 
@@ -176,8 +176,8 @@
                             matTooltip="Descargar ANEXO N° 24: CONTROL DE AUTORIZACIONES PARA ADQUISICIÓN DE INSUMOS">
                             <mat-icon>download</mat-icon>
                         </button>
-
-                        <button mat-icon-button color="primary" class="ml-2" (click)="exportAnexo25(row)"
+<!--*ngIf="isPEP && row.cidEstado=='004'"-->
+                        <button   mat-icon-button color="primary" class="ml-2" (click)="exportAnexo25(row)"
                             matTooltip="Descargar ANEXO N° 25: CONTROL Y MONITOREO DEL MOVIMIENTO FINANCIERO">
                             <mat-icon>download</mat-icon>
                         </button>

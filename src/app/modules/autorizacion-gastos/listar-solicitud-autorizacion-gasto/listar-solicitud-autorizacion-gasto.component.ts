@@ -59,7 +59,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
     console.log(roresp)
     this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");
   }
-  displayedColumns: string[] = ['item', 'cag', 'fechaRegistro', 'cantidadRecursos', 'total', 'estado', 'acciones'];
+  displayedColumns: string[] = [/*'item',*/'cag', 'fechaRegistro', 'cantidadRecursos', 'total', 'estado', 'acciones'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
@@ -86,6 +86,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
   pageIndex = 0; // Página actual
   isSupervisor: boolean = true
   isResidente: boolean = true
+  isPEP: boolean = true;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -471,6 +472,11 @@ export class ListarSolicitudAutorizacionGastoComponent {
       this.isSupervisor = true;
     }
 
+    else if (Session.identity.rol == 'UPS-PEP-PROYECTO') {
+      this.isPEP = true;
+    }
+
+
     // Si no es ninguno de los anteriores, es Administrador (o cualquier otro rol general)
     else {
       this.isAdministrador = true;
@@ -664,15 +670,15 @@ export class ListarSolicitudAutorizacionGastoComponent {
             gastoEfectuadoAcumulado: 2000,
             gastoEfectuadoPorcentaje: 66.7,
             observaciones: "Créditos adquiridos"
-          }        
+          }
         ]
       }
-      
+
       this.excelService.exportAnexo25(oRespL)
     }
   }
 
-  
+
 
 }
 

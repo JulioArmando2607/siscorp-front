@@ -55,13 +55,19 @@ export class ConfigurarPlataformaComponent {
   selectedPreciosFile: File | null = null;
   residenteNombre: string = ''
   SupervisorNombre: string = ''
+  PEPNombre: string = ''
+
   idRol: any;
   idUsuario: any;
   idProyecto: any;
   idUsuarioSupervisor: any;
   idRolSupervisor: any;
+
   idUsuarioResidente: any;
   idRolResidente: any;
+
+  idUsuarioPEP: any;
+  idRolPEP: any;
   constructor(
     private fb: FormBuilder,
     private maestraService: MaestrasService,
@@ -72,7 +78,8 @@ export class ConfigurarPlataformaComponent {
   ) {
     this.FormRegistro = this.fb.group({
       dniSupervisor: "",
-      dniResidente: ""
+      dniResidente: "",
+      dniPEP: ""
     });
   }
 
@@ -118,29 +125,43 @@ export class ConfigurarPlataformaComponent {
 
   async eliminarResidente() {
     console.log("eliminar supervisor", this.idUsuarioSupervisor);
-    const data ={
+    const data = {
       idUsuario: this.idUsuarioResidente,
       idProyecto: this.idProyecto,
     }
     const oRespL = await lastValueFrom(this.maestraService.eliminarUsuarioProyecto(data));
     if (oRespL) {
       this.FormRegistro.get("dniResidente").setValue("");
-      this.residenteNombre = "";  
-    } 
+      this.residenteNombre = "";
+    }
   }
 
   async eliminarSupervisor() {
     console.log("eliminar supervisor", this.idUsuarioSupervisor);
-    const data ={
+    const data = {
       idUsuario: this.idUsuarioSupervisor,
       idProyecto: this.idProyecto,
     }
     const oRespL = await lastValueFrom(this.maestraService.eliminarUsuarioProyecto(data));
     if (oRespL) {
       this.FormRegistro.get("dniSupervisor").setValue("");
-      this.SupervisorNombre = "";  
+      this.SupervisorNombre = "";
     }
- 
+
+  }
+
+  async eliminarPEP() {
+    console.log("eliminar supervisor", this.idUsuarioSupervisor);
+    const data = {
+      idUsuario: this.idUsuarioSupervisor,
+      idProyecto: this.idProyecto,
+    }
+    const oRespL = await lastValueFrom(this.maestraService.eliminarUsuarioProyecto(data));
+    if (oRespL) {
+      this.FormRegistro.get("dniSupervisor").setValue("");
+      this.SupervisorNombre = "";
+    }
+
   }
 
   async validarDniSupervisor() {
@@ -169,6 +190,39 @@ export class ConfigurarPlataformaComponent {
       this.idUsuarioSupervisor = oRespL.data[0]?.idUsuario
 
       this.SupervisorNombre = `Supervisor: ${oRespL.data[0]?.empleado || "No disponible"}`;
+    } catch (error) {
+      console.error("Error en la consulta del DNI:", error);
+      this.mostrarError("Ocurrió un error al validar el DNI del supervisor. Intente nuevamente.");
+    }
+  }
+
+  async validarDniPEP() {
+    this.PEPNombre = "";
+    const dniResidente = this.FormRegistro.get("dniResidente")?.value;
+    const dniSupervisor = this.FormRegistro.get("dniSupervisor")?.value;
+    const dniPEP = this.FormRegistro.get("dniPEP")?.value;
+
+    if (!dniPEP || dniPEP === dniSupervisor || dniPEP === dniResidente) {
+      this.mostrarError(
+        "El DNI no puede ser el mismo que el del Supervisor/Residente ni estar vacío"
+      );
+      return;
+    }
+
+    try {
+      const oRespL = await lastValueFrom(this.maestraService.getConsultaUsuarioDni(dniPEP));
+
+      if (!oRespL?.data || oRespL.data.length === 0) {
+        this.mostrarError(
+          "El DNI no está registrado en nuestras bases de datos. Favor de enviar un correo al administrador"
+        );
+        return;
+      }
+
+      this.idRolPEP = oRespL.data[0]?.idRol
+      this.idUsuarioPEP = oRespL.data[0]?.idUsuario
+
+      this.PEPNombre = `PEP : ${oRespL.data[0]?.empleado || "No disponible"}`;
     } catch (error) {
       console.error("Error en la consulta del DNI:", error);
       this.mostrarError("Ocurrió un error al validar el DNI del supervisor. Intente nuevamente.");
@@ -319,6 +373,11 @@ export class ConfigurarPlataformaComponent {
         idUsuario: this.idUsuarioSupervisor, // Obtenido del input después de validación
         idRol: this.idRolSupervisor, // Rol del supervisor
         idProyecto: this.idProyecto
+      },
+      {
+        idUsuario: this.idUsuarioPEP, // Obtenido del input después de validación
+        idRol: this.idRolPEP, // Rol del supervisor
+        idProyecto: this.idProyecto
       }
     ];
     const oRespL = await lastValueFrom(this.maestraService.registrarResidenteSupervisor(data));
@@ -353,7 +412,15 @@ export class ConfigurarPlataformaComponent {
           this.idRolSupervisor = supervisor.idRol;
           this.SupervisorNombre = `Supervisor: ${supervisor.empleado || "No disponible"}`;
           this.FormRegistro.get("dniSupervisor").setValue(supervisor.numeroDocumento);
-        } 
+        }
+
+        const PEP = oRespL.data.find(user => user.rolDescripcion === "UPS-PEP-PROYECTO");
+        if (PEP) {
+          this.idUsuarioPEP = PEP.idUsuario;
+          this.idRolPEP = PEP.idRol;
+          this.PEPNombre = `PEP: ${PEP.empleado || "No disponible"}`;
+          this.FormRegistro.get("dniPEP").setValue(PEP.numeroDocumento);
+        }
       }
     } catch (error) {
       console.error("Error al listar usuarios:", error);
@@ -361,6 +428,6 @@ export class ConfigurarPlataformaComponent {
   }
 
   cancelar() { this.matDialogRef.close() }
- 
+
 
 }

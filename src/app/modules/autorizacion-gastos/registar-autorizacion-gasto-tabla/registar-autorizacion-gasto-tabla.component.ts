@@ -61,18 +61,26 @@ export class RegistarAutorizacionGastoTablaComponent {
   displayedColumns = [
     'recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada',
     'parcial_segun_cotizacion', 'cantidad_solicitada',
-    'cantidad_restante',  'monto_restante',
+    'cantidad_restante', 'monto_restante',
     'cantidad', 'precio_unitario',
     'total_calculado', 'monto_utilizado',// 'cantidad_utilizado',
-     'porcentaje', 'acciones'
+    'porcentaje', 'acciones'
   ];
-  
+
+  displayedColumns2 = [
+    'recurso', 'valor_financiado', 'restante', 'actual', 'porcentaje_actual',
+    'acumulado', 'acumulado_porcentaje',
+    'acciones'
+  ];
+
   footerColumns: string[] = ['totalLabel'];//, 'totalValue' 
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild('tablaRubrosAdicionales') tablaRubrosAdicionales: any;
+
   filterForm: UntypedFormGroup;
-  dataSource:  MatTableDataSource<any>;
+  dataSource: MatTableDataSource<any>;
 
   estados: any[]
   centrosPoblados: any[]
@@ -94,6 +102,9 @@ export class RegistarAutorizacionGastoTablaComponent {
   totalElements = 0;
   pageSize = 10;
   pageIndex = 0; // Página actual
+
+  rubrosAdicionales: MatTableDataSource<any>;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService,
@@ -110,6 +121,7 @@ export class RegistarAutorizacionGastoTablaComponent {
 
   }
   async ngOnInit() {
+
     this.filterForm = this.fb.group({
 
       estado: [0],
@@ -119,13 +131,13 @@ export class RegistarAutorizacionGastoTablaComponent {
       cantidad: ["", [Validators.required, Validators.min(1)]],  // ✅ Mayor a 0
       precio: ["", [Validators.required, Validators.min(0.01)]]  // ✅ Mayor a 0.01
     });
- 
+
 
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
     this.titulo = "PROYECTO TAMBO: NAYAP"
     this.verProyecto(this.id)
     this.getFiltraRecursosAturorizacionGasto(true)
- 
+
     // 🔥 Monitorear el input de partidas y actualizar el filtrado en tiempo real
     this.filterForm.controls['partidaControl'].valueChanges.pipe(
       startWith(''),
@@ -149,6 +161,8 @@ export class RegistarAutorizacionGastoTablaComponent {
         return this.filtrarRecursos(value);
       })
     ).subscribe(filtered => this.recursosFiltradas = new BehaviorSubject(filtered));
+
+    this.cargarRubrosAdicionales()
   }
 
   async verProyecto(id) {
@@ -234,12 +248,15 @@ export class RegistarAutorizacionGastoTablaComponent {
     const distritoSeleccionado = event.value;
     this.getCentrosPoblados(distritoSeleccionado);
   }
-  
+
   async getFiltraRecursosAturorizacionGasto(mantenerFiltro: boolean = true) {
+    const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');
+
     try {
       const currentFilter = mantenerFiltro ? this.dataSource?.filter : '';
       const data = {
-        idAutorizacionGasto: this.idAutorizacionGasto,
+        // idAutorizacionGasto: this.idAutorizacionGasto,
+        idAutorizacionGasto: idAutorizacionGasto,
         idProyecto: this.id
       }
       const oRespL = await lastValueFrom(
@@ -305,40 +322,6 @@ export class RegistarAutorizacionGastoTablaComponent {
     }
   }
 
-  /*   async getRecursosProyecto(id) {
-      try {
-        const data ={
-          idAutorizacionGasto:"",
-          idProyecto:id
-        }
-        const response = await this.maestraService.listaRecursosAutorizacionGastoProyecto(data).toPromise();
-        this.partidas = response.data || [];
-        this.partidasSubject.next(this.partidas); // Guardamos los datos en el Subject
-      } catch (error) {
-        console.error('Error al cargar partidas:', error);
-        this.partidas = [];
-        this.partidasSubject.next([]);
-      }
-    } */
-
-  // Obtener recursos según la partida seleccionada
- /* async getRecursos(idPartida: number) {
-    try {
-      const response = await this.maestraService.getRecursosxPartidas(idPartida).toPromise();
-      this.recursos = response.data || [];
-
-      // 🔥 Reactivamos el filtrado en tiempo real
-      this.filterForm.controls['recursoControl'].valueChanges.pipe(
-        startWith(''),
-        map(value => this.filtrarRecursos(value || ''))
-      ).subscribe(filtered => this.recursosFiltradas = new BehaviorSubject(filtered));
-
-    } catch (error) {
-      console.error('Error al cargar recursos:', error);
-      this.recursos = [];
-    }
-  } */
-
   filtrarPartidas(value: any): any[] {
     const filterValue = (typeof value === 'string') ? value.toLowerCase() : '';
     return this.partidas.filter(partida =>
@@ -353,26 +336,6 @@ export class RegistarAutorizacionGastoTablaComponent {
     );
   }
 
-
-
-  /*onPartidaSelected(event: any) {
-    const selectedPartida = this.partidas.find(partida => partida.idPartida === event.option.value);
-
-    if (selectedPartida) {
-      this.filterForm.patchValue({ partidaControl: selectedPartida.descripcionPartida });
-      this.idPartidaSeleccionada = selectedPartida.idPartida
-      // 🔥 Llamamos a `getRecursos()` para traer los recursos de la partida
-      this.getRecursos(selectedPartida.idPartida);
-    } else {
-      // Si el usuario borra el campo, restablecemos los filtros
-      this.partidasFiltradas = new BehaviorSubject(this.partidas);
-      this.recursosFiltradas = new BehaviorSubject([]);
-    }
-
-    console.log('Partida seleccionada:', selectedPartida);
-  } */
-
-
   onRecursoSelected(event: any) {
     const selectedRecurso = this.recursos.find(recursos => recursos.idRecurso === event.option.value);
     if (selectedRecurso) {
@@ -383,23 +346,26 @@ export class RegistarAutorizacionGastoTablaComponent {
   }
 
   async setRegistrarAutorizacionGasto(row) {
- 
+
     const data = {
       idProyecto: this.id,
       idAutorizacionGasto: this.idAutorizacionGasto,
       idRecurso: row.idRecurso,
-      codigoRecurso:row.codigoRecurso,
+      codigoRecurso: row.codigoRecurso,
       cantidad: row.cantidad,
       precio: row.precio,
       precioCantidad: row.total,
       idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
-     /// idHistorialPrecio: row.idHistorialPrecio,
+      /// idHistorialPrecio: row.idHistorialPrecio,
       montoRestante: row.montoRestante - row.total,
       cantidadRestante: row.cantidadRestante - row.cantidad
     }
 
     const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
-    this.idAutorizacionGasto = response.data.response
+    //this.idAutorizacionGasto = response.data.response
+    localStorage.setItem('idAutorizacionGasto', response.data.response);
+    const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');
+    this.idAutorizacionGasto = idAutorizacionGasto
     console.log(response.data.response);
     if (response) {
       this.getFiltraRecursosAturorizacionGasto(true);        // Recargar datos con nueva paginación
@@ -410,23 +376,6 @@ export class RegistarAutorizacionGastoTablaComponent {
   validarRecursoSeleccionado(): boolean {
     return this.proyectos.some(proyecto => proyecto.idRecurso === this.idRecursoSeleccionado);
   }
- 
-  /*editar(row) {
-    this.idAutorizacionGastoRecurso = row.idAutorizacionGastoRecurso
-    console.log(row.idAutorizacionGastoRecurso)
-    this.isEditar = true
-    this.idPartidaSeleccionada = row.idPartida
-    this.idRecursoSeleccionado = row.idRecurso
-    this.idHistorialPrecio = row.idHistorialPrecio
-    this.idAutorizacionGasto = row.idAutorizacionGasto,
-
-      this.filterForm.get("cantidad").setValue(row.cantidad)
-    this.filterForm.get("precio").setValue(row.precio)
-    this.filterForm.get("partidaControl").setValue(row.descripcionPartida)
-    this.onPartidaSelected({ option: { value: this.idPartidaSeleccionada } })
-    this.filterForm.get("recursoControl").setValue(row.nombreRecurso)
-    this.onRecursoSelected({ option: { value: this.idRecursoSeleccionado } })
-  } */
 
   async eliminar(row) {
     console.log(row)
@@ -447,19 +396,24 @@ export class RegistarAutorizacionGastoTablaComponent {
     console.log(row)
   }
   salir() {
+    localStorage.removeItem('idAutorizacionGasto');
     this.location.back(); // Vuelve a la página anterior
   }
 
   async solicitarAutorizacion() {
+    const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');
+
     const confirmado = await this.dataModal(600, 'Solicitar Autorización de Gasto', '¿Deseas solicitar la autorización de gasto?', 'approve');
     if (confirmado) {
       const data = {
-        idAutorizacionGasto: this.idAutorizacionGasto,
+        // idAutorizacionGasto: this.idAutorizacionGasto,
+        idAutorizacionGasto: idAutorizacionGasto,
         cidEstadoAG: "002",
         observacion: "Solicitar Autorización de Gasto desde el Residente"
       }
       const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();
       if (response) {
+
         this.salir()
         // this.get()
       }
@@ -549,59 +503,13 @@ export class RegistarAutorizacionGastoTablaComponent {
     console.log(row);
     row.total = (row.cantidad || 0) * (row.precio || 0);
     this.dataSource._updateChangeSubscription();
-/*
-    const data = {
-      cantidad: row.cantidad,
-      precio: row.precio,
-      total: row.total,
-      idRecurso: row.idRecurso,
-      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
-      montoRestante: row.montoRestante,
-      cantidadRestante: row.cantidadRestante
-    }; */
     this.guardarActulizar(row);
-/*    setTimeout(() => {
-      if (
-        data.total > row.montoRestante ||
-        row.montoRestante < 0 ||
-        row.cantidadRestante < 0 ||
-        data.total < 0 ||
-        row.cantidad < 0 ||
-        row.precio < 0
-      ) {
-        alert('Verifica los valores: no pueden ser negativos ni mayores al monto restante.');
-      } else {
-       
-      }
-    }, 100); */
-
-
   }
 
-  /*
-  recalcularTotal(index: number): void {
-    
-    const row = this.dataSource.data[index];
-    console.log(row);
-    row.total = (row.cantidad || 0) * (row.precio || 0);
-    this.dataSource._updateChangeSubscription(); // refresca la tabla
-    const data = { cantidad: row.cantidad, precio: row.precio, total: row.total, idRecurso: row.idRecurso }
-
-    setTimeout(() => {
-      if (data.total > row.montoRestante) {
-        alert('El monto no puede ser mayor al monto restante.');
-      } else {
-        this.guardarActulizar(data)
-      }
-    }, 100);
-    //primero que data.total tenga el valor
-
-  }
-*/
   guardarActulizar(data) {
     console.log(data)
     this.setRegistrarAutorizacionGasto(data)
-   }
+  }
 
   getColor(estado: string): string {
     switch (estado.toUpperCase()) {
@@ -637,6 +545,50 @@ export class RegistarAutorizacionGastoTablaComponent {
     return this.dataSource?.data
       .reduce((sum, row) => sum + (Number(row.total) || 0), 0) || 0;
   }
- 
+
+
+  recalcularTotalmontos(row: any) {
+    this.guardarActulizarMontos(row);
+  }
+
+  async guardarActulizarMontos(row) {
+    const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');
+
+    const data = {
+      codigoRecurso: row.codigoRecurso,
+      actual: row.actual,
+      idControlMonitoreoProyecto: row.idControlMonitoreoProyecto,
+      idAutorizacionGasto: idAutorizacionGasto,
+      idControlMonitoreo: row.idControlMonitoreo
+    }
+    const response = await this.maestraService.setRegistrarAGadicional(data).toPromise();
+    console.log(response.data.response);
+    if (response) {
+      this.cargarRubrosAdicionales()
+    }
+  }
+
+  cargarRubrosAdicionales() {
+    const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');
+    const data = {
+      idProyecto: this.id,
+      idAutorizacionGasto: idAutorizacionGasto
+    };
+    this.maestraService.getRubrosAdicionalesAG(data).subscribe((res: any) => {
+      const rubrosFiltrados = res.data.filter((item: any) =>
+        item.cidControlMonitoreo !== "001" &&
+        item.cidControlMonitoreo !== "002" &&
+        item.cidControlMonitoreo !== "003"
+      );
+      this.rubrosAdicionales = new MatTableDataSource(rubrosFiltrados);
+
+      this.cdr.detectChanges(); // 🔥 asegura cambios
+
+      if (this.tablaRubrosAdicionales) {
+        this.tablaRubrosAdicionales.renderRows(); // 🔥 redibuja filas
+      }
+    });
+  }
+
 }
 

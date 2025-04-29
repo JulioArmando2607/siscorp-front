@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { Session } from "app/core/auth/Session";
 //import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx-js-style';
@@ -402,11 +403,19 @@ export class ExcelService {
   }
 
   exportAnexo25(response): void {
-    console.log(response.data.response.listamontosValorFinanciadoAG)
+
+
+    console.log(Session.identity.name)
     const v001 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "001");
     const v002 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "002");
     const v003 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "003");
 
+    const v004 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "004");
+    const v005 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "005");
+    const v006 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "006");
+    const v007 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "007");
+    const v008 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "008");
+    const v009 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "009");
 
     console.log(v001);
 
@@ -420,8 +429,8 @@ export class ExcelService {
     // ---------- DATOS DEL PROYECTO ----------
     worksheetData.push(["PROYECTO", "", "", "", "", "", "", "", ""]); // 10 columnas
     worksheetData.push(["NÚMERO CONVENIO", "", "", "", "", ""]);
-    worksheetData.push(["CORRESPONDE AL MES", "", "", "AUTORIZACIÓN Nº", "", "", ""]);
-    worksheetData.push(["ELABORADO POR EL PEP (NOMBRE)", "", "", "", "", ""]);
+    worksheetData.push(["CORRESPONDE AL MES", "", "", "AUTORIZACIÓN Nº", response.data.response.nroAutorizacionGasto, "", ""]);
+    worksheetData.push(["ELABORADO POR EL PEP (NOMBRE)", "", Session.identity.name, "", "", ""]);
     worksheetData.push(["FECHA DE PRESENTACIÓN", "", "", "", "", ""]);
     worksheetData.push([""]);
     worksheetData.push(["", "", "MONTO DE CONVENIO", "", "", `S/. ${v001.monto}`, ""]);
@@ -463,8 +472,20 @@ export class ExcelService {
       "ACUMULADO (S/)", "(%)",
       ""
     ]);
+    let costoDirecto = 0;
+    let cdgastoAutorizadoActual = 0;    // 1. Calcula el total
+    response.data.response.rubro.forEach((rubro: any) => {
+      costoDirecto += +rubro.valorFinanciado; // suma convertido a número
+      cdgastoAutorizadoActual += +rubro.gastoAutorizadoActual; // suma convertido a número
+    });
 
-    response.data.response.rubro.forEach((rubro: any, index: number) => {
+    // 2. Agrega fila resumen
+    worksheetData.push([
+      "1.0", "COSTO DIRECTO", costoDirecto, cdgastoAutorizadoActual, "", "", "", ""
+    ]);
+
+    // 3. Agrega cada rubro detallado
+    response.data.response.rubro.forEach((rubro: any) => {
       worksheetData.push([
         rubro.item,
         rubro.nombreRubro,
@@ -475,31 +496,50 @@ export class ExcelService {
         rubro.gastoEfectuadoPorcentaje,
         "",
       ]);
-
     });
 
+
     worksheetData.push([
-      "SUB TOTAL INVERSION", "", 1909814.13, "", "", 1910298.08, 100.02, ""
+      "2.0", "GASTOS GENERALES", v004.monto, "", "", "", "", ""
+    ]);
+    worksheetData.push([
+      "3.0", "GASTOS DE RESIDENTE", v005.monto, "", "", "", "", ""
+    ]);
+    worksheetData.push([
+      "4.0", "COSTOS FINANCIEROS", v006.monto, "", "", "", "", ""
     ]);
 
     worksheetData.push([
-      "7.0", "GASTOS DE SUPERVISION", 50561.79, 208.41, 0.41, 49936.94, 98.76, ""
+      "5.0", "GASTOS DE N.E.", v007.monto, "", "", "", "", ""
     ]);
 
     worksheetData.push([
-      "TOTAL INVERSION - MONTO DESEMBOLSADO (autorizado)", "", 1960375.92, 16900.62, 0.86, 1960235.02, 99.99, ""
+      "6.0", "INTERESES", v008.monto, "", "", "", "", ""
+    ]);
+
+    let subtotalInversion = costoDirecto + v004.monto + v005.monto + v006.monto + v007.monto + v008.monto;
+    worksheetData.push([
+      "SUB TOTAL INVERSION", "", subtotalInversion, "", "", "", "", ""
     ]);
 
     worksheetData.push([
-      "MONTO DEVUELTO A LA CUENTA BANCARIA", "", "", "", "", 25.99, "", ""
+      "7.0", "GASTOS DE SUPERVISION", v009.monto, "", "", "", "", ""
     ]);
 
     worksheetData.push([
-      "TOTAL INVERSION - MONTO DESEMBOLSADO (retirado)", "", 1960375.92, 16900.62, 0.86, 1960209.03, 99.99, ""
+      "TOTAL INVERSION - MONTO DESEMBOLSADO (autorizado)", "", subtotalInversion + v009.monto, "", "", "", "", ""
+    ]);
+
+    worksheetData.push([
+      "MONTO DEVUELTO A LA CUENTA BANCARIA", "", "", "", "", "", "", ""
+    ]);
+
+    worksheetData.push([
+      "TOTAL INVERSION - MONTO DESEMBOLSADO (retirado)", "", "", "", "", "", "", ""
     ]);
 
     // ---------- NOTAS Y FIRMAS ----------
-    worksheetData.push(["Comentario del PEP: ...", "", "", "", "", "", "", ""]);
+    worksheetData.push(["Comentario del PEP:", "", "", "", "", "", "", ""]);
     worksheetData.push([]);
     worksheetData.push([]);
     worksheetData.push(["(1) Deberá contener los montos rendidos según la última Pre liquidación presentada más las autorizaciones pendientes de rendir"]);

@@ -372,7 +372,7 @@ export class GestionPlataformasComponent implements OnInit {
       autoFocus: false,
       data: {
         proyecto: cloneDeep(row),
-        title: "CONFIGURAR RESIDENTE Y SUPERVISOR",
+        title: "",
         type: 'create'
       },
 
@@ -405,7 +405,7 @@ export class GestionPlataformasComponent implements OnInit {
       autoFocus: false,
       data: {
         proyecto: cloneDeep(data),
-        title: "CONFIGURAR RESIDENTE Y SUPERVISOR",
+        title: "",
         type: 'create'
       },
 

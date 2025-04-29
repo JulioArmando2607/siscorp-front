@@ -57,12 +57,18 @@ export class AnalizarAutorizacionGastoComponent {
   configForm: UntypedFormGroup;
   id: string | null = null;
   titulo: string;
+  rubrosAdicionales: MatTableDataSource<any>;
 
   displayedColumns = [
     'recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada',
     'cantidad_solicitada', 'parcial_segun_cotizacion',
     'monto_restante', 'cantidad_restante', 'cantidad', 'precio_unitario',
     'total_calculado', 'monto_utilizado', 'porcentaje', 'acciones'
+  ];
+  displayedColumns2 = [
+    'recurso', 'valor_financiado', 'restante', 'actual', 'porcentaje_actual',
+    'acumulado', 'acumulado_porcentaje',
+    'acciones'
   ];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -84,6 +90,7 @@ export class AnalizarAutorizacionGastoComponent {
 
     this.verProyecto(this.id);
     this.getFiltraRecursosAturorizacionGasto(true);
+    this.cargarRubrosAdicionales()
   }
 
 
@@ -444,10 +451,7 @@ export class AnalizarAutorizacionGastoComponent {
       this.isResidente = false;
       this.isAdmin = true;
     }
-
-
   }
-
 
   async getAutorizacionGastos() {
     const data = {
@@ -464,6 +468,20 @@ export class AnalizarAutorizacionGastoComponent {
     if (oRespL?.data?.content) {
 
     }
+  }
+
+  cargarRubrosAdicionales() {
+    const data = {
+      idProyecto: this.id,
+      idAutorizacionGasto: this.idAutorizacionGasto
+    };
+    this.maestraService.getRubrosAdicionalesAG(data).subscribe((res: any) => {
+      this.rubrosAdicionales = res.data.filter((item: any) => 
+        item.cidControlMonitoreo !== "001" &&
+        item.cidControlMonitoreo !== "002" &&
+        item.cidControlMonitoreo !== "003"
+      );
+    });
   }
 
 }

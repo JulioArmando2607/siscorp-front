@@ -105,18 +105,12 @@
             <th mat-header-cell *matHeaderCellDef> MONTO UTILIZADO </th>
             <td mat-cell *matCellDef="let row"> {{ row.montoUtilizado | number: '1.2-2' }} </td>
           </ng-container>
-  
-          <!-- CANTIDAD UTILIZADO    <ng-container matColumnDef="cantidad_utilizado">
-            <th mat-header-cell *matHeaderCellDef> CANTIDAD UTILIZADO </th>
-            <td mat-cell *matCellDef="let row"> {{ row.cantidadUtilizado }} </td>
-          </ng-container>-->
-        
-  
+   
           <!-- PORCENTAJE -->
           <ng-container matColumnDef="porcentaje">
             <th mat-header-cell *matHeaderCellDef> PORCENTAJE % </th>
             <td mat-cell *matCellDef="let row" [ngStyle]="{ 'font-weight': 'bold', 'color': getTextColor(row.colorEstado) }">
-              {{ row.porcentajeUso }} %
+              {{ row.porcentajeUso }}
             </td>
           </ng-container>
   
@@ -134,24 +128,101 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"  class="mat-header"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   
-          <!--   Encabezado de la tabla 
-    <thead mat-header-row *matHeaderRowDef="displayedColumns" class="mat-header"></thead>
-     Cuerpo de la tabla con scroll  
-    <tbody mat-row *matRowDef="let row; columns: displayedColumns;"></tbody>-->
         </table>
       </div>
           <!-- Linear Totals Section -->
           <div class="linear-totals mt-4">
             <div class="flex flex-wrap gap-4">
-        <!---        <div>TOTAL MONTO ASIGNADO: {{ calcularTotalMontoAsignado() | number:'1.2-2' }}</div>
-                <div>TOTAL CANTIDAD ASIGNADA: {{ calcularTotalCantidadAsignada() }}</div>
-                <div>TOTAL MONTO RESTANTE: {{ calcularTotalMontoRestante() | number:'1.2-2' }}</div>
-                <div>TOTAL CANTIDAD RESTANTE: {{ calcularTotalCantidadRestante() }}</div>-->
-                <div>TOTAL CALCULADO: {{ calcularTotalCalculado() | number:'1.2-2' }}</div>
-            <!---    <div>TOTAL MONTO UTILIZADO: {{ calcularTotalMontoUtilizado() | number:'1.2-2' }}</div>
-           -->
+                <div>TOTAL CALCULADO: {{ calcularTotalCalculado() | number:'1.2-2' }}</div>    
               </div>
         </div>
+    </div>
+
+    <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
+
+      <!-- Tabla -->
+      <div class="table-container">
+        <table #tablaRubrosAdicionales mat-table [dataSource]="rubrosAdicionales" class="mat-table">
+ 
+          <!-- Column headers -->
+          <ng-container matColumnDef="recurso">
+            <th mat-header-cell *matHeaderCellDef> RUBRO </th>
+            <td mat-cell *matCellDef="let row"> {{ row.nombreMontoRubroAdicionales }} </td>
+          </ng-container>
+  
+          <!-- UND -->
+          <ng-container matColumnDef="valor_financiado">
+            <th mat-header-cell *matHeaderCellDef> VALOR
+              FINANCIADO
+              S/
+            </th>
+            <td mat-cell *matCellDef="let row"> {{ row.monto }} </td>
+  
+          </ng-container>
+  
+          <!-- UND -->
+          <ng-container matColumnDef="actual">
+            <th mat-header-cell *matHeaderCellDef> ACTUAL (S/)
+            </th>
+            <td mat-cell *matCellDef="let row; let i = index">
+              <input [disabled]="isResidente" matInput type="number" 
+              [(ngModel)]="row.actual" 
+              [ngModelOptions]="{standalone: true}" 
+              class="w-full px-2 py-1 border rounded" 
+              (blur)="recalcularTotalmontos(row)"/>
+            </td> 
+          </ng-container>
+   
+          <!-- MONTO TOTAL ASIGNADO -->
+          <ng-container matColumnDef="porcentaje_actual">
+            <th mat-header-cell *matHeaderCellDef>(%)
+            </th>
+            <td mat-cell *matCellDef="let row"> 
+              <input matInput type="number" [value]="row.porcentajeActual" disabled
+                class="w-full px-2 py-1 border rounded bg-gray-100" />
+            </td>
+          </ng-container>
+  
+          <!-- CANTIDAD TOTAL ASIGNADA -->
+          <ng-container matColumnDef="acumulado">
+            <th mat-header-cell *matHeaderCellDef> ACUMULADO (S/) </th>
+            <td mat-cell *matCellDef="let row"> {{ row.cantidadAsignado }}
+              <input matInput type="number" [value]="row.cantidadAsignado" disabled
+                class="w-full px-2 py-1 border rounded bg-gray-100" />
+            </td>
+          </ng-container>
+  
+          <ng-container matColumnDef="acumulado_porcentaje">
+            <th mat-header-cell *matHeaderCellDef>(%)
+            </th>
+            <td mat-cell *matCellDef="let row"> {{ row.cantidadUtilizadoAcumulado }}
+              <input matInput type="number" [value]="row.cantidadUtilizadoAcumulado" disabled
+                class="w-full px-2 py-1 border rounded bg-gray-100" />
+            </td>
+          </ng-container>
+  
+          <ng-container matColumnDef="restante">
+            <th mat-header-cell *matHeaderCellDef>  RESTANTE </th>
+            <td mat-cell *matCellDef="let row">
+              <input matInput type="number" [value]="row.restante" disabled
+                class="w-full px-2 py-1 border rounded bg-gray-100" />
+            </td> 
+          </ng-container>
+  
+          <!-- ACCIONES -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef> Acciones </th>
+            <td mat-cell *matCellDef="let row">
+              <button mat-icon-button color="warn" (click)="eliminar(row)" matTooltip="Eliminar Recurso">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container> 
+          <tr mat-header-row *matHeaderRowDef="displayedColumns2" class="mat-header"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns2"></tr>
+        </table> 
+      </div>
+  
     </div>
   </div>
   

@@ -1,13 +1,9 @@
 <div class="prose prose-sm max-w-4xl overflow-y-auto max-h-screen">
-    <!-- Header sin franja morada, con botón a la izquierda y título centrado -->
     <div class="flex h-16 flex-0 items-center justify-between border-b px-4">
-        <!-- Botón de cerrar a la izquierda -->
         <button mat-icon-button (click)="matDialogRef.close()">
             <mat-icon class="text-gray-500" [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
         </button>
-        <!-- Título centrado -->
-        <div class="flex-1 text-center text-lg font-medium text-gray-700">{{title}}</div>
-        <!-- Espacio vacío para mantener el título centrado -->
+        <div class="flex-1 text-center text-lg font-medium text-gray-700">CONFIGURAR RESIDENTE, SUPERVISOR Y PEP</div>
         <div class="w-10"></div>
     </div>
 
@@ -19,38 +15,36 @@
                 <p class="font-medium text-gray-700">Ingresar DNI Residente</p>
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>DNI</mat-label>
-                    <input matInput type="text" formControlName="dniResidente" maxlength="8" pattern="[0-9]{8}" required>
+                    <input matInput type="text" formControlName="dniResidente" maxlength="8" pattern="[0-9]{8}"
+                        required>
                 </mat-form-field>
                 <button mat-flat-button color="primary" (click)="validarDniResidente()">
                     <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:funnel'"></mat-icon>
                     <span class="ml-2">Validar Residente </span>
- 
                 </button>
-
             </div>
 
             <div *ngIf="residenteNombre !== ''" class="row relative">
                 <span class="ml-2"><strong>{{ residenteNombre }}</strong></span>
-                <span 
-                    *ngIf="residenteNombre !== ''" 
-                    class="ml-2 text-red-500 cursor-pointer relative group" 
-                    (click)="eliminarResidente()"
-                >
+                <span *ngIf="residenteNombre !== ''" class="ml-2 text-red-500 cursor-pointer relative group"
+                    (click)="eliminarResidente()">
                     ✖
-                    <span class="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1">
+                    <span
+                        class="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1">
                         ¿Desea eliminar el Residente?
                     </span>
                 </span>
             </div>
-            
-            
-            
+
+
+
             <!-- Validar DNI Supervisor -->
             <div class="grid grid-cols-3 items-center gap-4">
                 <p class="font-medium text-gray-700">Ingresar DNI Supervisor</p>
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>DNI</mat-label>
-                    <input matInput type="text" formControlName="dniSupervisor" maxlength="8" pattern="[0-9]{8}" required>
+                    <input matInput type="text" formControlName="dniSupervisor" maxlength="8" pattern="[0-9]{8}"
+                        required>
                 </mat-form-field>
                 <button mat-flat-button color="primary" (click)="validarDniSupervisor()">
                     <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:funnel'"></mat-icon>
@@ -58,18 +52,43 @@
                 </button>
             </div>
 
-            <div *ngIf="SupervisorNombre !== ''"  class="row relative">
+            <div *ngIf="SupervisorNombre !== ''" class="row relative">
                 <span class="ml-2"><strong>{{ SupervisorNombre }}</strong></span>
                 <span *ngIf="SupervisorNombre !== ''" class="ml-2 text-red-500 cursor-pointer relative group"
-                (click)="eliminarSupervisor()">
+                    (click)="eliminarSupervisor()">
                     ✖
-                    <span class="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1">
+                    <span
+                        class="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1">
                         ¿Desea eliminar el Supervisor?
                     </span>
                 </span>
             </div>
-            
- 
+
+              <!-- Validar DNI PEP -->
+              <div class="grid grid-cols-3 items-center gap-4">
+                <p class="font-medium text-gray-700">Ingresar DNI PEP</p>
+                <mat-form-field appearance="fill" class="w-full">
+                    <mat-label>DNI</mat-label>
+                    <input matInput type="text" formControlName="dniPEP" maxlength="8" pattern="[0-9]{8}"
+                        required>
+                </mat-form-field>
+                <button mat-flat-button color="primary" (click)="validarDniPEP()">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:funnel'"></mat-icon>
+                    <span class="ml-2">Validar PEP</span>
+                </button>
+            </div>
+
+            <div *ngIf="PEPNombre !== ''" class="row relative">
+                <span class="ml-2"><strong>{{ PEPNombre }}</strong></span>
+                <span *ngIf="PEPNombre !== ''" class="ml-2 text-red-500 cursor-pointer relative group"
+                    (click)="eliminarPEP()">
+                    ✖
+                    <span
+                        class="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1">
+                        ¿Desea eliminar el PEP?
+                    </span>
+                </span>
+            </div>
         </div>
 
         <!-- Botón de enviar -->

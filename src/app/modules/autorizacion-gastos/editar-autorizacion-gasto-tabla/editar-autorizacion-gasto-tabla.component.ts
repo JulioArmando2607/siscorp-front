@@ -21,11 +21,11 @@ import { BehaviorSubject, lastValueFrom, map, Observable, startWith, switchMap }
 @Component({
   selector: 'app-editar-autorizacion-gasto-tabla',
   imports: [
-    //  ReactiveFormsModule, // <== Agregar esta línea
+    
     CommonModule,
-    MatTableModule, // <== Agregar la importación de MatTableModule
-    MatSortModule,  // <== Agregar la importación de MatSortModule
-    MatPaginatorModule, // <== Agregar la importación de MatPaginatorModule
+    MatTableModule,  
+    MatSortModule,  
+    MatPaginatorModule, 
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -60,15 +60,14 @@ export class EditarAutorizacionGastoTablaComponent {
     'parcial_segun_cotizacion', 'cantidad_solicitada',
     'cantidad_restante', 'monto_restante',
     'cantidad', 'precio_unitario',
-    'total_calculado', 'monto_utilizado', //'cantidad_utilizado', 
+    'total_calculado', 'monto_utilizado',  
     'porcentaje', 'acciones'
   ];
 
   displayedColumns2 = [
-    'recurso', 'valor_financiado','restante', 'actual', 'porcentaje_actual',
+    'recurso', 'valor_financiado', 'restante', 'actual', 'porcentaje_actual',
     'acumulado', 'acumulado_porcentaje',
-    //'observaciones',
-     'acciones'
+    'acciones'
   ];
 
   footerColumns: string[] = ['totalLabel'];//, 'totalValue' 
@@ -84,40 +83,33 @@ export class EditarAutorizacionGastoTablaComponent {
   titulo: string;
 
   partidas: any[] = []
-  partidasFiltradas!: Observable<any[]>; // Observable para filtrar en memoria
-  recursosFiltradas!: Observable<any[]>; // Observable para filtrar en memoria
-  partidasSubject = new BehaviorSubject<any[]>([]); // Para manejar el filtrado en memoria
+  partidasFiltradas!: Observable<any[]>;
+  recursosFiltradas!: Observable<any[]>;
+  partidasSubject = new BehaviorSubject<any[]>([]);
   recursos: any;
   recursosSubject: any;
-  // Variables de paginación
   totalElements = 0;
   pageSize = 10;
-  pageIndex = 0; // Página actual
-
+  pageIndex = 0; 
   rubrosAdicionales: MatTableDataSource<any>;
 
   constructor(
     private cdr: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService,
-    private _matDialog: MatDialog,
     private maestraService: MaestrasService,
     private fb: FormBuilder,
     private _formBuilder: UntypedFormBuilder,
     private excelService: ExcelService,
     private route: ActivatedRoute,
-    private _router: Router,
     private location: Location
-    //private _notesService: NotesService
   ) {
 
   }
   async ngOnInit() {
     this.filterForm = this.fb.group({
-
       estado: [0],
-
-      partidaControl: ["", Validators.required],  // ✅ Campo obligatorio
-      recursoControl: ["", Validators.required],  // ✅ Campo obligatorio
+      partidaControl: ["", Validators.required], 
+      recursoControl: ["", Validators.required], 
       cantidad: ["", [Validators.required, Validators.min(1)]],  // ✅ Mayor a 0
       precio: ["", [Validators.required, Validators.min(0.01)]]  // ✅ Mayor a 0.01
     });
@@ -236,23 +228,23 @@ export class EditarAutorizacionGastoTablaComponent {
     }
   }
 
- /* // Obtener recursos según la partida seleccionada
-  async getRecursos(idPartida: number) {
-    try {
-      const response = await this.maestraService.getRecursosxPartidas(idPartida).toPromise();
-      this.recursos = response.data || [];
-
-      // 🔥 Reactivamos el filtrado en tiempo real
-      this.filterForm.controls['recursoControl'].valueChanges.pipe(
-        startWith(''),
-        map(value => this.filtrarRecursos(value || ''))
-      ).subscribe(filtered => this.recursosFiltradas = new BehaviorSubject(filtered));
-
-    } catch (error) {
-      console.error('Error al cargar recursos:', error);
-      this.recursos = [];
-    }
-  } */
+  /* // Obtener recursos según la partida seleccionada
+   async getRecursos(idPartida: number) {
+     try {
+       const response = await this.maestraService.getRecursosxPartidas(idPartida).toPromise();
+       this.recursos = response.data || [];
+ 
+       // 🔥 Reactivamos el filtrado en tiempo real
+       this.filterForm.controls['recursoControl'].valueChanges.pipe(
+         startWith(''),
+         map(value => this.filtrarRecursos(value || ''))
+       ).subscribe(filtered => this.recursosFiltradas = new BehaviorSubject(filtered));
+ 
+     } catch (error) {
+       console.error('Error al cargar recursos:', error);
+       this.recursos = [];
+     }
+   } */
 
   filtrarPartidas(value: any): any[] {
     const filterValue = (typeof value === 'string') ? value.toLowerCase() : '';
@@ -267,27 +259,7 @@ export class EditarAutorizacionGastoTablaComponent {
       recurso.nombreRecurso.toLowerCase().includes(filterValue)
     );
   }
-
-
-
-/*  onPartidaSelected(event: any) {
-    const selectedPartida = this.partidas.find(partida => partida.idPartida === event.option.value);
-
-    if (selectedPartida) {
-      this.filterForm.patchValue({ partidaControl: selectedPartida.descripcionPartida });
-      this.idPartidaSeleccionada = selectedPartida.idPartida
-      // 🔥 Llamamos a `getRecursos()` para traer los recursos de la partida
-      this.getRecursos(selectedPartida.idPartida);
-    } else {
-      // Si el usuario borra el campo, restablecemos los filtros
-      this.partidasFiltradas = new BehaviorSubject(this.partidas);
-      this.recursosFiltradas = new BehaviorSubject([]);
-    }
-
-    console.log('Partida seleccionada:', selectedPartida);
-  }
- */
-
+  
   onRecursoSelected(event: any) {
     const selectedRecurso = this.recursos.find(recursos => recursos.idRecurso === event.option.value);
     if (selectedRecurso) {
@@ -299,32 +271,18 @@ export class EditarAutorizacionGastoTablaComponent {
 
   async guardarActulizarMontos(row) {
     console.log(row)
-/*    const data = {
-      idProyecto: this.id,
+    const data = {
+      codigoRecurso: row.codigoRecurso,
+      actual: row.actual,
+      idControlMonitoreoProyecto: row.idControlMonitoreoProyecto,
       idAutorizacionGasto: this.idAutorizacionGasto,
-      idRecurso: row.idRecurso,
-      cantidad: row.cantidad,
-      precio: row.precio,
-      precioCantidad: row.total,
-      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
-      idHistorialPrecio: row.idHistorialPrecio,
-      montoRestante: row.montoAsignado - (row.montoUtilizado + row.total),
-      cantidadRestante: row.cantidadAsignado - (row.cantidadRestante + row.cantidad),
-      codigoRecurso:row.codigoRecurso,
+      idControlMonitoreo: row.idControlMonitoreo
     }
-
-    const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
-   // this.idAutorizacionGasto = response.data.response
+    const response = await this.maestraService.setRegistrarAGadicional(data).toPromise();
     console.log(response.data.response);
     if (response) {
-      this.getFiltraRecursosAturorizacionGasto(true)
-    } */
-      const response = await this.maestraService.setRegistrarAGadicional(row).toPromise();
-      // this.idAutorizacionGasto = response.data.response
-       console.log(response.data.response);
-       if (response) {
-         this.cargarRubrosAdicionales()
-       }
+      this.cargarRubrosAdicionales()
+    }
   }
 
   async setRegistrarAutorizacionGasto(row) {
@@ -339,12 +297,12 @@ export class EditarAutorizacionGastoTablaComponent {
       idHistorialPrecio: row.idHistorialPrecio,
       montoRestante: row.montoAsignado - (row.montoUtilizado + row.total),
       cantidadRestante: row.cantidadAsignado - (row.cantidadRestante + row.cantidad),
-      codigoRecurso:row.codigoRecurso,
+      codigoRecurso: row.codigoRecurso,
 
     }
 
     const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
-   // this.idAutorizacionGasto = response.data.response
+    // this.idAutorizacionGasto = response.data.response
     console.log(response.data.response);
     if (response) {
       this.getFiltraRecursosAturorizacionGasto(true)
@@ -355,43 +313,21 @@ export class EditarAutorizacionGastoTablaComponent {
   validarRecursoSeleccionado(): boolean {
     return this.proyectos.some(proyecto => proyecto.idRecurso === this.idRecursoSeleccionado);
   }
-
-
-  /*editar(row) {
-    this.idAutorizacionGastoRecurso = row.idAutorizacionGastoRecurso
-    console.log(row.idAutorizacionGastoRecurso)
-    this.isEditar = true
-    this.idPartidaSeleccionada = row.idPartida
-    this.idRecursoSeleccionado = row.idRecurso
-    this.idHistorialPrecio = row.idHistorialPrecio
-    this.idAutorizacionGasto = row.idAutorizacionGasto,
-
-      this.filterForm.get("cantidad").setValue(row.cantidad)
-    this.filterForm.get("precio").setValue(row.precio)
-    this.filterForm.get("partidaControl").setValue(row.descripcionPartida)
-    this.onPartidaSelected({ option: { value: this.idPartidaSeleccionada } })
-    this.filterForm.get("recursoControl").setValue(row.nombreRecurso)
-    this.onRecursoSelected({ option: { value: this.idRecursoSeleccionado } })
-  }
- */
+ 
   async eliminar(row) {
-    console.log(row)
-
     const confirmado = await this.dataModal(522, 'Eliminar recurso', 'Deseas eliminar este recurso?', "warning");
     if (confirmado) {
       const data = {
         idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso
       }
-
       const response = await this.maestraService.setEliminarAutorizacionGastoRecurso(data).toPromise();
       console.log(response);
       if (response) {
         this.getFiltraRecursosAturorizacionGasto()
       }
     }
-
-    console.log(row)
   }
+
   salir() {
     this.location.back(); // Vuelve a la página anterior
   }
@@ -489,24 +425,12 @@ export class EditarAutorizacionGastoTablaComponent {
     });
   }
 
-/*  recalcularTotalmontos(index: number){
-    console.log(index)
-    const row = this.rubrosAdicionales.filteredData[index]; // <- CAMBIADO AQUÍ
+  recalcularTotalmontos(row: any) {
     console.log(row);
     row.total = (row.cantidad || 0) * (row.precio || 0);
-    this.rubrosAdicionales._updateChangeSubscription();
-//    this.guardarActulizar(row);
-    this.guardarActulizarMontos(row);
-
-  } */
-
-  recalcularTotalmontos(row: any){
-    console.log(row);
-    row.total = (row.cantidad || 0) * (row.precio || 0);
- //   this.rubrosAdicionales._updateChangeSubscription();
     this.guardarActulizarMontos(row);
   }
-  
+
 
   recalcularTotal(index: number): void {
     const row = this.dataSource.filteredData[index]; // <- CAMBIADO AQUÍ
@@ -575,7 +499,6 @@ export class EditarAutorizacionGastoTablaComponent {
     return this.dataSource?.data.reduce((sum, row) => sum + (Number(row.montoUtilizado) || 0), 0) || 0;
   }
 
-
   async getAutorizacionGastos() {
     const data = {
       idProyecto: this.id,
@@ -598,7 +521,7 @@ export class EditarAutorizacionGastoTablaComponent {
       idProyecto: this.id,
       idAutorizacionGasto: this.idAutorizacionGasto
     };
-  
+
     this.maestraService.getRubrosAdicionalesAG(data).subscribe((res: any) => {
       this.rubrosAdicionales = res.data.filter((item: any) => 
         item.cidControlMonitoreo !== "001" &&
@@ -607,6 +530,5 @@ export class EditarAutorizacionGastoTablaComponent {
       );
     });
   }
-  
-//control-monitoreo-proyecto-ag
+ 
 }

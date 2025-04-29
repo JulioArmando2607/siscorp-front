@@ -136,13 +136,7 @@
     <!-- Linear Totals Section -->
     <div class="linear-totals mt-4">
       <div class="flex flex-wrap gap-4">
-        <!---        <div>TOTAL MONTO ASIGNADO: {{ calcularTotalMontoAsignado() | number:'1.2-2' }}</div>
-                <div>TOTAL CANTIDAD ASIGNADA: {{ calcularTotalCantidadAsignada() }}</div>
-                <div>TOTAL MONTO RESTANTE: {{ calcularTotalMontoRestante() | number:'1.2-2' }}</div>
-                <div>TOTAL CANTIDAD RESTANTE: {{ calcularTotalCantidadRestante() }}</div>-->
-        <div>TOTAL CALCULADO: {{ calcularTotalCalculado() | number:'1.2-2' }}</div>
-        <!---    <div>TOTAL MONTO UTILIZADO: {{ calcularTotalMontoUtilizado() | number:'1.2-2' }}</div>
-           -->
+        <div>TOTAL CALCULADO: {{ calcularTotalCalculado() | number:'1.2-2' }}</div>      
       </div>
     </div>
   </div>
@@ -184,11 +178,10 @@
         <ng-container matColumnDef="porcentaje_actual">
           <th mat-header-cell *matHeaderCellDef>(%)
           </th>
-          <td mat-cell *matCellDef="let row"> {{ row.montoAsignado | number:'1.2-2' }}
-            <input matInput type="number" [value]="row.montoAsignado" disabled
+          <td mat-cell *matCellDef="let row"> 
+            <input matInput type="number" [value]="row.porcentajeActual" disabled
               class="w-full px-2 py-1 border rounded bg-gray-100" />
           </td>
-
         </ng-container>
 
         <!-- CANTIDAD TOTAL ASIGNADA -->
@@ -198,7 +191,6 @@
             <input matInput type="number" [value]="row.cantidadAsignado" disabled
               class="w-full px-2 py-1 border rounded bg-gray-100" />
           </td>
-
         </ng-container>
 
         <ng-container matColumnDef="acumulado_porcentaje">
@@ -212,7 +204,7 @@
 
         <ng-container matColumnDef="restante">
           <th mat-header-cell *matHeaderCellDef>  RESTANTE </th>
-          <td mat-cell *matCellDef="let row"> {{ row.restante | number:'1.2-2' }}
+          <td mat-cell *matCellDef="let row">
             <input matInput type="number" [value]="row.restante" disabled
               class="w-full px-2 py-1 border rounded bg-gray-100" />
           </td> 
@@ -226,7 +218,6 @@
               <mat-icon>delete</mat-icon>
             </button>
           </td>
-
         </ng-container>
 
         <!-- Encabezados y filas -->
