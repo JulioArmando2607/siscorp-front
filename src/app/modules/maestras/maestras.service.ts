@@ -135,7 +135,9 @@ export class MaestrasService {
   }
 
   solicitarAutorizacionGastoResidente(data): Observable<any> {
-    return this.http.post(`${this.getUrlAutorizacionGasto()}solicitar-autorizacion-gasto-residente`, data);
+    return this.http.post(`${this.getUrlAutorizacionGasto()}solicitar-autorizacion-gasto-residente`, data, { headers: Headers(false) });
+
+    //return this.http.post(`${this.getUrlAutorizacionGasto()}solicitar-autorizacion-gasto-residente`, data);
   }
 
   getEstadosAutorizacion(): Observable<any> {

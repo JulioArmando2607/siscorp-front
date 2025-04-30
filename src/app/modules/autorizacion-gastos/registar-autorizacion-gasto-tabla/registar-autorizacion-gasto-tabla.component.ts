@@ -104,6 +104,7 @@ export class RegistarAutorizacionGastoTablaComponent {
   pageIndex = 0; // Página actual
 
   rubrosAdicionales: MatTableDataSource<any>;
+  selectedFile: File | null = null; // Para almacenar el archivo seleccionado
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -401,9 +402,44 @@ export class RegistarAutorizacionGastoTablaComponent {
   }
 
   async solicitarAutorizacion() {
+    const confirmado = await this.dataModal(600, 'Solicitar Autorización de Gasto', '¿Deseas solicitar la autorización de gasto?', 'approve');
+
+    if (confirmado) {
+      const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');  
+      const detalle = {
+        idAutorizacionGasto: idAutorizacionGasto,
+        cidEstadoAG: "002",
+        observacion: "Solicitar Autorización de Gasto desde el Residente"
+      };
+  
+      console.log(detalle)
+      const formData = new FormData();
+      formData.append('detalle', new Blob([JSON.stringify(detalle)], { type: 'application/json' }));
+    
+      for (let file of this.selectedFiles) {
+        formData.append('archivos', file); // Usa el mismo nombre que en el backend
+      }
+    
+      const response = await this.maestraService.solicitarAutorizacionGastoResidente(formData).toPromise();
+  
+    //  const response = await this.http.post('/api/solicitar-autorizacion-gasto-residente', formData).toPromise();
+    
+      if (response) {
+        await this.dataModal(response.data.codResultado, 'Solicitar Autorización de Gasto', response.data.msgResultado, 'success');
+
+        this.salir();
+      }
+    }
+   
+  }
+  
+
+  /*async solicitarAutorizacion() {
     const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');
 
-    const confirmado = await this.dataModal(600, 'Solicitar Autorización de Gasto', '¿Deseas solicitar la autorización de gasto?', 'approve');
+    console.log(idAutorizacionGasto)
+    console.log(this.selectedFiles)
+     const confirmado = await this.dataModal(600, 'Solicitar Autorización de Gasto', '¿Deseas solicitar la autorización de gasto?', 'approve');
     if (confirmado) {
       const data = {
         // idAutorizacionGasto: this.idAutorizacionGasto,
@@ -413,12 +449,10 @@ export class RegistarAutorizacionGastoTablaComponent {
       }
       const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();
       if (response) {
-
         this.salir()
-        // this.get()
-      }
-    }
-  }
+       }
+    } 
+  }*/
   dataModal(codigo: number, title: string, message: string, type: 'success' | 'warning' | 'error' | 'approve' | 'reject'): Promise<boolean> {
     return new Promise((resolve) => {
       let confirmLabel = 'Aceptar';
@@ -588,6 +622,37 @@ export class RegistarAutorizacionGastoTablaComponent {
         this.tablaRubrosAdicionales.renderRows(); // 🔥 redibuja filas
       }
     });
+  }
+
+  selectedFiles: File[] = [];
+
+  onFileSelected(event: any): void {
+    const files: FileList = event.target.files;
+    const newFiles = Array.from(files);
+  
+    // Evitar duplicados por nombre (puedes usar otra lógica si lo prefieres)
+    newFiles.forEach(newFile => {
+      if (!this.selectedFiles.some(f => f.name === newFile.name)) {
+        this.selectedFiles.push(newFile);
+      }
+    });
+  
+    this.filterForm.patchValue({ archivo: this.selectedFiles });
+    this.filterForm.get('archivo')?.updateValueAndValidity();
+  }
+  
+  
+  removeFile(index: number): void {
+    this.selectedFiles.splice(index, 1);
+    this.filterForm.patchValue({ archivo: this.selectedFiles });
+  
+    if (this.selectedFiles.length < 3) {
+      this.filterForm.get('archivo')?.setErrors({ minFiles: true });
+    } else {
+      this.filterForm.get('archivo')?.setErrors(null);
+    }
+  
+    this.filterForm.get('archivo')?.updateValueAndValidity();
   }
 
 }
