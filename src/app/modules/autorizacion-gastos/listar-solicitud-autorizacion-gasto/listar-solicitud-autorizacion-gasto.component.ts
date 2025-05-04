@@ -527,6 +527,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
       this.excelService.exportControlAutorizaciones(oRespL?.data)
     }
   }
+
   async exportAnexo25(row) {
     const data = {
       idAutorizacionGasto: row.idAutorizacionGasto,
@@ -538,142 +539,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
       )
     );
     console.log(oRespL)
-    if (oRespL?.data) {
-      const data = {
-        rubros: [
-          {
-            item: "1.1",
-            rubro: "Mano de Obra Calificada",
-            valorFinanciado: 15000,
-            gastoAutorizadoActual: 5000,
-            gastoAutorizadoPorcentaje: 33.3,
-            gastoEfectuadoAcumulado: 8000,
-            gastoEfectuadoPorcentaje: 53.3,
-            observaciones: "Incluye feriados"
-          },
-          {
-            item: "1.2",
-            rubro: "Mano de Obra No Calificada",
-            valorFinanciado: 10000,
-            gastoAutorizadoActual: 3000,
-            gastoAutorizadoPorcentaje: 30,
-            gastoEfectuadoAcumulado: 6000,
-            gastoEfectuadoPorcentaje: 60,
-            observaciones: "Pago quincenal"
-          },
-          {
-            item: "1.3",
-            rubro: "Materiales",
-            valorFinanciado: 25000,
-            gastoAutorizadoActual: 8000,
-            gastoAutorizadoPorcentaje: 32,
-            gastoEfectuadoAcumulado: 18000,
-            gastoEfectuadoPorcentaje: 72,
-            observaciones: "Compras locales"
-          },
-          {
-            item: "1.4",
-            rubro: "Maquinaria y equipos",
-            valorFinanciado: 18000,
-            gastoAutorizadoActual: 6000,
-            gastoAutorizadoPorcentaje: 33.3,
-            gastoEfectuadoAcumulado: 12000,
-            gastoEfectuadoPorcentaje: 66.7,
-            observaciones: "Alquiler mensual"
-          },
-          {
-            item: "1.5",
-            rubro: "Herramientas",
-            valorFinanciado: 5000,
-            gastoAutorizadoActual: 1000,
-            gastoAutorizadoPorcentaje: 20,
-            gastoEfectuadoAcumulado: 2000,
-            gastoEfectuadoPorcentaje: 40,
-            observaciones: "Reemplazo parcial"
-          },
-          {
-            item: "1.6",
-            rubro: "Fletes",
-            valorFinanciado: 4000,
-            gastoAutorizadoActual: 1500,
-            gastoAutorizadoPorcentaje: 37.5,
-            gastoEfectuadoAcumulado: 3000,
-            gastoEfectuadoPorcentaje: 75,
-            observaciones: "Incluye transporte externo"
-          },
-          {
-            item: "1.7",
-            rubro: "Equipamiento",
-            valorFinanciado: 7000,
-            gastoAutorizadoActual: 2000,
-            gastoAutorizadoPorcentaje: 28.6,
-            gastoEfectuadoAcumulado: 4000,
-            gastoEfectuadoPorcentaje: 57.1,
-            observaciones: "Compras programadas"
-          },
-          {
-            item: "1.8",
-            rubro: "Otros",
-            valorFinanciado: 3000,
-            gastoAutorizadoActual: 1000,
-            gastoAutorizadoPorcentaje: 33.3,
-            gastoEfectuadoAcumulado: 1500,
-            gastoEfectuadoPorcentaje: 50,
-            observaciones: "Gastos varios menores"
-          },
-          {
-            item: "2.0",
-            rubro: "Gastos Generales",
-            valorFinanciado: 6000,
-            gastoAutorizadoActual: 2000,
-            gastoAutorizadoPorcentaje: 33.3,
-            gastoEfectuadoAcumulado: 4000,
-            gastoEfectuadoPorcentaje: 66.7,
-            observaciones: "Servicios y trámites"
-          },
-          {
-            item: "3.0",
-            rubro: "Gastos de Residente",
-            valorFinanciado: 4500,
-            gastoAutorizadoActual: 1500,
-            gastoAutorizadoPorcentaje: 33.3,
-            gastoEfectuadoAcumulado: 3000,
-            gastoEfectuadoPorcentaje: 66.7,
-            observaciones: "Personal técnico"
-          },
-          {
-            item: "4.0",
-            rubro: "Costos Financieros",
-            valorFinanciado: 3500,
-            gastoAutorizadoActual: 1200,
-            gastoAutorizadoPorcentaje: 34.3,
-            gastoEfectuadoAcumulado: 2500,
-            gastoEfectuadoPorcentaje: 71.4,
-            observaciones: "Intereses bancarios"
-          },
-          {
-            item: "5.0",
-            rubro: "Gastos de N.E.",
-            valorFinanciado: 2000,
-            gastoAutorizadoActual: 500,
-            gastoAutorizadoPorcentaje: 25,
-            gastoEfectuadoAcumulado: 1000,
-            gastoEfectuadoPorcentaje: 50,
-            observaciones: "No especificados"
-          },
-          {
-            item: "6.0",
-            rubro: "Intereses",
-            valorFinanciado: 3000,
-            gastoAutorizadoActual: 1000,
-            gastoAutorizadoPorcentaje: 33.3,
-            gastoEfectuadoAcumulado: 2000,
-            gastoEfectuadoPorcentaje: 66.7,
-            observaciones: "Créditos adquiridos"
-          }
-        ]
-      }
-
+    if (oRespL?.data) {  
       this.excelService.exportAnexo25(oRespL)
     }
   }

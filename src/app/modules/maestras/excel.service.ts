@@ -67,22 +67,15 @@ export class ExcelService {
   exportGastoAutorizacion(response: any): void {
     const fechaOriginal = response.row.fechaRegistro;
     const fecha = new Date(fechaOriginal);
-
-    // Formato: DD/MM/YYYY
     const fechaFormateada = `${fecha.getDate().toString().padStart(2, '0')}/${(fecha.getMonth() + 1).toString().padStart(2, '0')}/${fecha.getFullYear()}`;
-
     const worksheetData: any[][] = [];
-
-    // ---------------- CABECERA PRINCIPAL ----------------
     worksheetData.push(["ANEXO N° 23: AUTORIZACIÓN DE GASTO"]);
     worksheetData.push([`N°: ${response.response.total}`]);
-    //worksheetData.push([]);
     worksheetData.push(["N° CONVENIO COOPERACIÓN", "", "", `FECHA: ${fechaFormateada}`, "", "", ""]);
     worksheetData.push(["MONTO DE CONVENIO: S/.", "", "", "SALDO DISPONIBLE (S/.)", "", "", "ANTES DE LA PRESENTE AUTORIZACIÓN"]);
     worksheetData.push(["MONTO ACUMULADO DE AUTORIZACIONES ANTERIORES (S/.)", ""]);
     worksheetData.push([]);
     worksheetData.push(["DETALLE DEL GASTO"]);
-
     worksheetData.push([
       "N°",
       "INSUMO O SERVICIO",
@@ -93,7 +86,6 @@ export class ExcelService {
       "RAZÓN SOCIAL O NOMBRE DEL PROVEEDOR",
       "INDICAR FORMA DE PAGO"
     ]);
-
     response.response.detalle.forEach((item: any, index: number) => {
       worksheetData.push([
         index + 1,
@@ -106,9 +98,7 @@ export class ExcelService {
         item.formaPago
       ]);
     });
-
     const totalRowIndex = worksheetData.length;
-
     worksheetData.push([
       "MONTO TOTAL DE ESTA AUTORIZACIÓN", "", "", "", "", `S/. ${response.response.total}`, "", ""
     ]);
@@ -118,29 +108,21 @@ export class ExcelService {
     worksheetData.push([
       "(en letras)", "", "", "", "", "S/.", "-", ""
     ]);
-
     worksheetData.push([]);
     worksheetData.push([]);
     worksheetData.push([]);
     worksheetData.push([]);
-
-
     const firmasRow = worksheetData.length;
-
     worksheetData.push(["PRESIDENTE DEL N.E", "TESORERO DEL N.E", "SECRETARIO N.E (OPCIONAL)", ""]);
     worksheetData.push([]);
     worksheetData.push([]);
     worksheetData.push(["FISCAL N.E (OPCIONAL)", "RESIDENTE", "APROBACIÓN DEL SUPERVISOR", ""]);
-
     worksheetData.push([]);
     worksheetData.push([]);
-
     const notasInicioRow = worksheetData.length;
-
     worksheetData.push(["El Presidente y/o Tesorero y/o Residente, según sus obligaciones, son responsables de presentar los comprobantes de pago...", "", "", "", "", "", "", ""]);
     worksheetData.push(["Los montos indicados en la Autorización de Gasto deberán ser compatibles con las cotizaciones previamente realizadas.", "", "", "", "", "", "", ""]);
     worksheetData.push(["El Supervisor es responsable por la revisión, evaluación y conformidad de la presente autorización de gasto.", "", "", "", "", "", "", ""]);
-
     const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
     worksheet['!cols'] = [
@@ -401,15 +383,20 @@ export class ExcelService {
 
     saveAs(blob, 'ANEXO N° 24 CONTROL DE AUTORIZACIONES PARA ADQUISICIÓN DE INSUMOS.xlsx');
   }
-
+    toNumber(value: any): number {
+    const num = Number(value);
+    return isNaN(num) ? 0 : num;
+  }
   exportAnexo25(response): void {
-
-
     console.log(Session.identity.name)
     const v001 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "001");
+
+   // console.log(response.data.response.listamontosValorFinanciadoAG.);
+
+    console.log(v001);
+
     const v002 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "002");
     const v003 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "003");
-
     const v004 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "004");
     const v005 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "005");
     const v006 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "006");
@@ -417,7 +404,6 @@ export class ExcelService {
     const v008 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "008");
     const v009 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "009");
 
-    console.log(v001);
 
     const worksheetData: any[][] = [];
     // ---------- TÍTULO PRINCIPAL ----------
@@ -474,14 +460,20 @@ export class ExcelService {
     ]);
     let costoDirecto = 0;
     let cdgastoAutorizadoActual = 0;    // 1. Calcula el total
+    let gastoAutorizadoPorcentaje = 0;    // 1. Calcula el total
+    let gastoEfectuadoAcumulado = 0;    // 1. Calcula el total
+    let gastoEfectuadoPorcentaje = 0;
     response.data.response.rubro.forEach((rubro: any) => {
       costoDirecto += +rubro.valorFinanciado; // suma convertido a número
       cdgastoAutorizadoActual += +rubro.gastoAutorizadoActual; // suma convertido a número
+      gastoAutorizadoPorcentaje += +rubro.gastoAutorizadoPorcentaje; // suma convertido a número //Qquiero q sea dicivdo por la cantidad del arregle
+      gastoEfectuadoAcumulado+=+rubro.gastoEfectuadoAcumulado;
+      gastoEfectuadoPorcentaje+=+rubro.gastoEfectuadoPorcentaje;
     });
 
     // 2. Agrega fila resumen
     worksheetData.push([
-      "1.0", "COSTO DIRECTO", costoDirecto, cdgastoAutorizadoActual, "", "", "", ""
+      "1.0", "COSTO DIRECTO", costoDirecto, cdgastoAutorizadoActual,  (gastoAutorizadoPorcentaje)/response.data.response.rubro.length,gastoEfectuadoAcumulado, (gastoEfectuadoPorcentaje)/response.data.response.rubro.length, ""
     ]);
 
     // 3. Agrega cada rubro detallado
@@ -500,34 +492,39 @@ export class ExcelService {
 
 
     worksheetData.push([
-      "2.0", "GASTOS GENERALES", v004.monto, "", "", "", "", ""
+      "2.0", "GASTOS GENERALES", v004.monto, v004.actual, v004.porcentajeActual, v004.acumulado, v004.porcentajeAcumulado, ""
     ]);
     worksheetData.push([
-      "3.0", "GASTOS DE RESIDENTE", v005.monto, "", "", "", "", ""
+      "3.0", "GASTOS DE RESIDENTE", v005.monto,v005.actual, v005.porcentajeActual, v005.acumulado, v005.porcentajeAcumulado, ""
     ]);
     worksheetData.push([
-      "4.0", "COSTOS FINANCIEROS", v006.monto, "", "", "", "", ""
-    ]);
-
-    worksheetData.push([
-      "5.0", "GASTOS DE N.E.", v007.monto, "", "", "", "", ""
+      "4.0", "COSTOS FINANCIEROS", v006.monto,v006.actual, v006.porcentajeActual, v006.acumulado, v006.porcentajeAcumulado, ""
     ]);
 
     worksheetData.push([
-      "6.0", "INTERESES", v008.monto, "", "", "", "", ""
-    ]);
-
-    let subtotalInversion = costoDirecto + v004.monto + v005.monto + v006.monto + v007.monto + v008.monto;
-    worksheetData.push([
-      "SUB TOTAL INVERSION", "", subtotalInversion, "", "", "", "", ""
+      "5.0", "GASTOS DE N.E.", v007.monto,v007.actual, v007.porcentajeActual, v007.acumulado, v007.porcentajeAcumulado, ""
     ]);
 
     worksheetData.push([
-      "7.0", "GASTOS DE SUPERVISION", v009.monto, "", "", "", "", ""
+      "6.0", "INTERESES", v008.monto,v008.actual, v008.porcentajeActual, v008.acumulado, v008.porcentajeAcumulado, ""
+    ]);
+
+    let subtotalInversion1 = this.toNumber(costoDirecto) + this.toNumber(v004.monto) + this.toNumber(v005.monto) + this.toNumber(v006.monto) + this.toNumber(v007.monto) + this.toNumber(v008.monto);
+    let subtotalInversion2 = this.toNumber(cdgastoAutorizadoActual) + this.toNumber(v004.actual) + this.toNumber(v005.actual) + this.toNumber(v006.actual) + this.toNumber(v007.actual) + this.toNumber(v008.actual);
+    let subtotalInversion3 = this.toNumber(gastoAutorizadoPorcentaje) + this.toNumber(v004.porcentajeActual )+ this.toNumber(v005.porcentajeActual )+ this.toNumber(v006.porcentajeActual )+ this.toNumber(v007.porcentajeActual )+ this.toNumber(v008.porcentajeActual);
+    let subtotalInversion4 = this.toNumber(gastoEfectuadoAcumulado )+ this.toNumber(v004.acumulado )+ this.toNumber(v005.acumulado )+ this.toNumber(v006.acumulado )+ this.toNumber(v007.acumulado )+ this.toNumber(v008.acumulado);
+    let subtotalInversion5 = this.toNumber(gastoEfectuadoPorcentaje )+ this.toNumber(v004.porcentajeAcumulado )+ this.toNumber(v005.porcentajeAcumulado )+ this.toNumber(v006.porcentajeAcumulado )+ this.toNumber(v007.porcentajeAcumulado) + this.toNumber(v008.porcentajeAcumulado);
+
+    worksheetData.push([
+      "SUB TOTAL INVERSION", "", subtotalInversion1,subtotalInversion2,subtotalInversion3, subtotalInversion4, subtotalInversion5, ""
     ]);
 
     worksheetData.push([
-      "TOTAL INVERSION - MONTO DESEMBOLSADO (autorizado)", "", subtotalInversion + v009.monto, "", "", "", "", ""
+      "7.0", "GASTOS DE SUPERVISION", v009.monto, v009.actual, v009.porcentajeActual, v009.acumulado, v009.porcentajeAcumulado, ""
+    ]);
+
+    worksheetData.push([
+      "TOTAL INVERSION - MONTO DESEMBOLSADO (autorizado)", "", subtotalInversion1 + v009.monto, subtotalInversion2 + v009.actual, subtotalInversion3 + v009.porcentajeActual, subtotalInversion4 + v009.acumulado, subtotalInversion5 + v009.porcentajeAcumulado, ""
     ]);
 
     worksheetData.push([

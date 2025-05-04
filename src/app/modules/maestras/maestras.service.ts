@@ -147,16 +147,14 @@ export class MaestrasService {
     return this.http.post(`${this.getUrlAutorizacionGasto()}lista-recursos-autorizacion-gasto-proyecto`, data);
   }
   listaRecursosAutorizacionGastoProyectoAnalisis(data): Observable<any> {
-    return this.http.post(`${this.getUrlAutorizacionGasto()}lista-recursos-autorizacion-gasto-analisis`, data);
+    return this.http.post(`${this.getUrlAutorizacionGasto()}anexo24-autorizacion-gasto`, data);
   }
-
   anexo25AutorizacionGasto(data): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}anexo25-autorizacion-gasto`, data);
   }
   anexo23AutorizacionGasto(data): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}anexo23-autorizacion-gasto`, data);
   }
-
   getRubrosAdicionales(idProyecto): Observable<any> {
     return this.http.get(`${this.getUrlPlataforma()}control-monitoreo-proyecto/${idProyecto}`);
   }
