@@ -87,10 +87,11 @@ export class AnalizarAutorizacionGastoComponent {
   async ngOnInit() {
     this.id = this.route.snapshot.paramMap.get('id'); // ID del proyecto
     this.idAutorizacionGasto = this.route.snapshot.paramMap.get('ag'); // ID de autorización de gasto
+    this.cargarRubrosAdicionales()
+    this.getArchivosAutorizacionGasto()
 
     this.verProyecto(this.id);
     this.getFiltraRecursosAturorizacionGasto(true);
-    this.cargarRubrosAdicionales()
   }
 
 
@@ -476,12 +477,29 @@ export class AnalizarAutorizacionGastoComponent {
       idAutorizacionGasto: this.idAutorizacionGasto
     };
     this.maestraService.getRubrosAdicionalesAG(data).subscribe((res: any) => {
-      this.rubrosAdicionales = res.data.filter((item: any) => 
+      this.rubrosAdicionales = res.data.filter((item: any) =>
         item.cidControlMonitoreo !== "001" &&
         item.cidControlMonitoreo !== "002" &&
         item.cidControlMonitoreo !== "003"
       );
     });
   }
+
+  selectedFiles: { name: string; extension: string }[] = [];
+
+  getArchivosAutorizacionGasto() {
+    const data = { idAutorizacionGasto: this.idAutorizacionGasto };
+
+    this.maestraService.getArchivosAutorizacionGasto(data).subscribe((res: any) => {
+      if (res?.data?.response?.length) {
+        this.selectedFiles = res.data.response.map((archivo: any) => ({
+          name: archivo.nombre,
+          extension: archivo.extension
+        }));
+      }
+    });
+  }
+
+
 
 }

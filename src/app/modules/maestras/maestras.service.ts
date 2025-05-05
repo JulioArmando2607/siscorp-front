@@ -165,6 +165,11 @@ export class MaestrasService {
   getRubrosAdicionalesAG(data): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}control-monitoreo-proyecto-ag`, data);
   }
+
+ getArchivosAutorizacionGasto(data): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}archivos-autorizacion-gasto`, data);
+  }
+  
 }
 
 export function Headers(isJson = true): HttpHeaders {

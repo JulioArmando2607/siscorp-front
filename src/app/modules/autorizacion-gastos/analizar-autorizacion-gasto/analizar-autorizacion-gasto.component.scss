@@ -82,3 +82,9 @@ thead {
   z-index: 2;
   background: white;
 }
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

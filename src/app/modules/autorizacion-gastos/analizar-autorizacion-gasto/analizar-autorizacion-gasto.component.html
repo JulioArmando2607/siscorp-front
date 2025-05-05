@@ -23,9 +23,25 @@
         <mat-icon>check_circle</mat-icon>
         <span class="ml-2">Aprobar Autorización</span>
       </button>
-
+       
+      <div class="flex flex-col px-8 pb-4">
+        <div class="flex items-center gap-2 mb-2">
+          <mat-icon [svgIcon]="'heroicons_outline:paper-clip'"></mat-icon>
+          <span class="font-semibold text-sm">SUSTENTO</span>      
+        </div>
+        <!-- Lista de archivos -->
+        <div *ngFor="let file of selectedFiles; let i = index"
+          class="flex items-center gap-2 text-sm text-gray-700 mb-1">
+          <span class="truncate w-52" [matTooltip]="file.name" matTooltipPosition="above">{{ file.name }} </span>
+          <button (click)="descargarArchivo(file)" >
+            <mat-icon>download</mat-icon>
+             </button>
+      <!---    <button mat-icon-button (click)="removeFile(i)">
+            <mat-icon>close</mat-icon>
+          </button>-->
+        </div>
+      </div>
       
-
       <button *ngIf="isAdmin" mat-flat-button color="primary" (click)="aprobarAutorizacionAdmin()">
         <mat-icon>check_circle</mat-icon>
         <span class="ml-2">Aprobar Autorización</span>

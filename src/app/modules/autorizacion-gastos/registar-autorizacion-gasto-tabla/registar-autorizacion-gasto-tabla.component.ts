@@ -137,6 +137,8 @@ export class RegistarAutorizacionGastoTablaComponent {
     this.id = this.route.snapshot.paramMap.get('id'); // Obtiene el ID de la URL
     this.titulo = "PROYECTO TAMBO: NAYAP"
     this.verProyecto(this.id)
+    this.cargarRubrosAdicionales()
+
     this.getFiltraRecursosAturorizacionGasto(true)
 
     // 🔥 Monitorear el input de partidas y actualizar el filtrado en tiempo real
@@ -163,7 +165,6 @@ export class RegistarAutorizacionGastoTablaComponent {
       })
     ).subscribe(filtered => this.recursosFiltradas = new BehaviorSubject(filtered));
 
-    this.cargarRubrosAdicionales()
   }
 
   async verProyecto(id) {
