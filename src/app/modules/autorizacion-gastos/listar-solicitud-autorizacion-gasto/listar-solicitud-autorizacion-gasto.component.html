@@ -137,13 +137,13 @@
                             <mat-icon>delete</mat-icon>
                         </button>
 
-                        <!-- Botón Solicitar -->
-                        <button
+                        <!-- Botón Solicitar  <button
                             *ngIf="row.cidEstado!=='002' && isResidente && row.cidEstado!=='004' && row.cidEstado!=='005' "
                             mat-icon-button color="accent" (click)="solicitarAutorizacion(row)"
                             matTooltip="Solicitar Autorizacion de Gasto" matTooltipPosition="above">
                             <mat-icon>send</mat-icon>
-                        </button>
+                        </button> -->
+                       
 
                         <button *ngIf="isSupervisor && row.cidEstado=='002'" mat-icon-button color="primary"
                             (click)="aprobarSupervisor(row)" matTooltip="Aprobar" matTooltipPosition="above">

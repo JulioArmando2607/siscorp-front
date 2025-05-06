@@ -450,7 +450,7 @@ export class ListarSolicitudAutorizacionGastoComponent {
         cidEstadoAG: "004",
         observacion: "Aprobado desde el Supervisor"
       }
-      const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();
+      const response = await this.maestraService.solicitarAutorizacionGasto(data).toPromise();
       if (response) {
         this.getFiltrarProyectos()
       }
