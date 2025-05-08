@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,22 +12,26 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
-import { lastValueFrom } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, Observable } from 'rxjs';
 import { MaestrasService } from '../maestras/maestras.service';
 import { ExcelService } from '../maestras/excel.service';
 import { cloneDeep } from 'lodash';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ObservarDialogComponent } from '../autorizacion-gastos/observar-dialog/observar-dialog.component';
+import { Session } from 'app/core/auth/Session';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @Component({
-  selector: 'app-autorizacion-gastos',
+  selector: 'app-preliquidacion',
   standalone: true, // Declarar como componente standalone
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './autorizacion-gastos.component.html',
-  styleUrl: './autorizacion-gastos.component.scss',
+  templateUrl: './preliquidacion.component.html',
+  styleUrl: './preliquidacion.component.scss',
   imports: [
-    ReactiveFormsModule, // <== Agregar esta línea
+    ReactiveFormsModule,
     CommonModule,
     MatTableModule, // <== Agregar la importación de MatTableModule
     MatSortModule,  // <== Agregar la importación de MatSortModule
@@ -38,11 +42,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
-    MatTooltipModule
+    MatAutocompleteModule,
+    MatTooltipModule,
+    MatDatepickerModule
   ],
 })
 
-export class AutorizacionGastosComponent {
+export class PreliquidacionComponent {
   async descargarExcelProyecto() {
     const roresp = await lastValueFrom(this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(),
     ))
@@ -274,14 +280,14 @@ export class AutorizacionGastosComponent {
     }
   }
 
-  registrarAutorizacionGastos(proyecto) {
+/*  registrarAutorizacionGastos(proyecto) {
     console.log('Ver detalles de:', proyecto);
     this._router.navigate(['autorizacion-gastos/listar-solicitud-autorizacion-gasto/', proyecto.idProyecto]);
-  }
+  } */
   
   registrarPreliquidacionProyecto(proyecto) {
 //    this._router.navigate(['preliquidacion/', proyecto.idProyecto]);
-    this._router.navigate(['preliquidacion', proyecto.idProyecto]);
+    this._router.navigate(['preliquidacion/listar-solicitud-preliquidacion/', proyecto.idProyecto]);
 
   }
 }

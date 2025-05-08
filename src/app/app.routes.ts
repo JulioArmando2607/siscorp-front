@@ -77,6 +77,9 @@ export const appRoutes: Route[] = [
             {path: 'example', loadChildren: () => import('app/modules/admin/example/example.routes')}, 
             {path: 'gestion-plataformas', loadChildren: () => import('app/modules/gestion-plataformas/gestion-plataformas.routes')},
             {path: 'autorizacion-gastos', loadChildren: () => import('app/modules/autorizacion-gastos/autorizacion-gastos.routes')},
+            //{path: 'preliquidacion', loadChildren: () => import('app/modules/preliquidacion/preliquidacion.routes')},
+            { path: 'preliquidacion', loadChildren: () => import('app/modules/preliquidacion/preliquidacion.routes').then(m => m.default) }
+
         ]
     }
 ];

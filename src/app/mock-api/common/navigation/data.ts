@@ -18,6 +18,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
         type : 'basic',
         icon : 'heroicons_outline:chart-pie',
         link : '/autorizacion-gastos'
+    },
+    {
+        id   : 'autorizacionGasto',
+        title: 'Preliquidacion',
+        type : 'basic',
+        icon : 'heroicons_outline:chart-pie',
+        link : '/preliquidacion'
     }
 ];
 /*export const autorizaciondeGastotNavigation: FuseNavigationItem[] = [

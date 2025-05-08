@@ -1,0 +1,202 @@
+<div class="flex min-w-0 flex-auto flex-col bg-card p-10">
+    <!-- Contenedor principal -->
+    <!-- Contenedor de título y botón alineados -->
+    <div class="flex justify-center relative items-center mb-4">
+        <!-- Título centrado -->
+        <div class="text-2xl font-bold text-center flex-1">
+            LISTA DE SOLICITUDES DE PRELIQUIDACION {{titulo}}
+        </div>
+        <!-- Botón de salida alineado a la derecha -->
+        <div class="absolute right-0">
+            <button mat-flat-button style="background-color: red; color: white;" (click)="salir()">
+                <mat-icon>exit_to_app</mat-icon> Salir
+            </button>
+        </div>
+    </div>
+
+    <form [formGroup]="filterForm">
+        <!-- Contenedor de formulario -->
+        <div class="border p-6 rounded-lg shadow-lg">
+            <!-- Grid con inputs y selects -->
+            <div class="grid grid-cols-4 gap-4">
+
+                <!-- PARTIDA -->
+                <!-- PARTIDA -->
+                <mat-form-field appearance="fill" class="w-full">
+                    <mat-label>CODIGO</mat-label>
+                    <input type="text" matInput formControlName="codigo">
+                </mat-form-field>
+
+
+                <mat-form-field appearance="fill" class="w-full">
+                    <mat-label>FECHA</mat-label>
+                    <input matInput [matDatepicker]="picker" formControlName="fecha">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+
+
+                <mat-form-field appearance="fill" class="w-full">
+                    <mat-label>ESTADO</mat-label>
+                    <mat-select formControlName="estado">
+                        <mat-option [value]="0">Todos</mat-option>
+                        <mat-option *ngFor="let item of estados" [value]="item.idEstado">{{ item.nombreEstado
+                            }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- Actions -->
+                <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
+                    <button mat-flat-button color="accent" (click)="getFiltrarProyectos(true)">
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:funnel'"></mat-icon>
+                        <span class="ml-2">Filtrar</span>
+                    </button>
+
+                    <button mat-flat-button color="primary" (click)="limpiar()">
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+                        <span class="ml-2">Limpiar</span>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+    <!-- Tabla de proyectos registrados -->
+    <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
+        <!-- Contenedor de botones flotantes -->
+        <div class="botones-flotantes">
+
+            <!-- Botón -->
+            <!-- Botón mejorado *ngIf="isResidente" -->
+            <button  mat-flat-button style="background-color: #0056b3; color: white;"
+                (click)="registrarSolicitudPreliquidacion()">
+                <mat-icon>add</mat-icon>
+                <span class="ml-2">REGISTRAR SOLICITUD AUTORIZACIÓN DE GASTO</span>
+            </button>
+
+        </div>
+        <mat-table [dataSource]="dataSource" matSort class="w-full">
+            <!-- item Column -->
+          <!---  <ng-container matColumnDef="item">
+                <mat-header-cell *matHeaderCellDef mat-sort-header>
+                    ITEM
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    {{ row.item }}
+                </mat-cell>
+            </ng-container>-->
+            <!-- CUI Column -->
+            <ng-container matColumnDef="cag">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> NÚMERO PRELIQUIDACION </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.codigoAutorizacionGasto }} </mat-cell>
+            </ng-container>
+
+            <!-- CUI Column -->
+            <ng-container matColumnDef="fechaRegistro">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> FECHA REGISTRO </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.fechaRegistro }} </mat-cell>
+            </ng-container>
+
+
+            <!-- Departamento Column -->
+        <!---    <ng-container matColumnDef="cantidadRecursos">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> CANTIDAD RECURSOS </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.cantidadRecursos }} </mat-cell>
+            </ng-container>-->
+
+            <!-- Estado Column -->
+            <ng-container matColumnDef="estado">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> ESTADO </mat-header-cell>
+                <mat-cell *matCellDef="let row" [matTooltip]="row.observacion"> {{ row.nombreEstado }} </mat-cell>
+            </ng-container>
+
+            <!-- Estado Column -->
+            <ng-container matColumnDef="total">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> TOTAL </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.total }} </mat-cell>
+            </ng-container>
+
+            <!-- Botón de acciones -->
+            <ng-container matColumnDef="acciones">
+                <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    <div style="display: flex; flex-wrap: wrap;">
+
+
+                        <!-- Botón Editar -->
+                        <button *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003')" mat-icon-button
+                            color="primary" (click)="editar(row)" matTooltip="Editar">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+
+                        <!-- Botón Eliminar -->
+                        <button *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003') " mat-icon-button
+                            color="warn" (click)="eliminarAutorizacion(row)" matTooltip="Eliminar">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+
+                        <!-- Botón Solicitar  <button
+                            *ngIf="row.cidEstado!=='002' && isResidente && row.cidEstado!=='004' && row.cidEstado!=='005' "
+                            mat-icon-button color="accent" (click)="solicitarAutorizacion(row)"
+                            matTooltip="Solicitar Autorizacion de Gasto" matTooltipPosition="above">
+                            <mat-icon>send</mat-icon>
+                        </button> -->
+                       
+
+                        <button *ngIf="isSupervisor && row.cidEstado=='002'" mat-icon-button color="primary"
+                            (click)="aprobarSupervisor(row)" matTooltip="Aprobar" matTooltipPosition="above">
+                            <mat-icon>check</mat-icon>
+                        </button>
+<!--
+                        <button *ngIf="isSupervisor && row.cidEstado=='002'" mat-icon-button color="primary"
+                            (click)="observarAutorizacionGasto(row)" matTooltip="Observar Autorización de Gasto"
+                            matTooltipPosition="above">
+                            <mat-icon>visibility</mat-icon>
+                        </button>-->
+
+                      <!---  <button *ngIf="isAdministrador && row.cidEstado=='004'" mat-icon-button color="primary"
+                            (click)="observarAutorizacionGasto(row)" matTooltip="Observar Autorización de Gasto"
+                            matTooltipPosition="above">
+                            <mat-icon>visibility</mat-icon>
+                        </button>--> 
+ 
+                        <button mat-icon-button color="primary" class="ml-2" (click)="analizarAutorizacionGasto(row)"
+                            matTooltip="Analizar Autorización de Gasto">
+                            <mat-icon>analytics</mat-icon>
+                        </button>
+
+                        <button mat-icon-button color="accent" class="ml-2" (click)="descargarAutorizacionAuditado(row)"
+                            matTooltip="Descargar ANEXO N° 23 AUTORIZACIÓN DE GASTO">
+                            <mat-icon>download</mat-icon>
+                        </button>
+
+                        <button mat-icon-button color="#0056b3" class="ml-2" (click)="descargarAnexo24(row)"
+                            matTooltip="Descargar ANEXO N° 24: CONTROL DE AUTORIZACIONES PARA ADQUISICIÓN DE INSUMOS">
+                            <mat-icon>download</mat-icon>
+                        </button>
+<!--*ngIf="isPEP && row.cidEstado=='004'"-->
+                        <button   mat-icon-button color="primary" class="ml-2" (click)="exportAnexo25(row)"
+                            matTooltip="Descargar ANEXO N° 25: CONTROL Y MONITOREO DEL MOVIMIENTO FINANCIERO">
+                            <mat-icon>download</mat-icon>
+                        </button>
+
+
+                    </div>
+                </mat-cell>
+            </ng-container>
+
+            <!-- Encabezado de la tabla -->
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <!-- Filas de datos -->
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+
+
+        <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+            (page)="onPaginateChange($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+
+</div>

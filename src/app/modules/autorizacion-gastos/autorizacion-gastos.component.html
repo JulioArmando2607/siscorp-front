@@ -1,205 +1,201 @@
 <div class="flex min-w-0 flex-auto flex-col bg-card p-10">
-    <!-- Contenedor principal -->
-  
-    <!-- Título -->
-    <div class="text-center text-2xl font-bold mb-4">
-      BANDEJA PROYECTOS DEL TAMBO REGISTRADOS - AUTORIZACION DE GASTOS
-    </div>
-  
-    <form [formGroup]="filterForm">
-      <!-- Contenedor de formulario -->
-      <div class="border p-6 rounded-lg shadow-lg">
-        <!-- Grid con inputs y selects -->
-        <div class="grid grid-cols-4 gap-4">
-          <!-- CUI -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>CUI</mat-label>
-            <input matInput type="text" formControlName="cui">
-          </mat-form-field>
-  
-          <!-- UBIGEO CP -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>UBIGEO CP</mat-label>
-            <input matInput type="text" formControlName="ubigeoCp">
-          </mat-form-field>
-   
-          <!-- DEPARTAMENTO -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>DEPARTAMENTO</mat-label>
-            <mat-select formControlName="departamento" class="mr-1.5" (selectionChange)="onDepartamentoChange($event)">
-              <mat-option [value]="0">Todos</mat-option>
-              <mat-option *ngFor="let item of departamentos" [value]="item.departamentoUbigeo">{{ item.departamentoNombre
-                }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-  
-          <!-- PROVINCIA -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>PROVINCIA</mat-label>
-            <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange($event)">
-              <mat-option [value]="0">Todos</mat-option>
-              <mat-option *ngFor="let item of provincias" [value]="item.provinciaUbigeo">{{ item.provinciaDescripcion
-                }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <!-- DISTRITO -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>DISTRITO</mat-label>
-            <mat-select formControlName="distrito" (selectionChange)="onDistritoChange($event)">
-              <mat-option [value]="0">Todos</mat-option>
-              <mat-option *ngFor="let item of distritos" [value]="item.distritoUbigeo">{{ item.distritoDescripcion
-                }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <!-- CENTRO POBLADO -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>CENTRO POBLADO</mat-label>
-            <mat-select formControlName="centroPoblado">
-              <mat-option [value]="0">Todos</mat-option>
-              <mat-option *ngFor="let item of centrosPoblados" [value]="item.centroPobladoUbigeo">{{
-                item.centroPobladoDescripcion }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <!-- TAMBO -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>TAMBO</mat-label>
-            <input matInput type="text" formControlName="plataforma">
-          </mat-form-field>
-  
-          <!-- N° DE CONVENIO -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>N° DE CONVENIO</mat-label>
-            <input matInput type="text" formControlName="numeroConvenio">
-          </mat-form-field>
-  
-          <!-- ESTADO -->
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>ESTADO</mat-label>
-            <mat-select formControlName="estado">
-              <mat-option [value]="0">Todos</mat-option>
-              <mat-option *ngFor="let item of estados" [value]="item.idCodigo">{{ item.cidNombre }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <!-- Actions -->
-          <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
-            <button mat-flat-button color="accent" (click)="getFiltrarProyectos(true)">
-              <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:funnel'"></mat-icon>
-              <span class="ml-2">Filtrar</span>
-            </button>
-  
-            <button mat-flat-button color="primary" (click)="limpiar()">
-              <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:trash'"></mat-icon>
-              <span class="ml-2">Limpiar</span>
-            </button>
-  
-          </div>
+  <!-- Contenedor principal -->
+
+  <!-- Título -->
+  <div class="text-center text-2xl font-bold mb-4">
+    BANDEJA PROYECTOS DEL TAMBO REGISTRADOS - AUTORIZACION DE GASTOS
+  </div>
+
+  <form [formGroup]="filterForm">
+    <!-- Contenedor de formulario -->
+    <div class="border p-6 rounded-lg shadow-lg">
+      <!-- Grid con inputs y selects -->
+      <div class="grid grid-cols-4 gap-4">
+        <!-- CUI -->
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>CUI</mat-label>
+          <input matInput type="text" formControlName="cui">
+        </mat-form-field>
+
+        <!-- UBIGEO CP -->
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>UBIGEO CP</mat-label>
+          <input matInput type="text" formControlName="ubigeoCp">
+        </mat-form-field>
+
+        <!-- DEPARTAMENTO -->
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>DEPARTAMENTO</mat-label>
+          <mat-select formControlName="departamento" class="mr-1.5" (selectionChange)="onDepartamentoChange($event)">
+            <mat-option [value]="0">Todos</mat-option>
+            <mat-option *ngFor="let item of departamentos" [value]="item.departamentoUbigeo">{{ item.departamentoNombre
+              }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+
+        <!-- PROVINCIA -->
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>PROVINCIA</mat-label>
+          <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange($event)">
+            <mat-option [value]="0">Todos</mat-option>
+            <mat-option *ngFor="let item of provincias" [value]="item.provinciaUbigeo">{{ item.provinciaDescripcion
+              }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- DISTRITO -->
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>DISTRITO</mat-label>
+          <mat-select formControlName="distrito" (selectionChange)="onDistritoChange($event)">
+            <mat-option [value]="0">Todos</mat-option>
+            <mat-option *ngFor="let item of distritos" [value]="item.distritoUbigeo">{{ item.distritoDescripcion
+              }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- CENTRO POBLADO -->
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>CENTRO POBLADO</mat-label>
+          <mat-select formControlName="centroPoblado">
+            <mat-option [value]="0">Todos</mat-option>
+            <mat-option *ngFor="let item of centrosPoblados" [value]="item.centroPobladoUbigeo">{{
+              item.centroPobladoDescripcion }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- TAMBO -->
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>TAMBO</mat-label>
+          <input matInput type="text" formControlName="plataforma">
+        </mat-form-field>
+
+        <!-- N° DE CONVENIO -->
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>N° DE CONVENIO</mat-label>
+          <input matInput type="text" formControlName="numeroConvenio">
+        </mat-form-field>
+
+        <!-- ESTADO -->
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>ESTADO</mat-label>
+          <mat-select formControlName="estado">
+            <mat-option [value]="0">Todos</mat-option>
+            <mat-option *ngFor="let item of estados" [value]="item.idCodigo">{{ item.cidNombre }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Actions -->
+        <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
+          <button mat-flat-button color="accent" (click)="getFiltrarProyectos(true)">
+            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:funnel'"></mat-icon>
+            <span class="ml-2">Filtrar</span>
+          </button>
+
+          <button mat-flat-button color="primary" (click)="limpiar()">
+            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+            <span class="ml-2">Limpiar</span>
+          </button>
+
         </div>
       </div>
-  
-    </form>
-  
-    <!-- Tabla de proyectos registrados -->
-    <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
-      <!-- Contenedor de botones flotantes -->
-      <div class="botones-flotantes">
-        <!-- Botón Agregar -->
-        <!--<button mat-fab color="primary" (click)="agregarProyecto(1)">
+    </div>
+
+  </form>
+
+  <!-- Tabla de proyectos registrados -->
+  <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
+    <!-- Contenedor de botones flotantes -->
+    <div class="botones-flotantes">
+      <!-- Botón Agregar -->
+      <!--<button mat-fab color="primary" (click)="agregarProyecto(1)">
           <mat-icon>add</mat-icon>
         </button>-->
-  
-        <!-- Botón Ordenar -->
-        <button mat-fab color="accent" (click)="descargarExcelProyecto()">
-          <mat-icon>arrow_downward</mat-icon>
-        </button>
-      </div>
-      <mat-table [dataSource]="dataSource" matSort class="w-full">
-        <!-- item Column -->
-        <ng-container matColumnDef="item">
-          <mat-header-cell *matHeaderCellDef mat-sort-header> ITEM </mat-header-cell>
-          <mat-cell *matCellDef="let row"> {{ row.item }} </mat-cell>
-        </ng-container>
-        <!-- CUI Column -->
-        <ng-container matColumnDef="cui">
-          <mat-header-cell *matHeaderCellDef mat-sort-header> CUI </mat-header-cell>
-          <mat-cell *matCellDef="let row"> {{ row.cui }} </mat-cell>
-        </ng-container>
-        
-         <!-- CUI Column -->
-         <ng-container matColumnDef="ubigeoCp">
-          <mat-header-cell *matHeaderCellDef mat-sort-header> Ubigeo Cp </mat-header-cell>
-          <mat-cell *matCellDef="let row"> {{ row.ubigeoCp }} </mat-cell>
-        </ng-container>
-        
-  
-        <!-- Departamento Column -->
-        <ng-container matColumnDef="departamento">
-          <mat-header-cell *matHeaderCellDef mat-sort-header> Departamento </mat-header-cell>
-          <mat-cell *matCellDef="let row"> {{ row.departamentoNombre }} </mat-cell>
-        </ng-container>
-  
-        <!-- Provincia Column -->
-        <ng-container matColumnDef="provincia">
-          <mat-header-cell *matHeaderCellDef mat-sort-header> Provincia </mat-header-cell>
-          <mat-cell *matCellDef="let row"> {{ row.provinciaDescripcion }} </mat-cell>
-        </ng-container>
-  
-        <!-- Distrito Column -->
-        <ng-container matColumnDef="distrito">
-          <mat-header-cell *matHeaderCellDef mat-sort-header> Distrito </mat-header-cell>
-          <mat-cell *matCellDef="let row"> {{ row.distritoDescripcion }} </mat-cell>
-        </ng-container>
-  
-        <!-- Centro Poblado Column -->
-        <ng-container matColumnDef="centroPoblado">
-          <mat-header-cell *matHeaderCellDef mat-sort-header> Centro Poblado </mat-header-cell>
-          <mat-cell *matCellDef="let row"> {{ row.centroPobladoDescripcion }} </mat-cell>
-        </ng-container>
-  
-        <!-- Centro Poblado Column -->
-        <ng-container matColumnDef="tambo">
-          <mat-header-cell *matHeaderCellDef mat-sort-header> Tambo </mat-header-cell>
-          <mat-cell *matCellDef="let row"> {{ row.tambo }} </mat-cell>
-        </ng-container>
-  
-        <!-- Estado Column -->
-        <ng-container matColumnDef="estado">
-          <mat-header-cell *matHeaderCellDef mat-sort-header> Estado </mat-header-cell>
-          <mat-cell *matCellDef="let row"> {{ row.estado }} </mat-cell>
-        </ng-container>
-  
-        <!-- Botón de acciones -->
-        <ng-container matColumnDef="acciones">
-          <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <button mat-raised-button color="accent" (click)="registrarAutorizacionGastos(row)" matTooltip="Lista de Autorización de Gasto del proyecto">
-                <mat-icon>request_quote</mat-icon>
-              </button>             
-           
-          </mat-cell>
-        </ng-container>
-  
-        <!-- Encabezado de la tabla -->
-        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-        <!-- Filas de datos -->
-        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-      </mat-table>
-  
-      <!-- Paginador  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
-  -->
-     
-      <mat-paginator
-    [length]="totalElements"
-    [pageSize]="pageSize"
-   
-    [pageSizeOptions]="[5, 10, 20]"
-    (page)="onPaginateChange($event)"
-    showFirstLastButtons>
-  </mat-paginator>
+
+      <!-- Botón Ordenar -->
+      <button mat-fab color="accent" (click)="descargarExcelProyecto()">
+        <mat-icon>arrow_downward</mat-icon>
+      </button>
     </div>
-  
+    <mat-table [dataSource]="dataSource" matSort class="w-full">
+      <!-- item Column -->
+      <ng-container matColumnDef="item">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> ITEM </mat-header-cell>
+        <mat-cell *matCellDef="let row"> {{ row.item }} </mat-cell>
+      </ng-container>
+      <!-- CUI Column -->
+      <ng-container matColumnDef="cui">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> CUI </mat-header-cell>
+        <mat-cell *matCellDef="let row"> {{ row.cui }} </mat-cell>
+      </ng-container>
+
+      <!-- CUI Column -->
+      <ng-container matColumnDef="ubigeoCp">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Ubigeo Cp </mat-header-cell>
+        <mat-cell *matCellDef="let row"> {{ row.ubigeoCp }} </mat-cell>
+      </ng-container>
+
+
+      <!-- Departamento Column -->
+      <ng-container matColumnDef="departamento">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Departamento </mat-header-cell>
+        <mat-cell *matCellDef="let row"> {{ row.departamentoNombre }} </mat-cell>
+      </ng-container>
+
+      <!-- Provincia Column -->
+      <ng-container matColumnDef="provincia">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Provincia </mat-header-cell>
+        <mat-cell *matCellDef="let row"> {{ row.provinciaDescripcion }} </mat-cell>
+      </ng-container>
+
+      <!-- Distrito Column -->
+      <ng-container matColumnDef="distrito">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Distrito </mat-header-cell>
+        <mat-cell *matCellDef="let row"> {{ row.distritoDescripcion }} </mat-cell>
+      </ng-container>
+
+      <!-- Centro Poblado Column -->
+      <ng-container matColumnDef="centroPoblado">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Centro Poblado </mat-header-cell>
+        <mat-cell *matCellDef="let row"> {{ row.centroPobladoDescripcion }} </mat-cell>
+      </ng-container>
+
+      <!-- Centro Poblado Column -->
+      <ng-container matColumnDef="tambo">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Tambo </mat-header-cell>
+        <mat-cell *matCellDef="let row"> {{ row.tambo }} </mat-cell>
+      </ng-container>
+
+      <!-- Estado Column -->
+      <ng-container matColumnDef="estado">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Estado </mat-header-cell>
+        <mat-cell *matCellDef="let row"> {{ row.estado }} </mat-cell>
+      </ng-container>
+
+      <!-- Botón de acciones -->
+      <ng-container matColumnDef="acciones">
+        <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <button mat-raised-button color="accent" (click)="registrarAutorizacionGastos(row)"
+            matTooltip="Lista de Autorización de Gasto del proyecto">
+            <mat-icon>request_quote</mat-icon>
+          </button>
+          
+        </mat-cell>
+      </ng-container>
+
+      <!-- Encabezado de la tabla -->
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <!-- Filas de datos -->
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+
+    <!-- Paginador  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  -->
+
+    <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+      (page)="onPaginateChange($event)" showFirstLastButtons>
+    </mat-paginator>
   </div>
+
+</div>
