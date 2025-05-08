@@ -136,6 +136,7 @@ export class MaestrasService {
 
   solicitarAutorizacionGastoResidente(data): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}solicitar-autorizacion-gasto-residente`, data, { headers: Headers(false) });
+    //return this.http.post(`${this.getUrlAutorizacionGasto()}solicitar-autorizacion-gasto-residente`, data);
   }
   
   solicitarAutorizacionGasto(data): Observable<any> {
@@ -172,6 +173,10 @@ export class MaestrasService {
     return this.http.post(`${this.getUrlAutorizacionGasto()}archivos-autorizacion-gasto`, data);
   }
   
+  descargarArchivo(data): Observable<any> {
+    const url = `${this.getUrlAutorizacionGasto()}descargarArchivoSeleccionado`;
+    return this.http.post(url, data, { responseType: 'blob' });
+  }
 }
 
 export function Headers(isJson = true): HttpHeaders {

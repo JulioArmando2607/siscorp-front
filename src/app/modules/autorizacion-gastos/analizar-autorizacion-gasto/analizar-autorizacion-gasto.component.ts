@@ -62,8 +62,10 @@ export class AnalizarAutorizacionGastoComponent {
   displayedColumns = [
     'recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada',
     'cantidad_solicitada', 'parcial_segun_cotizacion',
-    'monto_restante', 'cantidad_restante', 'cantidad', 'precio_unitario',
-    'total_calculado', 'monto_utilizado', 'porcentaje', 'acciones'
+    'cantidad_restante','monto_restante', 'cantidad', 'precio_unitario',
+    'total_calculado',
+    // 'monto_utilizado', 
+    'porcentaje', 'acciones'
   ];
   displayedColumns2 = [
     'recurso', 'valor_financiado', 'restante', 'actual', 'porcentaje_actual',
@@ -148,15 +150,16 @@ export class AnalizarAutorizacionGastoComponent {
   async setRegistrarAutorizacionGasto(row) {
     const data = {
       idProyecto: this.id,
-      idAutorizacionGasto: this.idAutorizacionGasto,
-      idRecurso: row.idRecurso,
-      cantidad: row.cantidad,
-      precio: row.precio,
-      precioCantidad: row.total,
+      idAutorizacionGasto: this.idAutorizacionGasto,//idAutorizaciongasto
+      //idRecurso: row.idRecurso,
+      codigoRecurso: row.codigoRecurso,
+      cantidad: row.cantidadActual,
+      precio: row.precioActual,
+      precioCantidad: row.totalCalculadoActual,
       idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
-      idHistorialPrecio: row.idHistorialPrecio,
-      montoRestante: row.montoRestante - row.total,
-      cantidadRestante: row.cantidadRestante - row.cantidad
+      /// idHistorialPrecio: row.idHistorialPrecio,
+      // montoRestante: row.montoRestante - row.total,
+      // cantidadRestante: row.cantidadRestante - row.cantidad
     }
 
     const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
@@ -292,7 +295,20 @@ export class AnalizarAutorizacionGastoComponent {
     });
   }
 
+
   recalcularTotal(index: number): void {
+    const row = this.dataSource.filteredData[index];
+  
+    console.log(row);
+  
+    if (row.cantidadActual !== 0 && row.precioActual !== 0) {
+      row.totalCalculadoActual = row.cantidadActual * row.precioActual;
+      this.dataSource._updateChangeSubscription();
+      this.guardarActulizar(row);
+    }
+  }
+
+ /* recalcularTotal(index: number): void {
     const row = this.dataSource.filteredData[index]; // <- CAMBIADO AQUÍ
 
     console.log(row);
@@ -311,7 +327,7 @@ export class AnalizarAutorizacionGastoComponent {
     };
     this.guardarActulizar(data);
 
-  }
+  } */
 
   guardarActulizar(data) {
     console.log(data)
@@ -499,7 +515,28 @@ export class AnalizarAutorizacionGastoComponent {
       }
     });
   }
-
+  descargarArchivo(dt) {
+    console.log(dt);
+   // this._showLoading();
+    const data = { ruta: dt.path, nombre: dt.nombre };
+    this.maestraService.descargarArchivo(data).subscribe(
+      (responseWs) => {
+         const blob = new Blob([responseWs], { type: responseWs.type });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = dt.nombre; // Usa el nombre correcto para el archivo
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+      },
+      (error) => {
+        console.error('Error al descargar el archivo', error);
+      }
+    );
+  }
+  
 
 
 }

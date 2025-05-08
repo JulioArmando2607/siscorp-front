@@ -60,7 +60,7 @@ export class EditarAutorizacionGastoTablaComponent {
     'parcial_segun_cotizacion', 'cantidad_solicitada',
     'cantidad_restante', 'monto_restante',
     'cantidad', 'precio_unitario',
-    'total_calculado', 'monto_utilizado',  
+    'total_calculado', //'monto_utilizado',  
     'porcentaje', 'acciones'
   ];
 
@@ -285,7 +285,7 @@ export class EditarAutorizacionGastoTablaComponent {
     }
   }
 
-  async setRegistrarAutorizacionGasto(row) {
+/*  async setRegistrarAutorizacionGasto(row) {
     const data = {
       idProyecto: this.id,
       idAutorizacionGasto: this.idAutorizacionGasto,
@@ -306,6 +306,35 @@ export class EditarAutorizacionGastoTablaComponent {
     console.log(response.data.response);
     if (response) {
       this.getFiltraRecursosAturorizacionGasto(true)
+    }
+
+  }
+ */
+  
+  async setRegistrarAutorizacionGasto(row) {
+
+    const data = {
+      idProyecto: this.id,
+      idAutorizacionGasto: this.idAutorizacionGasto,
+      //idRecurso: row.idRecurso,
+      codigoRecurso: row.codigoRecurso,
+      cantidad: row.cantidadActual,
+      precio: row.precioActual,
+      precioCantidad: row.totalCalculadoActual,
+      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
+      /// idHistorialPrecio: row.idHistorialPrecio,
+      // montoRestante: row.montoRestante - row.total,
+      // cantidadRestante: row.cantidadRestante - row.cantidad
+    }
+
+    const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
+    //this.idAutorizacionGasto = response.data.response
+  //  localStorage.setItem('idAutorizacionGasto', response.data.response);
+    //const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');
+  /// this.idAutorizacionGasto = idAutorizacionGasto
+    console.log(response.data.response);
+    if (response) {
+      this.getFiltraRecursosAturorizacionGasto(true);        // Recargar datos con nueva paginación
     }
 
   }
@@ -432,13 +461,26 @@ export class EditarAutorizacionGastoTablaComponent {
   }
 
 
-  recalcularTotal(index: number): void {
+  /*recalcularTotal(index: number): void {
     const row = this.dataSource.filteredData[index]; // <- CAMBIADO AQUÍ
     console.log(row);
     row.total = (row.cantidad || 0) * (row.precio || 0);
     this.dataSource._updateChangeSubscription();
     this.guardarActulizar(row);
   }
+*/
+  
+  recalcularTotal(index: number): void {
+    const row = this.dataSource.filteredData[index];  
+    console.log(row);
+  
+    if (row.cantidadActual !== 0 && row.precioActual !== 0) {
+      row.totalCalculadoActual = row.cantidadActual * row.precioActual;
+      this.dataSource._updateChangeSubscription();
+      this.guardarActulizar(row);
+    }
+  }
+  
 
   guardarActulizar(data) {
     console.log(data)

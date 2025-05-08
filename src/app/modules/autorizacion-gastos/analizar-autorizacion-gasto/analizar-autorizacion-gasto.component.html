@@ -86,37 +86,37 @@
         <!-- MONTO TOTAL ASIGNADO -->
         <ng-container matColumnDef="monto_total_asignada">
           <th mat-header-cell *matHeaderCellDef> MONTO TOTAL ASIGNADO </th>
-          <td mat-cell *matCellDef="let row"> {{ row.montoAsignado | number:'1.2-2' }} </td>
+          <td mat-cell *matCellDef="let row"> {{ row.montoTotalAsignado | number:'1.2-2' }} </td>
         </ng-container>
 
         <!-- CANTIDAD TOTAL ASIGNADA -->
         <ng-container matColumnDef="cantidad_total_asignada">
           <th mat-header-cell *matHeaderCellDef> CANTIDAD TOTAL ASIGNADA </th>
-          <td mat-cell *matCellDef="let row"> {{ row.cantidadAsignado }} </td>
+          <td mat-cell *matCellDef="let row"> {{ row.cantidadTotalAsignada }} </td>
 
         </ng-container>
  
         <ng-container matColumnDef="cantidad_solicitada">
           <th mat-header-cell *matHeaderCellDef> CANTIDAD SOLICITADA ACUMULADO </th>
-          <td mat-cell *matCellDef="let row"> {{ row.cantidadUtilizadoAcumulado }} </td>
+          <td mat-cell *matCellDef="let row"> {{ row.cantidadSolicitadaAcumulado }} </td>
         </ng-container>
 
         <ng-container matColumnDef="parcial_segun_cotizacion">
           <th mat-header-cell *matHeaderCellDef> PARCIAL SEGUN COTIZACION ACUMULADO </th>
-          <td mat-cell *matCellDef="let row"> {{ row.montoUtilizadoAcumulado }} </td>
+          <td mat-cell *matCellDef="let row"> {{ row.parcialCotizacionAcumulado }} </td>
         </ng-container>
  
         <!-- MONTO RESTANTE -->
         <ng-container matColumnDef="monto_restante">
           <th mat-header-cell *matHeaderCellDef> MONTO TOTAL RESTANTE </th>
-          <td mat-cell *matCellDef="let row"> {{ row.montoRestante | number:'1.2-2' }} </td>
+          <td mat-cell *matCellDef="let row"> {{ row.montoTotalRestante | number:'1.2-2' }} </td>
 
         </ng-container>
 
         <!-- CANTIDAD RESTANTE -->
         <ng-container matColumnDef="cantidad_restante">
           <th mat-header-cell *matHeaderCellDef> CANTIDAD TOTAL RESTANTE </th>
-          <td mat-cell *matCellDef="let row"> {{ row.cantidadRestante }} </td>
+          <td mat-cell *matCellDef="let row"> {{ row.cantidadTotalRestante }} </td>
 
         </ng-container>
 
@@ -124,7 +124,7 @@
         <ng-container matColumnDef="cantidad">
           <th mat-header-cell *matHeaderCellDef> CANTIDAD </th>
           <td mat-cell *matCellDef="let row; let i = index">
-            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.cantidad" [ngModelOptions]="{standalone: true}"
+            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.cantidadActual" [ngModelOptions]="{standalone: true}"
               class="w-full px-2 py-1 border rounded" />
           </td>
 
@@ -134,7 +134,7 @@
         <ng-container matColumnDef="precio_unitario">
           <th mat-header-cell *matHeaderCellDef> PRECIO UNITARIO </th>
           <td mat-cell *matCellDef="let row; let i = index">
-            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.precio" (blur)="recalcularTotal(i)"
+            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.precioActual" (blur)="recalcularTotal(i)"
               [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded" />
           </td>
 
@@ -144,7 +144,7 @@
         <ng-container matColumnDef="total_calculado">
           <th mat-header-cell *matHeaderCellDef> TOTAL CALCULADO </th>
           <td mat-cell *matCellDef="let row">
-            <input matInput type="number" [value]="row.total" disabled
+            <input matInput type="number" [value]="row.totalCalculadoActual" disabled
               class="w-full px-2 py-1 border rounded bg-gray-100" />
           </td>
 

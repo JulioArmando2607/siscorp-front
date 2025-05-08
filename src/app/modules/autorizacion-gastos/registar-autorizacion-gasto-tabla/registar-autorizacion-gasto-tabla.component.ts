@@ -63,7 +63,8 @@ export class RegistarAutorizacionGastoTablaComponent {
     'parcial_segun_cotizacion', 'cantidad_solicitada',
     'cantidad_restante', 'monto_restante',
     'cantidad', 'precio_unitario',
-    'total_calculado', 'monto_utilizado',// 'cantidad_utilizado',
+    'total_calculado',
+    // 'monto_utilizado',// 'cantidad_utilizado',
     'porcentaje', 'acciones'
   ];
 
@@ -351,16 +352,16 @@ export class RegistarAutorizacionGastoTablaComponent {
 
     const data = {
       idProyecto: this.id,
-      idAutorizacionGasto: this.idAutorizacionGasto,
-      idRecurso: row.idRecurso,
+      idAutorizacionGasto: row.idAutorizacionGasto,
+      //idRecurso: row.idRecurso,
       codigoRecurso: row.codigoRecurso,
-      cantidad: row.cantidad,
-      precio: row.precio,
-      precioCantidad: row.total,
+      cantidad: row.cantidadActual,
+      precio: row.precioActual,
+      precioCantidad: row.totalCalculadoActual,
       idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
       /// idHistorialPrecio: row.idHistorialPrecio,
-      montoRestante: row.montoRestante - row.total,
-      cantidadRestante: row.cantidadRestante - row.cantidad
+      // montoRestante: row.montoRestante - row.total,
+      // cantidadRestante: row.cantidadRestante - row.cantidad
     }
 
     const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
@@ -403,37 +404,41 @@ export class RegistarAutorizacionGastoTablaComponent {
   }
 
   async solicitarAutorizacion() {
+    if (this.selectedFiles.length <= 0) {
+      await this.dataModal(400, 'Agregar Archivo', 'Agrega un archivo de sustentación de autorización de gasto.', 'warning');
+      return;
+    }
     const confirmado = await this.dataModal(600, 'Solicitar Autorización de Gasto', '¿Deseas solicitar la autorización de gasto?', 'approve');
 
     if (confirmado) {
-      const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');  
+      const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');
       const detalle = {
         idAutorizacionGasto: idAutorizacionGasto,
         cidEstadoAG: "002",
         observacion: "Solicitar Autorización de Gasto desde el Residente"
       };
-  
+
       console.log(detalle)
       const formData = new FormData();
       formData.append('detalle', new Blob([JSON.stringify(detalle)], { type: 'application/json' }));
-    
+
       for (let file of this.selectedFiles) {
         formData.append('archivos', file); // Usa el mismo nombre que en el backend
       }
-    
+
       const response = await this.maestraService.solicitarAutorizacionGastoResidente(formData).toPromise();
-  
-    //  const response = await this.http.post('/api/solicitar-autorizacion-gasto-residente', formData).toPromise();
-    
+
+      //  const response = await this.http.post('/api/solicitar-autorizacion-gasto-residente', formData).toPromise();
+
       if (response) {
         await this.dataModal(response.data.codResultado, 'Solicitar Autorización de Gasto', response.data.msgResultado, 'success');
 
         this.salir();
       }
     }
-   
+
   }
-  
+
 
   /*async solicitarAutorizacion() {
     const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');
@@ -533,13 +538,17 @@ export class RegistarAutorizacionGastoTablaComponent {
   }
 
   recalcularTotal(index: number): void {
-    const row = this.dataSource.filteredData[index]; // <- CAMBIADO AQUÍ
-
+    const row = this.dataSource.filteredData[index];
+  
     console.log(row);
-    row.total = (row.cantidad || 0) * (row.precio || 0);
-    this.dataSource._updateChangeSubscription();
-    this.guardarActulizar(row);
+  
+    if (row.cantidadActual !== 0 && row.precioActual !== 0) {
+      row.totalCalculadoActual = row.cantidadActual * row.precioActual;
+      this.dataSource._updateChangeSubscription();
+      this.guardarActulizar(row);
+    }
   }
+  
 
   guardarActulizar(data) {
     console.log(data)
@@ -630,29 +639,29 @@ export class RegistarAutorizacionGastoTablaComponent {
   onFileSelected(event: any): void {
     const files: FileList = event.target.files;
     const newFiles = Array.from(files);
-  
+
     // Evitar duplicados por nombre (puedes usar otra lógica si lo prefieres)
     newFiles.forEach(newFile => {
       if (!this.selectedFiles.some(f => f.name === newFile.name)) {
         this.selectedFiles.push(newFile);
       }
     });
-  
+
     this.filterForm.patchValue({ archivo: this.selectedFiles });
     this.filterForm.get('archivo')?.updateValueAndValidity();
   }
-  
-  
+
+
   removeFile(index: number): void {
     this.selectedFiles.splice(index, 1);
     this.filterForm.patchValue({ archivo: this.selectedFiles });
-  
+
     if (this.selectedFiles.length < 3) {
       this.filterForm.get('archivo')?.setErrors({ minFiles: true });
     } else {
       this.filterForm.get('archivo')?.setErrors(null);
     }
-  
+
     this.filterForm.get('archivo')?.updateValueAndValidity();
   }
 

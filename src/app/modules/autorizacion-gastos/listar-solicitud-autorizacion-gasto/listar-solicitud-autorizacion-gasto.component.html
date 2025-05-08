@@ -149,18 +149,18 @@
                             (click)="aprobarSupervisor(row)" matTooltip="Aprobar" matTooltipPosition="above">
                             <mat-icon>check</mat-icon>
                         </button>
-
+<!--
                         <button *ngIf="isSupervisor && row.cidEstado=='002'" mat-icon-button color="primary"
                             (click)="observarAutorizacionGasto(row)" matTooltip="Observar Autorización de Gasto"
                             matTooltipPosition="above">
                             <mat-icon>visibility</mat-icon>
-                        </button>
+                        </button>-->
 
-                        <button *ngIf="isAdministrador && row.cidEstado=='004'" mat-icon-button color="primary"
+                      <!---  <button *ngIf="isAdministrador && row.cidEstado=='004'" mat-icon-button color="primary"
                             (click)="observarAutorizacionGasto(row)" matTooltip="Observar Autorización de Gasto"
                             matTooltipPosition="above">
                             <mat-icon>visibility</mat-icon>
-                        </button>
+                        </button>--> 
  
                         <button mat-icon-button color="primary" class="ml-2" (click)="analizarAutorizacionGasto(row)"
                             matTooltip="Analizar Autorización de Gasto">
