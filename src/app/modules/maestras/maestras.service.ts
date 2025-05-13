@@ -28,6 +28,10 @@ export class MaestrasService {
     return environment.apiurl + '/api/autorizacion-gasto/';
   }
 
+  getUrlPreliquidacion() {
+    return environment.apiurl + '/api/preliquidacion/';
+  }
+
   getDepartamentos(): Observable<any> {
     return this.http.get(`${this.getUrlMaestras()}departamentos`);
   }
@@ -176,6 +180,9 @@ export class MaestrasService {
   descargarArchivo(data): Observable<any> {
     const url = `${this.getUrlAutorizacionGasto()}descargarArchivoSeleccionado`;
     return this.http.post(url, data, { responseType: 'blob' });
+  } 
+  listaPartidadPreliquidacion(data): Observable<any> {
+    return this.http.post(`${this.getUrlPreliquidacion()}partidas`, data);
   }
 }
 
