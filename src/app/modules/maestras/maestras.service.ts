@@ -192,6 +192,10 @@ export class MaestrasService {
   listarAvanceFinancieroAsignado(data): Observable<any> {
     return this.http.post(`${this.getUrlPreliquidacion()}listar-avance-financiero-asignado`, data);
   }
+
+  RegManifiestoGastoAvanceFinanciero(data): Observable<any> {
+    return this.http.post(`${this.getUrlPreliquidacion()}registrar-manifiesto-gasto-avance-financiero`, data);
+  }  
    
 }
 
