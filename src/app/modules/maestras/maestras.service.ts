@@ -184,6 +184,15 @@ export class MaestrasService {
   listaPartidadPreliquidacion(data): Observable<any> {
     return this.http.post(`${this.getUrlPreliquidacion()}partidas`, data);
   }
+
+  setRegistrarAvanceObra(formData): Observable<any> {
+    return this.http.post(`${this.getUrlPreliquidacion()}registrar-avance-obra`, formData);
+  }
+
+  listarAvanceFinancieroAsignado(data): Observable<any> {
+    return this.http.post(`${this.getUrlPreliquidacion()}listar-avance-financiero-asignado`, data);
+  }
+   
 }
 
 export function Headers(isJson = true): HttpHeaders {

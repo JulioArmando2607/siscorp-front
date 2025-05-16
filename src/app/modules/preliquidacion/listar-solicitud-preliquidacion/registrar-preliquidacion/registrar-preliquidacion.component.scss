@@ -43,3 +43,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+::ng-deep .mat-tab-body-content {
+  min-height: 500px; /* o lo que necesites */
+}
+.tab-content {
+  min-height: 500px;
+  padding-bottom: 2rem;
+}

@@ -19,6 +19,8 @@ import { ActivatedRoute } from '@angular/router';
 import { ExcelService } from 'app/modules/maestras/excel.service';
 import { lastValueFrom } from 'rxjs';
 import { MaestrasService } from 'app/modules/maestras/maestras.service';
+import { ManifiestoGastoComponent } from './manifiesto-gasto/manifiesto-gasto.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-registrar-preliquidacion',
@@ -50,17 +52,31 @@ export class RegistrarPreliquidacionComponent {
     'total_calculado',
     'porcentaje', 'acciones'
   ];
+
+  
+  displayedColumnsEstadoFinaciero= [
+    'codigo', 'nombreControlAvanceFinanciero', 'montoAsignado', /*'cantidad', 'costo_unitario',
+    'precio_parcial', 'metrado_anterior', 'valor_anterior', 'metrado', 'valor',
+    'total_calculado',
+    'porcentaje', */ 'acciones'
+  ];
   // dataSource: MatTableDataSource<any>;
   dataSource = new MatTableDataSource<any>();
+  dataSourceEstadoFinaciero = new MatTableDataSource<any>();
 
   titulo: ''
   selectedFiles: File[] = [];
   idProyecto: string;
   totalElements: any;
+  // En la definición:
+  idValorizacionObra: string | number;
+  idPreliquidacion: string | number;
 
   constructor(
     private maestraService: MaestrasService,
     private cdr: ChangeDetectorRef,
+    private _matDialog: MatDialog,
+
     /*  
        private _fuseConfirmationService: FuseConfirmationService,
        private _matDialog: MatDialog,
@@ -81,7 +97,7 @@ export class RegistrarPreliquidacionComponent {
     this.idProyecto = this.route.snapshot.paramMap.get('idProyecto'); // Obtiene el ID de la URL
     console.log(this.idProyecto)
     this.getFiltraPartidasPreliquidacion()
-
+    this.getListarAvanceFinancieroAsignado()
   }
 
   salir() { }
@@ -142,7 +158,7 @@ export class RegistrarPreliquidacionComponent {
     const metrado = Number(row.metrado);
     const valor = Number(row.valor);
     const parcial = Number(row.precioParcial);
- 
+
     if (!isNaN(metrado) && !isNaN(valor) && valor > 0) {
       row.totalCalculadoActual = metrado * valor;
 
@@ -157,35 +173,75 @@ export class RegistrarPreliquidacionComponent {
       row.totalCalculadoActual = 0;
     }
   }
+  async guardar(idProyecto, idPartida, idSubPartida, metrado, valor, totalCalculado) {
+    // Obtener valores de localStorage (como string) o usar '0' si son null
+    this.idValorizacionObra = localStorage.getItem('idValorizacionObra') ?? '0';
+    this.idPreliquidacion = localStorage.getItem('idPreliquidacion') ?? '0';
 
-  guardar(idProyecto, idPartida, idSubPartida, metrado, valor, totalCalculado) {
     const data = {
-      id_proyecto: idProyecto,
-      id_partida: idPartida,
-      id_sub_partida: idSubPartida,
-      metrado: metrado,
-      valor: valor,
-      totalCalculado: totalCalculado
-    }
-    console.log(data)
+      idProyecto,
+      idPartida,
+      idSubPartida,
+      metrado,
+      valor,
+      totalCalculado,
+      idValorizacionObra: this.idValorizacionObra,
+      idPreliquidacion: this.idPreliquidacion,
+    };
+
+    const response = await this.maestraService.setRegistrarAvanceObra(data).toPromise();
+
+    // Actualizar localStorage y propiedades con los nuevos valores
+    const { idValorizacionObra, idPreliquidacion } = response.data.response;
+    localStorage.setItem('idValorizacionObra', idValorizacionObra);
+    localStorage.setItem('idPreliquidacion', idPreliquidacion);
+    this.idValorizacionObra = idValorizacionObra;
+    this.idPreliquidacion = idPreliquidacion;
+
   }
-  /*  if (oRespL?.data) {
-            //this.proyectos = oRespL.data.response;
-            this.totalElements = oRespL.data.length;
-            this.dataSource = oRespL.data ;
-            console.log(this.dataSource)
-    
-            // Restore filter if needed
-            if (mantenerFiltro && currentFilter) {
-              this.dataSource.filter = currentFilter;
-            }
-            // Set up filter predicate if not already set
-            if (!this.dataSource.filterPredicate) {
-              this.dataSource.filterPredicate = (data: any, filter: string) => {
-                return data.nombreRecurso?.toLowerCase().includes(filter.toLowerCase());
-              };
-            } 
-            this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
-    
-          } */
+
+  async getListarAvanceFinancieroAsignado(mantenerFiltro: boolean = true) {
+    // const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');
+    const idPreliquidacion = 0;
+    try {
+   //   const currentFilter = mantenerFiltro ? this.dataSource?.filter : '';
+      const data = {
+        idPreliquidacion: idPreliquidacion,
+        idProyecto: this.idProyecto
+      }
+      const oRespL = await lastValueFrom(
+        this.maestraService.listarAvanceFinancieroAsignado(
+          data
+        )
+      );
+      console.log(oRespL.data)
+      this.dataSourceEstadoFinaciero = new MatTableDataSource(oRespL.data);
+    } catch (error) {
+      console.error('Error al obtener proyectos:', error);
+    }
+  }
+
+  agregarManiefiestoGastos(data){
+    console.log('Ver detalles de: ',data);
+     const dialogRef = this._matDialog.open(ManifiestoGastoComponent, {
+      autoFocus: false,
+      width: '90%',
+    //  height: '90%', // opcional
+      data: {
+        proyecto: data,
+        title: "",
+        type: 'create'
+      },
+
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log("Diálogo cerrado con resultado:", result);
+
+      if (result === 'success') {
+      //  this.getFiltrarProyectos(); // Ejemplo: Llamar a una función de actualización
+      }
+    });
+  }
+
+
 }
