@@ -87,7 +87,7 @@ export class ManifiestoGastoComponent {
     }
     const oRespL = await lastValueFrom(
       this.maestraService.RegManifiestoGastoAvanceFinanciero(
-        data
+        datosFormulario
       )
     );
     console.log(oRespL) 
