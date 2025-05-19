@@ -13,6 +13,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MaestrasService } from 'app/modules/maestras/maestras.service';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-manifiesto-gasto',
@@ -44,6 +46,7 @@ export class ManifiestoGastoComponent {
   footerColumns: string[] = ['totalLabel', 'totalValue'];
 
   constructor(
+    private maestraService: MaestrasService,
 /*    private cdr: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService,
     private _matDialog: MatDialog,
@@ -62,8 +65,8 @@ export class ManifiestoGastoComponent {
   async ngOnInit() {
     this.filterForm = this.fb.group({
       fecha:["", Validators.required],
-      clase:["", Validators.required],
-      numero:["", Validators.required],
+      claseDocumento:["", Validators.required],
+      numeroDocumento:["", Validators.required],
       razonSocial:["", Validators.required],
       concepto:["", Validators.required],
       importe:["", Validators.required],
@@ -72,7 +75,24 @@ export class ManifiestoGastoComponent {
   }
 
   salir(){}
-  setRegistrarAutorizacionGasto(){}
+
+  async setRegistrarManifiestoG(){
+    const datosFormulario = this.filterForm.getRawValue();
+    console.log(datosFormulario)
+
+    const data = {
+      idProyecto: 1,
+      idValorizacionObra: 1,
+      idPreliquidacion: 1, 
+    }
+    const oRespL = await lastValueFrom(
+      this.maestraService.RegManifiestoGastoAvanceFinanciero(
+        datosFormulario
+      )
+    );
+    console.log(oRespL) 
+   
+  }
   limpiar(){}
   getTotalCost(){}
 }

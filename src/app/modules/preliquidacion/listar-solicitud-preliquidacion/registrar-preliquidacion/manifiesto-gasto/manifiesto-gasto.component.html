@@ -31,14 +31,14 @@
                 <!-- DEPARTAMENTO -->
                 <mat-form-field appearance="fill" class="col-span-1">
                     <mat-label>CLASE</mat-label>
-                    <input type="text" matInput formControlName="clase">
+                    <input type="text" matInput formControlName="claseDocumento">
                 </mat-form-field>
 
 
                 <!-- DEPARTAMENTO -->
                 <mat-form-field appearance="fill" class="col-span-1">
                     <mat-label>N°</mat-label>
-                    <input type="text" matInput formControlName="numero">
+                    <input type="text" matInput formControlName="numeroDocumento">
                 </mat-form-field>
 
                 <!-- RECURSO--->
@@ -66,7 +66,7 @@
                 </mat-form-field>
                 <div class="mt-10 flex items-center space-x-3 sm:ml-2 sm:mt-0">
                     <button mat-flat-button style="background-color: #28a745; color: white;"
-                        (click)="setRegistrarAutorizacionGasto()" [disabled]="!filterForm.valid">
+                        (click)="setRegistrarManifiestoG()" [disabled]="!filterForm.valid">
                         <mat-icon class="icon-size-5">add</mat-icon>
                         <span class="ml-2"></span>
                     </button>
