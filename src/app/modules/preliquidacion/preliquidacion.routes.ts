@@ -16,6 +16,14 @@ export default [
     {
         path: 'registrar-preliquidacion/:idProyecto',
         component: RegistrarPreliquidacionComponent,
+    },
+    {
+        path: 'editar-preliquidacion/:idProyecto/:idPreliquidacion',
+        component: RegistrarPreliquidacionComponent,
+    },
+    {
+        path: 'analisar-preliquidacion/:idProyecto/:idPreliquidacion',
+        component: RegistrarPreliquidacionComponent,
     }
 
     

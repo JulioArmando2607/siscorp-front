@@ -84,9 +84,9 @@ export class ListarSolicitudAutorizacionGastoComponent {
   totalElements = 0;
   pageSize = 10;
   pageIndex = 0; // Página actual
-  isSupervisor: boolean = true
-  isResidente: boolean = true
-  isPEP: boolean = true;
+  isSupervisor: boolean = false
+  isResidente: boolean = false
+  isPEP: boolean = false;
 
   constructor(
     private cdr: ChangeDetectorRef,

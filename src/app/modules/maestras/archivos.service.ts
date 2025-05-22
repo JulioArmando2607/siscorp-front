@@ -7,11 +7,11 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class MaestrasService {
+export class ArchivosService {
 
   constructor(public http: HttpClient) { }
 
-  getUrlMaestras() {
+/*  getUrlMaestras() {
     return environment.apiurl + '/api/maestras/';
   }
 
@@ -30,7 +30,34 @@ export class MaestrasService {
   getUrlPreliquidacion() {
     return environment.apiurl + '/api/preliquidacion/';
   }
+ */
+  getUrlArchivos() {
+    return environment.apiurl + '/api/archivos/';
+  }
 
+  descargarArchivoPorRuta(rawValue): Observable<any> {
+    return this.http.post(`${this.getUrlArchivos()}descargarArchivoPorRuta`, rawValue, {
+      responseType: 'blob', // IMPORTANTE para archivos
+    });
+  }
+  async descargar(archivo: { txtNombre: string; txtPath: string; idArchivo: number }): Promise<void> {
+    try {
+      const blob = await this.descargarArchivoPorRuta(archivo).toPromise();
+  
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = archivo.txtNombre.trim() || 'archivo-descargado';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error al procesar descarga:', error);
+    }
+  }
+/*
   getDepartamentos(): Observable<any> {
     return this.http.get(`${this.getUrlMaestras()}departamentos`);
   }
@@ -186,11 +213,6 @@ export class MaestrasService {
     return this.http.post(`${this.getUrlPreliquidacion()}partidas`, data);
   }
 
-  listaAnalisisPartidadPreliquidacion(data): Observable<any> {
-    return this.http.post(`${this.getUrlPreliquidacion()}analisar-preliquidacion`, data);
-  }
-
-
   setRegistrarAvanceObra(formData): Observable<any> {
     return this.http.post(`${this.getUrlPreliquidacion()}registrar-avance-obra`, formData);
   }
@@ -219,6 +241,7 @@ export class MaestrasService {
   }
   optnerValorizacionAvanceObra(rawvalue): Observable<any> {
     return this.http.post(`${this.getUrlPreliquidacion()}optner-valorizacion-avance-obra`, rawvalue);
+
   }
 
   eliminarPreliquidacion(data): Observable<any> {
@@ -234,7 +257,7 @@ export class MaestrasService {
   }
   eliminarArchivoPreliquidacion(data): Observable<any> {
     return this.http.post(`${this.getUrlPreliquidacion()}eliminar-archivo-preliquidacion`, data);
-  }
+  } */
 }
 
 export function Headers(isJson = true): HttpHeaders {

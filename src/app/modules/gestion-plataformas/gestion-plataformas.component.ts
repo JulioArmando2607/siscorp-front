@@ -70,9 +70,9 @@ export class GestionPlataformasComponent implements OnInit {
   departamentos: any[] = []
   proyectos: any[]
   configForm: UntypedFormGroup;
-  isSupervisor: boolean = true;
-  isResidente: boolean = true;
-  isBotonesGestion: boolean = true;
+  isSupervisor: boolean = false;
+  isResidente: boolean = false;
+  isBotonesGestion: boolean = false;
 
   constructor(
     private cdr: ChangeDetectorRef,

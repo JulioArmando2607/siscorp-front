@@ -15,6 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute } from '@angular/router';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { Session } from 'app/core/auth/Session';
+import { ArchivosService } from 'app/modules/maestras/archivos.service';
 import { MaestrasService } from 'app/modules/maestras/maestras.service';
 import { lastValueFrom } from 'rxjs';
 
@@ -48,9 +49,9 @@ export class AnalizarAutorizacionGastoComponent {
   isEditar: boolean;
   idAutorizacionGastoRecurso: any;
   idHistorialPrecio: any;
-  isSupervisor: boolean = true;
-  isResidente: boolean = true;
-  isAdmin: boolean = true;
+  isSupervisor: boolean = false;
+  isResidente: boolean = false;
+  isAdmin: boolean = false;
   autorizacionGasto: any;
   dataSource: MatTableDataSource<any>;
   proyectos: any[]
@@ -80,6 +81,7 @@ export class AnalizarAutorizacionGastoComponent {
     private cdr: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService,
     private maestraService: MaestrasService,
+    private archivoService: ArchivosService,
     private _formBuilder: UntypedFormBuilder,
     private route: ActivatedRoute,
     private location: Location
@@ -515,26 +517,18 @@ export class AnalizarAutorizacionGastoComponent {
       }
     });
   }
-  descargarArchivo(dt) {
-    console.log(dt);
-   // this._showLoading();
-    const data = { ruta: dt.path, nombre: dt.nombre };
-    this.maestraService.descargarArchivo(data).subscribe(
-      (responseWs) => {
-         const blob = new Blob([responseWs], { type: responseWs.type });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = dt.nombre; // Usa el nombre correcto para el archivo
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        a.remove();
-      },
-      (error) => {
-        console.error('Error al descargar el archivo', error);
-      }
-    );
+
+ 
+  async descargarArchivo(dt) {
+
+    const archivoPayload = {
+      idPreliquidacion: 0,
+      idArchivo: 0,
+      txtNombre: dt.nombre,
+      txtPath: dt.path
+    };
+    await this.archivoService.descargar(archivoPayload);
+    
   }
   
 

@@ -1,14 +1,54 @@
-.botones-flotantes {
-    position: absolute;
-    top: -30px;  /* Coloca los botones encima de la tabla */
-    right: 10px; /* Mueve los botones hacia la izquierda */
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    z-index: 100; /* Asegura que estén sobre la tabla */
-}
- 
-::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
-    padding: 0px !important;
+.table-container {
+    max-height:400px;
+    overflow-x: auto;
+    overflow-y: auto;
+    width: 100%;
+  }
+  
+  .mat-table {
+    width: 100%;
+    min-width: 100px; /* Puedes ajustar este valor */
+    table-layout: auto; /* Permite que las columnas se ajusten mejor */
+  }
+  
+  .mat-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1000;
+  }
+  
+  /* Scroll bonito opcional */
+  .table-container::-webkit-scrollbar {
+    height: 6px;
+  }
+  .table-container::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 3px;
+  }
+  .linear-totals {
+    background-color: #f5f5f5;
+    padding: 12px;
+    border-top: 2px solid #ddd;
+    font-weight: bold;
+  
+    div {
+        display: inline-block;
+        margin-right: 20px;
+    }
+  }
+  
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  ::ng-deep .mat-tab-body-content {
+    min-height: 500px; /* o lo que necesites */
+  }
+  .tab-content {
+    min-height: 500px;
+    padding-bottom: 2rem;
   }
   

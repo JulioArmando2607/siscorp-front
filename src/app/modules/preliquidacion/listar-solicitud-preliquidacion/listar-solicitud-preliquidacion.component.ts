@@ -21,6 +21,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Session } from 'app/core/auth/Session';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { ObservarDialogComponent } from 'app/modules/autorizacion-gastos/observar-dialog/observar-dialog.component';
+import { ExcelPreliquidacionService } from 'app/modules/maestras/excel.preliquidacion.service';
 
 
 @Component({
@@ -51,16 +52,14 @@ export class ListarSolicitudPreliquidacionComponent {
   recursosSubject: any;
   Sess
   isAdministrador: boolean;
-  async descargarExcelProyecto() {
-    const roresp = await lastValueFrom(this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(),
-    ))
 
-    console.log(roresp)
-    this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");
-  }
-  displayedColumns: string[] = [/*'item',*/'cag', 'fechaRegistro',
+  displayedColumns: string[] = [
+    'item',
+    /*'item',*///'cag',
+    'fechaRegistro',
     //'cantidadRecursos', 
-    'total', 'estado', 'acciones'];
+    //'total',
+     'estado', 'acciones'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
@@ -85,9 +84,9 @@ export class ListarSolicitudPreliquidacionComponent {
   totalElements = 0;
   pageSize = 10;
   pageIndex = 0; // Página actual
-  isSupervisor: boolean = true
-  isResidente: boolean = true
-  isPEP: boolean = true;
+  isSupervisor: boolean = false
+  isResidente: boolean = false
+  isPEP: boolean = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -96,7 +95,7 @@ export class ListarSolicitudPreliquidacionComponent {
     private maestraService: MaestrasService,
     private fb: FormBuilder,
     private _formBuilder: UntypedFormBuilder,
-    private excelService: ExcelService,
+    private excelService: ExcelPreliquidacionService,
     private route: ActivatedRoute,
     private _router: Router,
     private location: Location, private dialog: MatDialog
@@ -270,10 +269,10 @@ export class ListarSolicitudPreliquidacionComponent {
         idProyecto: this.id,
         idEstado: this.filterForm.get("estado").value,
         fecha: this.filterForm.get("fecha").value,
-        codigo: this.filterForm.get("codigo").value
+       // codigo: this.filterForm.get("codigo").value
       }
       const oRespL = await lastValueFrom(
-        this.maestraService.getListarAutorizacionGasto(
+        this.maestraService.getListarPreliquidacion(
           data,
           this.pageIndex,
           this.pageSize
@@ -316,6 +315,9 @@ export class ListarSolicitudPreliquidacionComponent {
 
   registrarSolicitudPreliquidacion() {
     console.log( this.id)
+    localStorage.removeItem('idPreliquidacion');
+    localStorage.removeItem('idValorizacionAvanceObra');
+
     this._router.navigate(['preliquidacion/registrar-preliquidacion/', this.id]);
   }
 
@@ -335,10 +337,12 @@ export class ListarSolicitudPreliquidacionComponent {
 
   editar(row) {
     console.log(row)
-    this._router.navigate(['autorizacion-gastos/editar-autorizacion-gasto-tabla/', this.id, row.idAutorizacionGasto]);
+    this._router.navigate(['preliquidacion/editar-preliquidacion/', this.id, row.idPreliquidacion
+
+    ]);
   }
 
-  async descargarAutorizacion(row) {
+/*  async descargarAutorizacion(row) {
     try {
 
       const data = {
@@ -364,7 +368,7 @@ export class ListarSolicitudPreliquidacionComponent {
       console.error('Error al obtener proyectos:', error);
     }
   }
-
+ */
   async verProyecto(id) {
     const data = { idProyecto: id }
     const roresp = await lastValueFrom(this.maestraService.verProyecto(data))
@@ -376,14 +380,14 @@ export class ListarSolicitudPreliquidacionComponent {
     }
   }
 
-  async eliminarAutorizacion(row) {
-    const confirmado = await this.dataModal(522, 'Eliminar Solicitud de Autorizacion de Gasto', 'Deseas eliminar esta solicitud?', 'warning');
+  async eliminarPreliquidacion(row) {
+    const confirmado = await this.dataModal(522, 'Eliminar Solicitud de Preliquidacion', 'Deseas eliminar esta solicitud?', 'warning');
     if (confirmado) {
       const data = {
-        idAutorizacionGasto: row.idAutorizacionGasto
+        idPreliquidacion: row.idPreliquidacion
       }
 
-      const response = await this.maestraService.setEliminarAutorizacionGasto(data).toPromise();
+      const response = await this.maestraService.eliminarPreliquidacion(data).toPromise();
       console.log(response);
       //this.partidas = response.data || [];
       if (response) {
@@ -495,56 +499,62 @@ export class ListarSolicitudPreliquidacionComponent {
 
 
   }
-
+/*
   analizarAutorizacionGasto(row) {
     this._router.navigate(['autorizacion-gastos/analizar-autorizacion-gasto', this.id, row.idAutorizacionGasto]);
+  } 
+    
+  editar(row) {
+    console.log(row)
+    this._router.navigate(['preliquidacion/editar-preliquidacion/', this.id, row.idPreliquidacion
+
+    ]);
+  }*/
+
+
+  analizarPreliquidacion(row){
+    this._router.navigate(['preliquidacion/analisar-preliquidacion/', this.id, row.idPreliquidacion]);
   }
 
-  async descargarAutorizacionAuditado(row) {
+  async export26(row) {
     const data = {
       idAutorizacionGasto: row.idAutorizacionGasto,
       idProyecto: row.idProyecto
     }
-    const response = await this.maestraService.anexo23AutorizacionGasto(data).toPromise();
+   /* const response = await this.maestraService.anexo23AutorizacionGasto(data).toPromise();
     const dataExcel = {
       row: row,
       response: response.data.response
-    }
-    this.excelService.exportGastoAutorizacion(dataExcel)
+    } */
+   let prueba =[]
+    this.excelService.export26(prueba)
 
   }
+ 
 
-  async descargarAnexo24(row) {
+  async export28(row) {
     const data = {
       idAutorizacionGasto: row.idAutorizacionGasto,
       idProyecto: row.idProyecto
     }
-    const oRespL = await lastValueFrom(
-      this.maestraService.listaRecursosAutorizacionGastoProyectoAnalisis(
-        data
-      )
-    );
-    console.log(oRespL)
-    if (oRespL?.data) {
-      this.excelService.exportControlAutorizaciones(oRespL?.data)
-    }
-  }
+   /* const response = await this.maestraService.anexo23AutorizacionGasto(data).toPromise();
+    const dataExcel = {
+      row: row,
+      response: response.data.response
+    } */
+   let prueba =[]
+    this.excelService.exportAnexo28(prueba)
 
-  async exportAnexo25(row) {
-    const data = {
-      idAutorizacionGasto: row.idAutorizacionGasto,
-      idProyecto: row.idProyecto
-    }
-    const oRespL = await lastValueFrom(
-      this.maestraService.anexo25AutorizacionGasto(
-        data
-      )
-    );
-    console.log(oRespL)
-    if (oRespL?.data) {  
-      this.excelService.exportAnexo25(oRespL)
-    }
   }
+ async descargarExcelProyecto() {
+    /*  const roresp = await lastValueFrom(this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(),
+    ))
+
+    console.log(roresp)
+    this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");*/
+  } 
+ 
+  
 
 
 

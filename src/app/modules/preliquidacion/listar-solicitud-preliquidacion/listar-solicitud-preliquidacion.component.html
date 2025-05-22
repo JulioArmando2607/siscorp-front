@@ -22,10 +22,10 @@
 
                 <!-- PARTIDA -->
                 <!-- PARTIDA -->
-                <mat-form-field appearance="fill" class="w-full">
+           <!---     <mat-form-field appearance="fill" class="w-full">
                     <mat-label>CODIGO</mat-label>
                     <input type="text" matInput formControlName="codigo">
-                </mat-form-field>
+                </mat-form-field>-->
 
 
                 <mat-form-field appearance="fill" class="w-full">
@@ -69,8 +69,8 @@
         <div class="botones-flotantes">
 
             <!-- Botón -->
-            <!-- Botón mejorado *ngIf="isResidente" -->
-            <button  mat-flat-button style="background-color: #0056b3; color: white;"
+            <!-- Botón mejorado -->
+            <button *ngIf="isResidente" mat-flat-button style="background-color: #0056b3; color: white;"
                 (click)="registrarSolicitudPreliquidacion()">
                 <mat-icon>add</mat-icon>
                 <span class="ml-2">REGISTRAR SOLICITUD AUTORIZACIÓN DE GASTO</span>
@@ -79,15 +79,15 @@
         </div>
         <mat-table [dataSource]="dataSource" matSort class="w-full">
           
-            <ng-container matColumnDef="cag">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> NÚMERO PRELIQUIDACION </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.codigoAutorizacionGasto }} </mat-cell>
-            </ng-container>
+            <ng-container matColumnDef="item">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> ITEM </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.item }} </mat-cell>
+            </ng-container> 
 
             <!-- CUI Column -->
             <ng-container matColumnDef="fechaRegistro">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> FECHA REGISTRO </mat-header-cell>
-                <mat-cell *matCellDef="let row"> {{ row.fechaRegistro }} </mat-cell>
+                <mat-cell *matCellDef="let row"> {{ row.fechaReg }} </mat-cell>
             </ng-container>
  
             <!-- Estado Column -->
@@ -96,11 +96,11 @@
                 <mat-cell *matCellDef="let row" [matTooltip]="row.observacion"> {{ row.nombreEstado }} </mat-cell>
             </ng-container>
 
-            <!-- Estado Column -->
-            <ng-container matColumnDef="total">
+            <!-- Estado Column  <ng-container matColumnDef="total">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> TOTAL </mat-header-cell>
                 <mat-cell *matCellDef="let row"> {{ row.total }} </mat-cell>
-            </ng-container>
+            </ng-container>-->
+           
 
             <!-- Botón de acciones -->
             <ng-container matColumnDef="acciones">
@@ -108,15 +108,15 @@
                 <mat-cell *matCellDef="let row">
                     <div style="display: flex; flex-wrap: wrap;">
  
-                        <!-- Botón Editar -->
-                        <button *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003')" mat-icon-button
+                        <!-- Botón Editar  *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003')" -->
+                        <button *ngIf="isResidente  && (row.cidEstado=='001' || row.cidEstado=='003')" mat-icon-button
                             color="primary" (click)="editar(row)" matTooltip="Editar">
                             <mat-icon>edit</mat-icon>
                         </button>
 
-                        <!-- Botón Eliminar -->
-                        <button *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003') " mat-icon-button
-                            color="warn" (click)="eliminarAutorizacion(row)" matTooltip="Eliminar">
+                        <!-- Botón Eliminar *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003') "-->
+                        <button *ngIf="isResidente && (row.cidEstado=='001' || row.cidEstado=='003')" mat-icon-button
+                            color="warn" (click)="eliminarPreliquidacion(row)" matTooltip="Eliminar">
                             <mat-icon>delete</mat-icon>
                         </button>
  
@@ -125,27 +125,21 @@
                             <mat-icon>check</mat-icon>
                         </button>
   
-                        <button mat-icon-button color="primary" class="ml-2" (click)="analizarAutorizacionGasto(row)"
-                            matTooltip="Analizar Autorización de Gasto">
+                     <button *ngIf="isSupervisor|| isResidente || isPEP" mat-icon-button color="primary" class="ml-2" (click)="analizarPreliquidacion(row)"
+                            matTooltip="Analizar Preliquidacion">
                             <mat-icon>analytics</mat-icon>
                         </button>
-
-                        <button mat-icon-button color="accent" class="ml-2" (click)="descargarAutorizacionAuditado(row)"
-                            matTooltip="Descargar ANEXO N° 26 AUTORIZACIÓN DE GASTO">
+ 
+                        <button mat-icon-button color="accent" class="ml-2" (click)="export26(row)"
+                            matTooltip="Descargar ANEXO N° 26  VALORIZACIÓN DEL AVANCE DE OBRA">
                             <mat-icon>download</mat-icon>
                         </button>
 
-                        <button mat-icon-button color="#0056b3" class="ml-2" (click)="descargarAnexo24(row)"
-                            matTooltip="Descargar ANEXO N° 28: CONTROL DE AUTORIZACIONES PARA ADQUISICIÓN DE INSUMOS">
+                        <button mat-icon-button color="#0056b3" class="ml-2" (click)="export28(row)"
+                            matTooltip="Descargar ANEXO N° 28: AVANCE FINACIERO">
                             <mat-icon>download</mat-icon>
                         </button>
-<!--*ngIf="isPEP && row.cidEstado=='004'"-->
-                        <button mat-icon-button color="primary" class="ml-2" (click)="exportAnexo25(row)"
-                            matTooltip="Descargar ANEXO N° 29: CONTROL Y MONITOREO DEL MOVIMIENTO FINANCIERO">
-                            <mat-icon>download</mat-icon>
-                        </button>
-
-
+ 
                     </div>
                 </mat-cell>
             </ng-container>
