@@ -100,12 +100,12 @@ export class RegistrarPreliquidacionComponent {
 
   }
 
-  async inicioproyecto(){
-  await  this.validarusuario()
-    
+  async inicioproyecto() {
+    await this.validarusuario()
+
     this.mostarEstadoActualPreliquidacion()
 
-   
+
     if (this.idPreliquidacion != "0") {
       setTimeout(() => {
         this.optnerValorizacionAvanceObra()
@@ -146,7 +146,7 @@ export class RegistrarPreliquidacionComponent {
 
   async mostarEstadoActualPreliquidacion() {
     const data = {
-    ///  idProyecto: this.idProyecto,
+      ///  idProyecto: this.idProyecto,
       idPreliquidacion: this.idPreliquidacion,
     }
     const oRespL = await lastValueFrom(
@@ -191,8 +191,8 @@ export class RegistrarPreliquidacionComponent {
         idProyecto: this.idProyecto
       }
       let oRespL: any
-      if(this.isResidente){
-          oRespL = await lastValueFrom(
+      if (this.isResidente) {
+        oRespL = await lastValueFrom(
           this.maestraService.listaPartidadPreliquidacion(
             data
           )
@@ -204,14 +204,14 @@ export class RegistrarPreliquidacionComponent {
           )
         );
       }
-    
+
       console.log(oRespL.data)
       //   this.dataSource = oRespL.data ;
       this.dataSource = new MatTableDataSource(oRespL.data);
 
       if (this.idPreliquidacion != "0") {
         this.getListarAvanceFinancieroAsignado()
-  
+
       }
 
 
@@ -257,9 +257,41 @@ export class RegistrarPreliquidacionComponent {
       row.totalCalculadoActual = 0;
     }
   }
+  /* async guardar(idProyecto, idPartida, idSubPartida, metrado, valor, totalCalculado) {
+     console.log(idProyecto, idPartida, idSubPartida, metrado, valor, totalCalculado)
+     // Obtener valores de localStorage (como string) o usar '0' si son null
+     this.idValorizacionAvanceObra = localStorage.getItem('idValorizacionAvanceObra') ?? '0';
+     this.idPreliquidacion = localStorage.getItem('idPreliquidacion') ?? '0';
+ 
+     const data = {
+       idProyecto,
+       idPartida,
+       idSubPartida,
+       metrado,
+       valor,
+       totalCalculado,
+       idValorizacionObra: this.idValorizacionAvanceObra,
+       idPreliquidacion: this.idPreliquidacion,
+     };
+     console.log(data)
+     const response = await this.maestraService.setRegistrarAvanceObra(data).toPromise();
+ 
+     // Actualizar localStorage y propiedades con los nuevos valores
+     const { idValorizacionObra, idPreliquidacion } = response.data.response;
+     localStorage.setItem('idValorizacionAvanceObra', idValorizacionObra);
+     localStorage.setItem('idPreliquidacion', idPreliquidacion);
+     this.idValorizacionAvanceObra = idValorizacionObra;
+     this.idPreliquidacion = idPreliquidacion;
+   ///1ioerp quie pída csolo una vez en esta sesion
+       this.getListarAvanceFinancieroAsignado()
+    ////////////
+     this.mostarEstadoActualPreliquidacion()
+ 
+   }*/
   async guardar(idProyecto, idPartida, idSubPartida, metrado, valor, totalCalculado) {
-    console.log(idProyecto, idPartida, idSubPartida, metrado, valor, totalCalculado)
-    // Obtener valores de localStorage (como string) o usar '0' si son null
+    console.log(idProyecto, idPartida, idSubPartida, metrado, valor, totalCalculado);
+
+    // Obtener valores de localStorage
     this.idValorizacionAvanceObra = localStorage.getItem('idValorizacionAvanceObra') ?? '0';
     this.idPreliquidacion = localStorage.getItem('idPreliquidacion') ?? '0';
 
@@ -273,26 +305,30 @@ export class RegistrarPreliquidacionComponent {
       idValorizacionObra: this.idValorizacionAvanceObra,
       idPreliquidacion: this.idPreliquidacion,
     };
-    console.log(data)
+
+    console.log(data);
+
     const response = await this.maestraService.setRegistrarAvanceObra(data).toPromise();
 
-    // Actualizar localStorage y propiedades con los nuevos valores
+    // Actualizar localStorage y propiedades
     const { idValorizacionObra, idPreliquidacion } = response.data.response;
     localStorage.setItem('idValorizacionAvanceObra', idValorizacionObra);
     localStorage.setItem('idPreliquidacion', idPreliquidacion);
     this.idValorizacionAvanceObra = idValorizacionObra;
     this.idPreliquidacion = idPreliquidacion;
-    this.getListarAvanceFinancieroAsignado()
-    this.mostarEstadoActualPreliquidacion()
 
+    // ✅ Solo una vez por sesión
+    if (!sessionStorage.getItem('avanceFinancieroCargado')) {
+      this.getListarAvanceFinancieroAsignado();
+      sessionStorage.setItem('avanceFinancieroCargado', 'true');
+    }
+
+    this.mostarEstadoActualPreliquidacion();
   }
 
   async getListarAvanceFinancieroAsignado(mantenerFiltro: boolean = true) {
-    // const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');
     try {
-      //   const currentFilter = mantenerFiltro ? this.dataSource?.filter : '';
       const data = {
-        
         idPreliquidacion: this.idPreliquidacion,
         idProyecto: this.idProyecto
       }
@@ -492,7 +528,7 @@ export class RegistrarPreliquidacionComponent {
       console.error('Error al solicitar:', error);
     }
   }
-  async solicitarPreliquidacionSupervisor(){
+  async solicitarPreliquidacionSupervisor() {
     const confirmDelete = confirm(`¿Deseas solicitar al supervisor?`);
     if (!confirmDelete) return;
     const data = {
@@ -510,7 +546,7 @@ export class RegistrarPreliquidacionComponent {
     }
   }
 
-  async observar(){
+  async observar() {
     const confirmDelete = confirm(`¿Deseas observar Preliquidacion?`);
     if (!confirmDelete) return;
     const data = {
@@ -527,7 +563,7 @@ export class RegistrarPreliquidacionComponent {
       console.error('Error al solicitar:', error);
     }
   }
-  async solicitarPep(){
+  async solicitarPep() {
     const confirmDelete = confirm(`¿Deseas solicitar al PEP?`);
     if (!confirmDelete) return;
     const data = {
@@ -544,7 +580,7 @@ export class RegistrarPreliquidacionComponent {
       console.error('Error al solicitar:', error);
     }
   }
-  async aprobadoPep(){
+  async aprobadoPep() {
     const confirmDelete = confirm(`¿Deseas aprobar solicitud?`);
     if (!confirmDelete) return;
     const data = {
@@ -562,20 +598,53 @@ export class RegistrarPreliquidacionComponent {
     }
   }
 
+
   async exporManiefiestoGasto(row) {
     const data = {
-      idAutorizacionGasto: row.idAutorizacionGasto,
-      idProyecto: row.idProyecto
+      idPreliquidacion: this.idPreliquidacion,
+      idControlAvanceFinancieroProyecto: row.idControlAvanceFinancieroProyecto
     }
-   /* const response = await this.maestraService.anexo23AutorizacionGasto(data).toPromise();
-    const dataExcel = {
-      row: row,
-      response: response.data.response
-    } */
-   let prueba =[]
-    this.excelService.exporManiefiestoGasto(prueba)
+    const oRespL1 = await lastValueFrom(
+      this.maestraService.listarManifiestoPreliquidacion(
+        data
+      )
+    );
+    if (oRespL1.data.length > 0) {
+      let idManifiestoGastoAvanceFinanciero = oRespL1.data[0].idManifiestoGastoAvanceFinanciero
+ 
+      const datos = {
+        idManifiestoGastoAvanceFinanciero: idManifiestoGastoAvanceFinanciero
+  
+      };
+      const oRespL = await lastValueFrom(
+        this.maestraService.listarManifiestoGastoAvanceFinanciero(
+          datos
+        )
+      );
 
+      this.excelService.exporManiefiestoGasto(oRespL.data) 
+
+     // this.dataSource = oRespL.data
+     // this.dataSource = new MatTableDataSource(oRespL.data);
+ 
+
+    } 
   }
+ 
+
+  private async obtenerManifiesto(idControl: number): Promise<any | null> {
+    const parametros = {
+      idPreliquidacion: this.idPreliquidacion,
+      idControlAvanceFinancieroProyecto: idControl
+    };
+
+    const respuesta = await lastValueFrom(
+      this.maestraService.listarManifiestoPreliquidacion(parametros)
+    );
+
+    return respuesta.data.length > 0 ? respuesta.data[0] : null;
+  }
+
 
 
   applyFilter(event: Event) {
@@ -583,30 +652,30 @@ export class RegistrarPreliquidacionComponent {
     this.dataSource.filter = filterValue;
   }
 
-    validarusuario() {
-      // Reiniciamos todos los roles
-      this.isAdministrador = false;
-      this.isSupervisor = false;
-      this.isResidente = false;
-  
-      // Validar Residente
-      if (Session.identity.rol == 'UPS-RESIDENTE-PROYECTO') {
-        this.isResidente = true;
-      }
-  
-      // Validar Supervisor
-      else if (Session.identity.rol == 'UPS-SUPERVISOR-PROYECTO') {
-        this.isSupervisor = true;
-      }
-  
-      else if (Session.identity.rol == 'UPS-PEP-PROYECTO') {
-        this.isPEP = true;
-      }
-   
-      // Si no es ninguno de los anteriores, es Administrador (o cualquier otro rol general)
-      else {
-        this.isAdministrador = true;
-      }
+  validarusuario() {
+    // Reiniciamos todos los roles
+    this.isAdministrador = false;
+    this.isSupervisor = false;
+    this.isResidente = false;
+
+    // Validar Residente
+    if (Session.identity.rol == 'UPS-RESIDENTE-PROYECTO') {
+      this.isResidente = true;
     }
+
+    // Validar Supervisor
+    else if (Session.identity.rol == 'UPS-SUPERVISOR-PROYECTO') {
+      this.isSupervisor = true;
+    }
+
+    else if (Session.identity.rol == 'UPS-PEP-PROYECTO') {
+      this.isPEP = true;
+    }
+
+    // Si no es ninguno de los anteriores, es Administrador (o cualquier otro rol general)
+    else {
+      this.isAdministrador = true;
+    }
+  }
 
 }

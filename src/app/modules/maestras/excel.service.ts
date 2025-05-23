@@ -258,27 +258,28 @@ export class ExcelService {
 
     response.response.forEach((item: any, index: number) => {
       worksheetData.push([
-        index + 1, item.nombreRecurso, item.unidad,
-        item.cantidadAsignado,
+        index + 1,
+        item.nombreRecurso,
+        item.unidad,
+        item.cantidadTotalAsignada,
         //item.montoAsignado/item.cantidadAsignado, 
-        safeDivide(item.montoAsignado, item.cantidadAsignado),
-
-        item.montoAsignado,
-        item.cantidadUtilizadoAcumulado,
-        safeDivide(item.montoUtilizadoAcumulado, item.cantidadUtilizadoAcumulado),
+        safeDivide(item.montoTotalAsignado, item.cantidadTotalAsignada),
+        item.montoTotalAsignado,
+        item.cantidadSolicitadaAcumulado,
+        safeDivide(item.parcialCotizacionAcumulado, item.cantidadSolicitadaAcumulado),
         //item.montoUtilizadoAcumulado/item.cantidadUtilizadoAcumulado, 
-        item.montoUtilizadoAcumulado,
+        item.parcialCotizacionAcumulado,
 
-        item.cantidad, item.precio, item.cantidad * item.precio,
-        item.cantidad + item.cantidadUtilizadoAcumulado, item.precioCantidad + item.montoUtilizadoAcumulado,
-        item.cantidadRestante, item.montoRestante
+        item.cantidadActual, item.precioActual, item.cantidadActual * item.precioActual,
+        item.cantidadActual + item.cantidadSolicitadaAcumulado, item.precioActual + item.parcialCotizacionAcumulado,
+        item.cantidadTotalRestante, item.montoTotalRestante
       ]);
-      totalMontoAsignado += item.montoAsignado;
-      totalMontoAcumulado += item.montoUtilizadoAcumulado;
-      totalCUSolicitado += item.precio;
-      totalParcialCotizado += item.cantidad * item.precio;
-      totalPrecioMontoActual += item.precioCantidad + item.montoUtilizadoAcumulado;
-      totalSaldo += item.montoRestante;
+      totalMontoAsignado += item.montoTotalAsignado;
+      totalMontoAcumulado += item.parcialCotizacionAcumulado;
+      totalCUSolicitado += item.precioActual;
+      totalParcialCotizado += item.cantidadActual * item.precioActual;
+      totalPrecioMontoActual += item.precioActual + item.parcialCotizacionAcumulado;
+      totalSaldo += item.montoTotalRestante;
     });
 
     worksheetData.push(["", "", "", "", "", totalMontoAsignado, "", "", totalMontoAcumulado, "", totalCUSolicitado, totalParcialCotizado, "", totalPrecioMontoActual, "", totalSaldo, response.total]);

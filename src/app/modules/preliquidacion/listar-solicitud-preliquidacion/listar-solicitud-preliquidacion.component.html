@@ -120,10 +120,10 @@
                             <mat-icon>delete</mat-icon>
                         </button>
  
-                        <button *ngIf="isSupervisor && row.cidEstado=='002'" mat-icon-button color="primary"
+                    <!--    <button *ngIf="isSupervisor && row.cidEstado=='002'" mat-icon-button color="primary"
                             (click)="aprobarSupervisor(row)" matTooltip="Aprobar" matTooltipPosition="above">
                             <mat-icon>check</mat-icon>
-                        </button>
+                        </button>-->
   
                      <button *ngIf="isSupervisor|| isResidente || isPEP" mat-icon-button color="primary" class="ml-2" (click)="analizarPreliquidacion(row)"
                             matTooltip="Analizar Preliquidacion">

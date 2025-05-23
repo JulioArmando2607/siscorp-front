@@ -56,7 +56,7 @@ export class GestionPlataformasComponent implements OnInit {
   totalElements = 0;
   pageSize = 10;
   pageIndex = 0; // Página actual
- 
+
   displayedColumns: string[] = ['item', 'cui', 'ubigeoCp', 'departamento', 'provincia', 'distrito', 'centroPoblado', 'tambo', 'estado', 'acciones'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -274,8 +274,8 @@ export class GestionPlataformasComponent implements OnInit {
     const valor = event.target.value.trim();
     if (valor.length > 2) { // Opcional: Para evitar búsquedas con pocos caracteres
       console.log('Buscando:', valor);
-     }
- 
+    }
+
   }
   onDepartamentoChange(event) {
     const departamentoSeleccionado = event.value;
@@ -366,7 +366,7 @@ export class GestionPlataformasComponent implements OnInit {
     this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");
   }
 
-  configurarUsuarios(row){
+  configurarUsuarios(row) {
     console.log('Ver detalles de:', row);
     const dialogRef = this._matDialog.open(ConfigurarPlataformaComponent, {
       autoFocus: false,
@@ -387,10 +387,13 @@ export class GestionPlataformasComponent implements OnInit {
 
   }
 
-  validarusuario(){
-    if(Session.identity.rol=='UPS-RESIDENTE-PROYECTO' || Session.identity.rol=='UPS-SUPERVISOR-PROYECTO')
-    this.isBotonesGestion= false;
-   }
+  validarusuario() {
+    if (Session.identity.rol == 'UPS-RESIDENTE-PROYECTO' || Session.identity.rol == 'UPS-SUPERVISOR-PROYECTO') {
+      this.isBotonesGestion = false;
+    } else {
+      this.isBotonesGestion = true;
+    }
+  }
   async getEstadosProyecto() {
     this.estados = []
     const oRespL = await lastValueFrom(
@@ -398,10 +401,10 @@ export class GestionPlataformasComponent implements OnInit {
     );
     this.estados = oRespL.data
   }
-  
-  agregarGastosAdicionales(data){
-    console.log('Ver detalles de: ',data);
-     const dialogRef = this._matDialog.open(AgregarGastosAdicionalesComponent, {
+
+  agregarGastosAdicionales(data) {
+    console.log('Ver detalles de: ', data);
+    const dialogRef = this._matDialog.open(AgregarGastosAdicionalesComponent, {
       autoFocus: false,
       data: {
         proyecto: cloneDeep(data),

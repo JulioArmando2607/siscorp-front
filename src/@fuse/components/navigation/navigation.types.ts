@@ -5,6 +5,7 @@ import {
 } from '@angular/router';
 
 export interface FuseNavigationItem {
+    onlyAdmin?:boolean;
     id?: string;
     title?: string;
     subtitle?: string;

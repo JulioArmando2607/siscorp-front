@@ -387,7 +387,7 @@ export class AnalizarAutorizacionGastoComponent {
       };
 
       const response = await lastValueFrom(
-        this.maestraService.solicitarAutorizacionGastoResidente(data)
+        this.maestraService.solicitarAutorizacionGasto(data)
       );
 
       if (response) {

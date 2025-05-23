@@ -44,7 +44,7 @@ import { ExcelPreliquidacionService } from 'app/modules/maestras/excel.preliquid
     MatIconModule,
     MatProgressBarModule,
     MatTooltipModule,
-    MatDatepickerModule 
+    MatDatepickerModule
   ],
 })
 export class ListarSolicitudPreliquidacionComponent {
@@ -59,12 +59,12 @@ export class ListarSolicitudPreliquidacionComponent {
     'fechaRegistro',
     //'cantidadRecursos', 
     //'total',
-     'estado', 'acciones'];
+    'estado', 'acciones'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   filterForm: UntypedFormGroup;
   dataSource: MatTableDataSource<any> = new MatTableDataSource();
- 
+
   estados: any[]
   centrosPoblados: any[]
   distritos: any[]
@@ -269,7 +269,7 @@ export class ListarSolicitudPreliquidacionComponent {
         idProyecto: this.id,
         idEstado: this.filterForm.get("estado").value,
         fecha: this.filterForm.get("fecha").value,
-       // codigo: this.filterForm.get("codigo").value
+        // codigo: this.filterForm.get("codigo").value
       }
       const oRespL = await lastValueFrom(
         this.maestraService.getListarPreliquidacion(
@@ -314,9 +314,10 @@ export class ListarSolicitudPreliquidacionComponent {
   }
 
   registrarSolicitudPreliquidacion() {
-    console.log( this.id)
+    console.log(this.id)
     localStorage.removeItem('idPreliquidacion');
     localStorage.removeItem('idValorizacionAvanceObra');
+    sessionStorage.removeItem('avanceFinancieroCargado');
 
     this._router.navigate(['preliquidacion/registrar-preliquidacion/', this.id]);
   }
@@ -342,33 +343,33 @@ export class ListarSolicitudPreliquidacionComponent {
     ]);
   }
 
-/*  async descargarAutorizacion(row) {
-    try {
-
-      const data = {
-        idAutorizacionGasto: row.idAutorizacionGasto,
-        idProyecto: this.id
+  /*  async descargarAutorizacion(row) {
+      try {
+  
+        const data = {
+          idAutorizacionGasto: row.idAutorizacionGasto,
+          idProyecto: this.id
+        }
+        const oRespL = await lastValueFrom(
+          this.maestraService.getlistarRecursosAturorizacionGasto(
+            data
+          )
+        );
+  
+        console.log(oRespL)
+        if (oRespL?.data) {
+          this.proyectos = oRespL.data;
+          this.excelService.exportToExcelAutorizaciondeGasto(oRespL.data, "AUTORIZACION DE GASTO - " + this.titulo);
+  
+          this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
+  
+          this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
+        }
+      } catch (error) {
+        console.error('Error al obtener proyectos:', error);
       }
-      const oRespL = await lastValueFrom(
-        this.maestraService.getlistarRecursosAturorizacionGasto(
-          data
-        )
-      );
-
-      console.log(oRespL)
-      if (oRespL?.data) {
-        this.proyectos = oRespL.data;
-        this.excelService.exportToExcelAutorizaciondeGasto(oRespL.data, "AUTORIZACION DE GASTO - " + this.titulo);
-
-        this.dataSource._updateChangeSubscription(); // 🔥 Refrescar tabla
-
-        this.cdr.detectChanges(); // 🔥 Asegurar actualización de la UI
-      }
-    } catch (error) {
-      console.error('Error al obtener proyectos:', error);
     }
-  }
- */
+   */
   async verProyecto(id) {
     const data = { idProyecto: id }
     const roresp = await lastValueFrom(this.maestraService.verProyecto(data))
@@ -472,7 +473,6 @@ export class ListarSolicitudPreliquidacionComponent {
     if (Session.identity.rol == 'UPS-RESIDENTE-PROYECTO') {
       this.isResidente = true;
     }
-
     // Validar Supervisor
     else if (Session.identity.rol == 'UPS-SUPERVISOR-PROYECTO') {
       this.isSupervisor = true;
@@ -481,8 +481,6 @@ export class ListarSolicitudPreliquidacionComponent {
     else if (Session.identity.rol == 'UPS-PEP-PROYECTO') {
       this.isPEP = true;
     }
-
-
     // Si no es ninguno de los anteriores, es Administrador (o cualquier otro rol general)
     else {
       this.isAdministrador = true;
@@ -499,62 +497,91 @@ export class ListarSolicitudPreliquidacionComponent {
 
 
   }
-/*
-  analizarAutorizacionGasto(row) {
-    this._router.navigate(['autorizacion-gastos/analizar-autorizacion-gasto', this.id, row.idAutorizacionGasto]);
-  } 
-    
-  editar(row) {
-    console.log(row)
-    this._router.navigate(['preliquidacion/editar-preliquidacion/', this.id, row.idPreliquidacion
+  /*
+    analizarAutorizacionGasto(row) {
+      this._router.navigate(['autorizacion-gastos/analizar-autorizacion-gasto', this.id, row.idAutorizacionGasto]);
+    } 
+      
+    editar(row) {
+      console.log(row)
+      this._router.navigate(['preliquidacion/editar-preliquidacion/', this.id, row.idPreliquidacion
+  
+      ]);
+    }*/
 
-    ]);
-  }*/
 
-
-  analizarPreliquidacion(row){
+  analizarPreliquidacion(row) {
     this._router.navigate(['preliquidacion/analisar-preliquidacion/', this.id, row.idPreliquidacion]);
   }
 
   async export26(row) {
-    const data = {
-      idAutorizacionGasto: row.idAutorizacionGasto,
-      idProyecto: row.idProyecto
+    try {
+      const { idProyecto, idPreliquidacion } = row;
+
+      const { data: valorizacion } = await lastValueFrom(
+        this.maestraService.optnerValorizacionAvanceObra({ idProyecto, idPreliquidacion })
+      );
+
+      const { data: analisis } = await lastValueFrom(
+        this.maestraService.listaAnalisisPartidadPreliquidacion({
+          idProyecto,
+          idPreliquidacion,
+          idValorizacionObra: valorizacion?.idValorizacionAvanceObra
+        })
+      );
+      console.log(analisis)
+      this.excelService.export26(analisis || []);
+    } catch (e) {
+      console.error("Error exportando:", e);
     }
-   /* const response = await this.maestraService.anexo23AutorizacionGasto(data).toPromise();
-    const dataExcel = {
-      row: row,
-      response: response.data.response
-    } */
-   let prueba =[]
-    this.excelService.export26(prueba)
-
   }
- 
 
+  /* const data = {
+          // idAutorizacionGasto: this.idAutorizacionGasto,
+          idPreliquidacion: this.idPreliquidacion,
+          idValorizacionObra: this.idValorizacionAvanceObra,
+          idProyecto: this.idProyecto
+        }
+        let oRespL: any
+        if(this.isResidente){
+            oRespL = await lastValueFrom(
+            this.maestraService.listaPartidadPreliquidacion(
+              data
+            )
+          );
+        } else {
+          oRespL = await lastValueFrom(
+            this.maestraService.listaAnalisisPartidadPreliquidacion(
+              data
+            )
+          ); */
   async export28(row) {
-    const data = {
-      idAutorizacionGasto: row.idAutorizacionGasto,
-      idProyecto: row.idProyecto
+    try {
+      const data = {
+        idPreliquidacion: row.idPreliquidacion,
+        idProyecto: row.idProyecto
+      }
+      const oRespL = await lastValueFrom(
+        this.maestraService.listarAvanceFinancieroAsignado(
+          data
+        )
+      );
+      console.log(oRespL.data)
+      this.excelService.exportAnexo28(oRespL.data)
+    } catch (error) {
+      console.error('Error al obtener proyectos:', error);
     }
-   /* const response = await this.maestraService.anexo23AutorizacionGasto(data).toPromise();
-    const dataExcel = {
-      row: row,
-      response: response.data.response
-    } */
-   let prueba =[]
-    this.excelService.exportAnexo28(prueba)
 
   }
- async descargarExcelProyecto() {
+  async descargarExcelProyecto() {
     /*  const roresp = await lastValueFrom(this.maestraService.listarPlataformasExcel(this.filterForm.getRawValue(),
     ))
 
     console.log(roresp)
     this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");*/
-  } 
- 
-  
+  }
+
+
 
 
 

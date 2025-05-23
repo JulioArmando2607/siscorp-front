@@ -94,12 +94,12 @@
                   <th mat-header-cell *matHeaderCellDef> VALOR EJECUCIÓN</th>
                   <td mat-cell *matCellDef="let row"> {{ row.porcentajeAcumulado }} </td>
                 </ng-container>
-
+<!-- (ngModelChange)="recalcularTotalmontos(row)"-->
                 <ng-container matColumnDef="metrado">
                   <th mat-header-cell *matHeaderCellDef> METRADO </th>
                   <td mat-cell *matCellDef="let row">
                     <input *ngIf="row.orden > 0" matInput type="number" [(ngModel)]="row.metrado"
-                      [ngModelOptions]="{standalone: true}" (ngModelChange)="recalcularTotalmontos(row)"
+                      [ngModelOptions]="{standalone: true}"
                       class="w-full px-2 py-1 border rounded" />
                   </td>
                 </ng-container>
@@ -108,7 +108,7 @@
                   <th mat-header-cell *matHeaderCellDef> VALOR </th>
                   <td mat-cell *matCellDef="let row">
                     <input *ngIf="row.orden > 0" matInput type="number" [(ngModel)]="row.valor"
-                      [ngModelOptions]="{standalone: true}" (ngModelChange)="recalcularTotalmontos(row)"
+                      [ngModelOptions]="{standalone: true}" (blur)="recalcularTotalmontos(row)"
                       class="w-full px-2 py-1 border rounded" />
                   </td>
                 </ng-container>

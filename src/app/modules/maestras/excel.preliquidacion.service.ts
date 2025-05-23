@@ -12,7 +12,7 @@ import * as XLSX from 'xlsx-js-style';
 export class ExcelPreliquidacionService {
   constructor() { }
 
-  export26(response: any): void {
+  export26(analisis: any): void {
     const worksheetData: any[][] = [];
     // CABECERA
     worksheetData.push([]); // fila vacía para mejor centrado
@@ -63,63 +63,25 @@ export class ExcelPreliquidacionService {
     // DATOS DE INSUMOS
     const safeDivide = (numerador: number, denominador: number): number =>
       denominador && denominador !== 0 ? numerador / denominador : 0;
-    let prueba = [
-      {
-        nombreRecurso: "Cemento",
-        unidad: "bolsa",
-        cantidadAsignado: 100,
-        montoAsignado: 1500,
-        cantidadUtilizadoAcumulado: 60,
-        montoUtilizadoAcumulado: 900,
-        cantidad: 20,
-        precio: 15,
-        precioCantidad: 300, // cantidad * precio (20 * 15)
-        cantidadRestante: 20,
-        montoRestante: 300
-      },
-      {
-        nombreRecurso: "Arena",
-        unidad: "m3",
-        cantidadAsignado: 50,
-        montoAsignado: 1000,
-        cantidadUtilizadoAcumulado: 30,
-        montoUtilizadoAcumulado: 600,
-        cantidad: 10,
-        precio: 20,
-        precioCantidad: 200, // cantidad * precio (10 * 20)
-        cantidadRestante: 10,
-        montoRestante: 200
-      }
-    ];
 
-    //  response.response.
-    prueba.forEach((item: any, index: number) => {
+    analisis.forEach((item: any, index: number) => {
       worksheetData.push([
-        index + 1, item.nombreRecurso,
+        item.codigo,
+        item.descripcion,
         item.unidad,
-        item.cantidadAsignado,
-        //item.montoAsignado/item.cantidadAsignado, 
-        safeDivide(item.montoAsignado, item.cantidadAsignado),
-
-        item.montoAsignado,
-        item.cantidadUtilizadoAcumulado,
-        safeDivide(item.montoUtilizadoAcumulado, item.cantidadUtilizadoAcumulado),
-        //item.montoUtilizadoAcumulado/item.cantidadUtilizadoAcumulado, 
-        item.montoUtilizadoAcumulado,
-
-        item.cantidad, item.precio, item.cantidad * item.precio,
-        item.cantidad + item.cantidadUtilizadoAcumulado, item.precioCantidad + item.montoUtilizadoAcumulado,
-        item.cantidadRestante, item.montoRestante
+        item.cantidad, item.costoUnitario, item.precioParcial, //6
+        item.metradoAnterior, item.valorAnterior,
+        item.metrado, item.totalCalculadoActual,
+        item.metradoAcumulado, item.acumulado, item.porcentajeAcumulado,
+        ((+item.cantidad) - ((+item.metradoAcumulado))),
+        ((+item.precioParcial) - ((+item.acumulado))),
+        0
+        /* */
       ]);
-      totalMontoAsignado += item.montoAsignado;
-      totalMontoAcumulado += item.montoUtilizadoAcumulado;
-      totalCUSolicitado += item.precio;
-      totalParcialCotizado += item.cantidad * item.precio;
-      totalPrecioMontoActual += item.precioCantidad + item.montoUtilizadoAcumulado;
-      totalSaldo += item.montoRestante;
+
     });
 
-    worksheetData.push(["", "COSTO DIRECTO AVANCE FISICO %", "", "", "", totalMontoAsignado, "", "", totalMontoAcumulado, "", totalCUSolicitado, totalParcialCotizado, "", totalPrecioMontoActual, "", totalSaldo, response.total]);
+    worksheetData.push(["", "COSTO DIRECTO AVANCE FISICO %", "", "", "", totalMontoAsignado, "", "", totalMontoAcumulado, "", totalCUSolicitado, totalParcialCotizado, "", totalPrecioMontoActual, "", totalSaldo]);
     worksheetData.push([]);
     worksheetData.push([]);
     worksheetData.push([]);
@@ -295,288 +257,18 @@ export class ExcelPreliquidacionService {
     return isNaN(num) ? 0 : num;
   }
   exportAnexo28(response): void {
-    response = {
-      "data": {
-        "codResultado": 200,
-        "msgResultado": "",
-        "total": null,
-        "response": {
-          "rubro": [
-            {
-              "item": "1.1",
-              "gastoAutorizadoActual": 12,
-              "gastoEfectuadoAcumulado": "5.0000",
-              "nombreRubro": "Materiales",
-              "precioUnitario": 4,
-              "cantidad": 3,
-              "valorFinanciado": "3860.9200",
-              "gastoEfectuadoPorcentaje": "0.129502",
-              "gastoAutorizadoPorcentaje": "0.310806"
-            }
-          ],
-          "listaAutorizacionesGasto": [
-            {
-              "item": 1,
-              "cantidadRecursos": 1,
-              "codigoAutorizacionGasto": 1309,
-              "idAutorizacionGasto": 1309,
-              "cantidadRestante": null,
-              "cidEstado": "001",
-              "nombreEstado": "REGISTRADO",
-              "total": 1,
-              "cantidadAsignado": null,
-              "idEstado": 1,
-              "idProyecto": 7110,
-              "observacion": null,
-              "montoParcial": 1,
-              "fechaRegistro": "2025-05-18",
-              "montoAcumuladoR": 0,
-              "saldoAntesDeAG": 0
-            },
-            {
-              "item": 2,
-              "cantidadRecursos": 1,
-              "codigoAutorizacionGasto": 1310,
-              "idAutorizacionGasto": 1310,
-              "cantidadRestante": null,
-              "cidEstado": "002",
-              "nombreEstado": "SOLICITADO A SUPERVISOR",
-              "total": 1,
-              "cantidadAsignado": null,
-              "idEstado": 3,
-              "idProyecto": 7110,
-              "observacion": "Solicitar Autorización de Gasto desde el Residente",
-              "montoParcial": 1,
-              "fechaRegistro": "2025-05-18",
-              "montoAcumuladoR": 0,
-              "saldoAntesDeAG": 0
-            },
-            {
-              "item": 3,
-              "cantidadRecursos": 1,
-              "codigoAutorizacionGasto": 1311,
-              "idAutorizacionGasto": 1311,
-              "cantidadRestante": null,
-              "cidEstado": "002",
-              "nombreEstado": "SOLICITADO A SUPERVISOR",
-              "total": 1,
-              "cantidadAsignado": null,
-              "idEstado": 3,
-              "idProyecto": 7110,
-              "observacion": "Solicitar Autorización de Gasto desde el Residente",
-              "montoParcial": 1,
-              "fechaRegistro": "2025-05-18",
-              "montoAcumuladoR": 0,
-              "saldoAntesDeAG": 0
-            },
-            {
-              "item": 4,
-              "cantidadRecursos": 1,
-              "codigoAutorizacionGasto": 1312,
-              "idAutorizacionGasto": 1312,
-              "cantidadRestante": null,
-              "cidEstado": "002",
-              "nombreEstado": "SOLICITADO A SUPERVISOR",
-              "total": 2,
-              "cantidadAsignado": null,
-              "idEstado": 3,
-              "idProyecto": 7110,
-              "observacion": "Solicitar Autorización de Gasto desde el Residente",
-              "montoParcial": 2,
-              "fechaRegistro": "2025-05-18",
-              "montoAcumuladoR": 0,
-              "saldoAntesDeAG": 0
-            },
-            {
-              "item": 5,
-              "cantidadRecursos": 1,
-              "codigoAutorizacionGasto": 1313,
-              "idAutorizacionGasto": 1313,
-              "cantidadRestante": null,
-              "cidEstado": "002",
-              "nombreEstado": "SOLICITADO A SUPERVISOR",
-              "total": 12,
-              "cantidadAsignado": null,
-              "idEstado": 3,
-              "idProyecto": 7110,
-              "observacion": "Solicitar Autorización de Gasto desde el Residente",
-              "montoParcial": 12,
-              "fechaRegistro": "2025-05-19",
-              "montoAcumuladoR": 0,
-              "saldoAntesDeAG": 0
-            }
-          ],
-          "listamontosValorFinanciadoAG": [
-            {
-              "porcentaje": null,
-              "idAutorizacionGasto": null,
-              "idControlMonitoreo": 46,
-              "observaciones": null,
-              "monto": 12,
-              "actual": "0.00",
-              "acumulado": 0,
-              "porcentajeActual": 0,
-              "porcentajeAcumulado": 0,
-              "idProyecto": null,
-              "restante": "12.00",
-              "idControlMonitoreoProyecto": 329,
-              "cidControlMonitoreo": "001",
-              "nombreMontoRubroAdicionales": "MONTO DE CONVENIO"
-            },
-            {
-              "porcentaje": null,
-              "idAutorizacionGasto": null,
-              "idControlMonitoreo": 47,
-              "observaciones": null,
-              "monto": 12,
-              "actual": "0.00",
-              "acumulado": 0,
-              "porcentajeActual": 0,
-              "porcentajeAcumulado": 0,
-              "idProyecto": null,
-              "restante": "12.00",
-              "idControlMonitoreoProyecto": 330,
-              "cidControlMonitoreo": "002",
-              "nombreMontoRubroAdicionales": "MONTO AMPLIACIÓN PRESUPUESTAL"
-            },
-            {
-              "porcentaje": null,
-              "idAutorizacionGasto": null,
-              "idControlMonitoreo": 48,
-              "observaciones": null,
-              "monto": 12,
-              "actual": "0.00",
-              "acumulado": 0,
-              "porcentajeActual": 0,
-              "porcentajeAcumulado": 0,
-              "idProyecto": null,
-              "restante": "12.00",
-              "idControlMonitoreoProyecto": 331,
-              "cidControlMonitoreo": "003",
-              "nombreMontoRubroAdicionales": "MONTO TOTAL FINANCIADO"
-            },
-            {
-              "porcentaje": null,
-              "idAutorizacionGasto": null,
-              "idControlMonitoreo": 49,
-              "observaciones": null,
-              "monto": 12,
-              "actual": "0.00",
-              "acumulado": 0,
-              "porcentajeActual": 0,
-              "porcentajeAcumulado": 0,
-              "idProyecto": null,
-              "restante": "-211.00",
-              "idControlMonitoreoProyecto": 332,
-              "cidControlMonitoreo": "004",
-              "nombreMontoRubroAdicionales": "GASTOS GENERALES"
-            },
-            {
-              "porcentaje": null,
-              "idAutorizacionGasto": null,
-              "idControlMonitoreo": 50,
-              "observaciones": null,
-              "monto": 12,
-              "actual": "0.00",
-              "acumulado": 0,
-              "porcentajeActual": 0,
-              "porcentajeAcumulado": 0,
-              "idProyecto": null,
-              "restante": "-2320.00",
-              "idControlMonitoreoProyecto": 333,
-              "cidControlMonitoreo": "005",
-              "nombreMontoRubroAdicionales": "GASTOS DE RESIDENTE"
-            },
-            {
-              "porcentaje": null,
-              "idAutorizacionGasto": null,
-              "idControlMonitoreo": 51,
-              "observaciones": null,
-              "monto": 12,
-              "actual": "2.00",
-              "acumulado": 3,
-              "porcentajeActual": 16.67,
-              "porcentajeAcumulado": 12.5,
-              "idProyecto": null,
-              "restante": "7.00",
-              "idControlMonitoreoProyecto": 334,
-              "cidControlMonitoreo": "006",
-              "nombreMontoRubroAdicionales": "COSTOS FINANCIERO"
-            },
-            {
-              "porcentaje": null,
-              "idAutorizacionGasto": null,
-              "idControlMonitoreo": 52,
-              "observaciones": null,
-              "monto": 12,
-              "actual": "0.00",
-              "acumulado": 0,
-              "porcentajeActual": 0,
-              "porcentajeAcumulado": 0,
-              "idProyecto": null,
-              "restante": "12.00",
-              "idControlMonitoreoProyecto": 335,
-              "cidControlMonitoreo": "007",
-              "nombreMontoRubroAdicionales": "GASTOS DE N.E."
-            },
-            {
-              "porcentaje": null,
-              "idAutorizacionGasto": null,
-              "idControlMonitoreo": 53,
-              "observaciones": null,
-              "monto": 222,
-              "actual": "0.00",
-              "acumulado": 0,
-              "porcentajeActual": 0,
-              "porcentajeAcumulado": 0,
-              "idProyecto": null,
-              "restante": "222.00",
-              "idControlMonitoreoProyecto": 336,
-              "cidControlMonitoreo": "008",
-              "nombreMontoRubroAdicionales": "INTERESES"
-            },
-            {
-              "porcentaje": null,
-              "idAutorizacionGasto": null,
-              "idControlMonitoreo": 54,
-              "observaciones": null,
-              "monto": 2,
-              "actual": "0.00",
-              "acumulado": 0,
-              "porcentajeActual": 0,
-              "porcentajeAcumulado": 0,
-              "idProyecto": null,
-              "restante": "2.00",
-              "idControlMonitoreoProyecto": 337,
-              "cidControlMonitoreo": "009",
-              "nombreMontoRubroAdicionales": "GASTOS DE SUPERVISION"
-            }
-          ],
-          "total": null,
-          "nroAutorizacionGasto": 5,
-          "totalEnLetras": null
-        },
-        "objeto": null,
-        "aerror": null
-      }
-    }
 
     console.log(Session.identity.name)
-    const v001 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "001");
-
-    // console.log(response.data.response.listamontosValorFinanciadoAG.);
-
-    console.log(v001);
-
-    const v002 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "002");
-    const v003 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "003");
-    const v004 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "004");
-    const v005 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "005");
-    const v006 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "006");
-    const v007 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "007");
-    const v008 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "008");
-    const v009 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "009");
-
+    /*     const v001 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "001"); 
+        const v002 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "002");
+        const v003 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "003");
+        const v004 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "004");
+        const v005 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "005");
+        const v006 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "006");
+        const v007 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "007");
+        const v008 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "008");
+        const v009 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "009");
+     */
 
     const worksheetData: any[][] = [];
     // ---------- TÍTULO PRINCIPAL ----------
@@ -593,43 +285,45 @@ export class ExcelPreliquidacionService {
 
     worksheetData.push(["", "", "", "", "", ""]);
     worksheetData.push([""]);
-    worksheetData.push(["", "", "MONTO DE CONVENIO", "", "", `S/. ${v001.monto}`, "", "", "Entidad"]);
-    worksheetData.push(["", "", "MONTO AMPLIACIÓN PRESUPUESTAL", "", "", `S/. ${v002.monto}`, "", "", ""]);
-    worksheetData.push(["", "", "MONTO TOTAL FINANCIADO", "", "", `S/. ${v003.monto}`, "", "", ""]);
+    worksheetData.push(["", "", "MONTO DE CONVENIO", "", "", `S/. 0`, "", "", "Entidad"]);
+    worksheetData.push(["", "", "MONTO AMPLIACIÓN PRESUPUESTAL", "", "", `S/. 0`, "", "", ""]);
+    worksheetData.push(["", "", "MONTO TOTAL FINANCIADO", "", "", `S/. 0`, "", "", ""]);
     worksheetData.push(["", "", "", "", "", "", "", "", "Número de Cuenta de Ahorros:"]);
 
+    /*    worksheetData.push(["", "", "MONTO DE CONVENIO", "", "", `S/. ${v001.monto}`, "", "", "Entidad"]);
+    worksheetData.push(["", "", "MONTO AMPLIACIÓN PRESUPUESTAL", "", "", `S/. ${v002.monto}`, "", "", ""]);
+    worksheetData.push(["", "", "MONTO TOTAL FINANCIADO", "", "", `S/. ${v003.monto}`, "", "", ""]);
+    worksheetData.push(["", "", "", "", "", "", "", "", "Número de Cuenta de Ahorros:"]); */
 
     // ---------- CUADRO DE PRE ----------
     worksheetData.push(["DESEMBOLSO", "FECHA", "COMPROBANTE DE PAGO", "IMPORTE", "NTERESES", "MONTO TOTAL", "", "", ""]);
     const primeraTablaCominenza = worksheetData.length;
 
-    let totalMontoAcumulado = 0;
-    response.data.response.listaAutorizacionesGasto.forEach(rubro => {
-      worksheetData.push([
-        "",
-        rubro.item,
-        rubro.fechaRegistro,
-        rubro.montoParcial,
-        rubro.montoAcumuladoR,
-        rubro.saldoAntesDeAG
-      ]);
-      totalMontoAcumulado += rubro.montoAcumuladoR;//`FECHA: ${fechaFormateada}`
-    });
+    /*   let totalMontoAcumulado = 0;
+       response.data.response.listaAutorizacionesGasto.forEach(rubro => {
+         worksheetData.push([
+           "",
+           rubro.item,
+           rubro.fechaRegistro,
+           rubro.montoParcial,
+           rubro.montoAcumuladoR,
+           rubro.saldoAntesDeAG
+         ]);
+         totalMontoAcumulado += rubro.montoAcumuladoR;//`FECHA: ${fechaFormateada}`
+       }); */
     const primeraTablaTermina = worksheetData.length;
 
+    //worksheetData.push(["", "", "", "Total Autorizado (S/.)", totalMontoAcumulado, ""]);
+    worksheetData.push(["", ""]);
 
-
-
-    worksheetData.push(["", "", "", "Total Autorizado (S/.)", totalMontoAcumulado, ""]);
     worksheetData.push([]);
     const startEncabezado = worksheetData.length;
 
     console.log(startEncabezado)
 
-
     // ---------- ENCABEZADO TABLA PRINCIPAL ----------
     worksheetData.push([
-      "ITEM", "RUBROS", "VALOR FINANCIADO (S/.)",
+      "ITEM", "RUBRO", "VALOR FINANCIADO (S/.)",
       "GASTOS EFECTUADOS\n(según documentos aprobatorios)", "",
       "GASTOS EFECTUADOS ACUMULADOS", "",
       "OBSERVACIONES"
@@ -646,73 +340,46 @@ export class ExcelPreliquidacionService {
     let gastoAutorizadoPorcentaje = 0;    // 1. Calcula el total
     let gastoEfectuadoAcumulado = 0;    // 1. Calcula el total
     let gastoEfectuadoPorcentaje = 0;
-    response.data.response.rubro.forEach((rubro: any) => {
-      costoDirecto += +rubro.valorFinanciado; // suma convertido a número
-      cdgastoAutorizadoActual += +rubro.gastoAutorizadoActual; // suma convertido a número
-      gastoAutorizadoPorcentaje += +rubro.gastoAutorizadoPorcentaje; // suma convertido a número //Qquiero q sea dicivdo por la cantidad del arregle
-      gastoEfectuadoAcumulado += +rubro.gastoEfectuadoAcumulado;
-      gastoEfectuadoPorcentaje += +rubro.gastoEfectuadoPorcentaje;
-    });
+    /*    response.data.response.rubro.forEach((rubro: any) => {
+          costoDirecto += +rubro.valorFinanciado; // suma convertido a número
+          cdgastoAutorizadoActual += +rubro.gastoAutorizadoActual; // suma convertido a número
+          gastoAutorizadoPorcentaje += +rubro.gastoAutorizadoPorcentaje; // suma convertido a número //Qquiero q sea dicivdo por la cantidad del arregle
+          gastoEfectuadoAcumulado += +rubro.gastoEfectuadoAcumulado;
+          gastoEfectuadoPorcentaje += +rubro.gastoEfectuadoPorcentaje;
+        }); */
 
     // 2. Agrega fila resumen
-    worksheetData.push([
-      "1.0", "COSTO DIRECTO", costoDirecto, cdgastoAutorizadoActual, (gastoAutorizadoPorcentaje) / response.data.response.rubro.length, gastoEfectuadoAcumulado, (gastoEfectuadoPorcentaje) / response.data.response.rubro.length, ""
-    ]);
 
+    /*{
+        "codigo": "1",
+        "idPreliquidacion": null,
+        "idControlAvanceFinancieroProyecto": null,
+        "acumulado": 0,
+        "nombreControlAvanceFinanciero": "COSTO DIRECTO",
+        "porcentajeAcumulado": null,
+        "idControlAvanceFinanciero": 55,
+        "montoAsignado": null,
+        "avanceActual": 0,
+        "ejecucionPorcentaje": null,
+        "cidControlAvanceFinanciero": "001"
+    } */
 
-    response.data.response.rubro.forEach((rubro: any) => {
+    response.forEach((rubro: any) => {
       worksheetData.push([
-        rubro.item,
-        rubro.nombreRubro,
-        rubro.valorFinanciado,
-        rubro.gastoAutorizadoActual,
-        rubro.gastoAutorizadoPorcentaje,
-        rubro.gastoEfectuadoAcumulado,
-        rubro.gastoEfectuadoPorcentaje,
+        rubro.codigo,
+        rubro.nombreControlAvanceFinanciero,
+        rubro.montoAsignado,
+        rubro.avanceActual,
+        rubro.ejecucionPorcentaje,
+        rubro.acumulado,
+        rubro.porcentajeAcumulado,
         "",
       ]);
     });
-
-
     worksheetData.push([
-      "2.0", "GASTOS GENERALES", v004.monto, v004.actual, v004.porcentajeActual, v004.acumulado, v004.porcentajeAcumulado, ""
+      "TOTAL INVERSION", "", "", "", "", "", "", ""
     ]);
-    worksheetData.push([
-      "3.0", "GASTOS DE RESIDENTE", v005.monto, v005.actual, v005.porcentajeActual, v005.acumulado, v005.porcentajeAcumulado, ""
-    ]);
-    worksheetData.push([
-      "4.0", "COSTOS FINANCIEROS", v006.monto, v006.actual, v006.porcentajeActual, v006.acumulado, v006.porcentajeAcumulado, ""
-    ]);
-
-    worksheetData.push([
-      "5.0", "GASTOS DE N.E.", v007.monto, v007.actual, v007.porcentajeActual, v007.acumulado, v007.porcentajeAcumulado, ""
-    ]);
-
-    worksheetData.push([
-      "6.0", "INTERESES", v008.monto, v008.actual, v008.porcentajeActual, v008.acumulado, v008.porcentajeAcumulado, ""
-    ]);
-
-    let subtotalInversion1 = this.toNumber(costoDirecto) + this.toNumber(v004.monto) + this.toNumber(v005.monto) + this.toNumber(v006.monto) + this.toNumber(v007.monto) + this.toNumber(v008.monto);
-    let subtotalInversion2 = this.toNumber(cdgastoAutorizadoActual) + this.toNumber(v004.actual) + this.toNumber(v005.actual) + this.toNumber(v006.actual) + this.toNumber(v007.actual) + this.toNumber(v008.actual);
-    let subtotalInversion3 = this.toNumber(gastoAutorizadoPorcentaje) + this.toNumber(v004.porcentajeActual) + this.toNumber(v005.porcentajeActual) + this.toNumber(v006.porcentajeActual) + this.toNumber(v007.porcentajeActual) + this.toNumber(v008.porcentajeActual);
-    let subtotalInversion4 = this.toNumber(gastoEfectuadoAcumulado) + this.toNumber(v004.acumulado) + this.toNumber(v005.acumulado) + this.toNumber(v006.acumulado) + this.toNumber(v007.acumulado) + this.toNumber(v008.acumulado);
-    let subtotalInversion5 = this.toNumber(gastoEfectuadoPorcentaje) + this.toNumber(v004.porcentajeAcumulado) + this.toNumber(v005.porcentajeAcumulado) + this.toNumber(v006.porcentajeAcumulado) + this.toNumber(v007.porcentajeAcumulado) + this.toNumber(v008.porcentajeAcumulado);
-
-    worksheetData.push([
-      "SUB TOTAL INVERSION", "", subtotalInversion1, subtotalInversion2, subtotalInversion3, subtotalInversion4, subtotalInversion5, ""
-    ]);
-
-    worksheetData.push([
-      "7.0", "GASTOS DE", v009.monto, v009.actual, v009.porcentajeActual, v009.acumulado, v009.porcentajeAcumulado, ""
-    ]);
-    worksheetData.push([
-      "8", "GASTOS DE SUPERVISION", v009.monto, v009.actual, v009.porcentajeActual, v009.acumulado, v009.porcentajeAcumulado, ""
-    ]);
-
-    worksheetData.push([
-      "TOTAL INVERSION", "", subtotalInversion1 + v009.monto, subtotalInversion2 + v009.actual, subtotalInversion3 + v009.porcentajeActual, subtotalInversion4 + v009.acumulado, subtotalInversion5 + v009.porcentajeAcumulado, ""
-    ]);
-
+ 
     // ---------- NOTAS Y FIRMAS ----------
     worksheetData.push(["(*) ESPECIFICAR:", "", "", "", "", "", "", ""]);
     worksheetData.push([]);
@@ -760,12 +427,13 @@ export class ExcelPreliquidacionService {
       { s: { r: startEncabezado, c: 1 }, e: { r: startEncabezado + 1, c: 1 } },
       { s: { r: startEncabezado, c: 2 }, e: { r: startEncabezado + 1, c: 2 } },
 
-      { s: { r: worksheetData.length - 17, c: 0 }, e: { r: worksheetData.length - 17, c: 1 } },
+      { s: { r: worksheetData.length - 10, c: 0 }, e: { r: worksheetData.length - 9, c: 7 } } 
+ /*     { s: { r: worksheetData.length - 17, c: 0 }, e: { r: worksheetData.length - 17, c: 1 } },
       // { s: { r: worksheetData.length - 15, c: 0 }, e: { r: worksheetData.length - 15, c: 1 } },
       { s: { r: worksheetData.length - 14, c: 0 }, e: { r: worksheetData.length - 14, c: 1 } },
       { s: { r: worksheetData.length - 13, c: 0 }, e: { r: worksheetData.length - 13, c: 1 } },
       { s: { r: worksheetData.length - 12, c: 0 }, e: { r: worksheetData.length - 12, c: 7 } },
-      { s: { r: worksheetData.length - 10, c: 0 }, e: { r: worksheetData.length - 9, c: 7 } },
+      { s: { r: worksheetData.length - 10, c: 0 }, e: { r: worksheetData.length - 9, c: 7 } }, */
       //{ s: { r: worksheetData.length - 9, c: 0 }, e: { r: worksheetData.length - 9, c: 7 } },
 
     ];
@@ -868,7 +536,7 @@ export class ExcelPreliquidacionService {
     const worksheetData: any[][] = [];
     // CABECERA
     worksheetData.push([]); // fila vacía para mejor centrado
-    worksheetData.push(["ANEXO N° 29: MANIFIESTO DE GASTO","", "", "", "", ]);
+    worksheetData.push(["ANEXO N° 29: MANIFIESTO DE GASTO", "", "", "", "",]);
     worksheetData.push([]);
     worksheetData.push([]);
     worksheetData.push(["PROYECTO", '', '', '', '', '', '', '', '', '', '']);
@@ -888,61 +556,27 @@ export class ExcelPreliquidacionService {
       "", "FECHA", "CLASE(***)", "N°", "RAZON SOCIAL O NOMBRE", "CONCEPTO", "", ""
     ]);
 
-    let totalMontoAsignado = 0;
-    let totalMontoAcumulado = 0;
-    let totalCUSolicitado = 0;
-    let totalParcialCotizado = 0;
-    let totalPrecioMontoActual = 0
-    let totalSaldo = 0
+    let totalImporte = 0; 
     // DATOS DE INSUMOS
     const safeDivide = (numerador: number, denominador: number): number =>
       denominador && denominador !== 0 ? numerador / denominador : 0;
-    let prueba = [
-      {
-        nombreRecurso: "Cemento",
-        unidad: "bolsa",
-        cantidadAsignado: 100,
-        montoAsignado: 1500,
-        cantidadUtilizadoAcumulado: 60,
-        montoUtilizadoAcumulado: 900,
-        cantidad: 20,
-        precio: 15,
-      },
-      {
-        nombreRecurso: "Arena",
-        unidad: "m3",
-        cantidadAsignado: 50,
-        montoAsignado: 1000,
-        cantidadUtilizadoAcumulado: 30,
-        montoUtilizadoAcumulado: 600,
-        cantidad: 10,
-        precio: 20,
-
-      }
-    ];
-
+   
     //  response.response.
-    prueba.forEach((item: any, index: number) => {
+    response.forEach((item: any, index: number) => {
       worksheetData.push([
         index + 1,
-        item.nombreRecurso,
-        item.unidad,
-        item.cantidadAsignado,
-        safeDivide(item.montoAsignado, item.cantidadAsignado),
-        item.montoAsignado,
-        item.cantidadUtilizadoAcumulado,
-        safeDivide(item.montoUtilizadoAcumulado, item.cantidadUtilizadoAcumulado),
-
+        item.fecha,
+        item.claseDocumento,
+        item.numeroDocumento,
+        item.razonSocial,
+        item.concepto,
+        item.importe,
+        item.observaciones 
       ]);
-      totalMontoAsignado += item.montoAsignado;
-      totalMontoAcumulado += item.montoUtilizadoAcumulado;
-      totalCUSolicitado += item.precio;
-      totalParcialCotizado += item.cantidad * item.precio;
-      totalPrecioMontoActual += item.precioCantidad + item.montoUtilizadoAcumulado;
-      totalSaldo += item.montoRestante;
+      totalImporte += (+item.importe) 
     });
 
-    worksheetData.push(["", "", "", "", "", "TOTAL:", "", ""]);
+    worksheetData.push(["", "", "", "", "", "TOTAL:", totalImporte, ""]);
     worksheetData.push([]);
 
     worksheetData.push(["Por el presente, los abajo firmantes declaramos bajo juramento que los gastos aquí detallados, están previstos en el Presupuesto Aprobado del componente(s) del Objeto del Convenio y han sido utilizados, en su integridad, en la ejecución de la obra."]);
@@ -959,100 +593,32 @@ export class ExcelPreliquidacionService {
     const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
     worksheet['!merges'] = [
-      //ANEXO N° 26: VALORIZACIÓN DEL AVANCE DE OBRA
-
       { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
       { s: { r: 4, c: 0 }, e: { r: 4, c: 2 } },
       { s: { r: 5, c: 0 }, e: { r: 5, c: 2 } },
       { s: { r: 6, c: 0 }, e: { r: 6, c: 2 } },
       { s: { r: 7, c: 0 }, e: { r: 7, c: 2 } },
       { s: { r: 9, c: 0 }, e: { r: 9, c: 2 } },
-
       { s: { r: 4, c: 3 }, e: { r: 4, c: 7 } },
       { s: { r: 5, c: 3 }, e: { r: 5, c: 7 } },
       { s: { r: 6, c: 3 }, e: { r: 6, c: 7 } },
       { s: { r: 7, c: 3 }, e: { r: 7, c: 7 } },
       { s: { r: 9, c: 3 }, e: { r: 9, c: 7 } },
-
       { s: { r: 12, c: 0 }, e: { r: 13, c: 0 } },
       { s: { r: 12, c: 1 }, e: { r: 12, c: 3 } },
-
       { s: { r: 12, c: 4 }, e: { r: 12, c: 5 } },
-
       { s: { r: 12, c: 6 }, e: { r: 13, c: 6 } },
       { s: { r: 12, c: 7 }, e: { r: 13, c: 7 } },
-
-      //{ s: { r: 12, c: 7 }, e: { r: 13, c: 7} },
- 
       { s: { r: totalRowIndex - 1, c: 0 }, e: { r: totalRowIndex - 1, c: 1 } },
       { s: { r: totalRowIndex - 2, c: 0 }, e: { r: totalRowIndex - 2, c: 1 } },
-
-      
       { s: { r: totalRowIndex - 1, c: 2 }, e: { r: totalRowIndex - 1, c: 3 } },
       { s: { r: totalRowIndex - 2, c: 2 }, e: { r: totalRowIndex - 2, c: 3 } },
-
       { s: { r: totalRowIndex - 1, c: 4 }, e: { r: totalRowIndex - 1, c: 5 } },
       { s: { r: totalRowIndex - 2, c: 4 }, e: { r: totalRowIndex - 2, c: 5 } },
-
       { s: { r: totalRowIndex - 1, c: 6 }, e: { r: totalRowIndex - 1, c: 7 } },
       { s: { r: totalRowIndex - 2, c: 6 }, e: { r: totalRowIndex - 2, c: 7 } },
-
-      { s: { r: totalRowIndex - 7, c: 0 }, e: { r: totalRowIndex - 7, c: 7 } },
-   //   { s: { r: totalRowIndex - 5, c: 0 }, e: { r: totalRowIndex - 4, c: 7 } },
-
-      //{ s: { r: totalRowIndex - 1, c: 2 }, e: { r: totalRowIndex - 1, c: 1 } },
-     // { s: { r: totalRowIndex - 1, c:  }, e: { r: totalRowIndex - 1, c: 1 } },
-     // { s: { r: totalRowIndex - 1, c: 0 }, e: { r: totalRowIndex - 1, c: 1 } },
-
-      //{ s: { r: 12, c: 6 }, e: { r: 12, c: 6} },
-
-      // { s: { r: 12, c: 5 }, e: { r: 13, c: 5} },
-
-      /*  { s: { r: 1, c: 4 }, e: { r: 1, c: 11 } },
-        //VALORIZACIÓN DEL AVANCE DE OBRA N: .................
-        { s: { r: 3, c: 4 }, e: { r: 3, c: 11 } },
-        //AL..../..../....
-        { s: { r: 5, c: 7 }, e: { r: 5, c: 11 } },
-        //CONVENIO N°
-        { s: { r: 7, c: 1 }, e: { r: 7, c: 7 } },
-        //PROYECTO
-        { s: { r: 9, c: 1 }, e: { r: 9, c: 9 } },
-        ////CORRESPONDIENTE AL MES DE
-        { s: { r: 7, c: 11 }, e: { r: 7, c: 13 } },
-        { s: { r: 8, c: 11 }, e: { r: 8, c: 13 } },
-        { s: { r: 9, c: 11 }, e: { r: 9, c: 13 } },
-        { s: { r: 10, c: 11 }, e: { r: 10, c: 13 } },
-        { s: { r: 11, c: 11 }, e: { r: 11, c: 13 } },
-        { s: { r: 12, c: 11 }, e: { r: 12, c: 13 } },
-        ////CORRESPONDIENTE AL MES DE
-        { s: { r: 7, c: 14 }, e: { r: 7, c: 16 } },
-        { s: { r: 8, c: 14 }, e: { r: 8, c: 16 } },
-        { s: { r: 9, c: 14 }, e: { r: 9, c: 16 } },
-        { s: { r: 10, c: 14 }, e: { r: 10, c: 16 } },
-        { s: { r: 11, c: 14 }, e: { r: 11, c: 16 } },
-        { s: { r: 12, c: 14 }, e: { r: 12, c: 16 } },
-        //PRESUPESTO //
-        { s: { r: 15, c: 2 }, e: { r: 16, c: 5 } },
-        //PARTIDAS //
-        { s: { r: 15, c: 0 }, e: { r: 17, c: 0 } },
-        //DESCRIPCION //
-        { s: { r: 15, c: 1 }, e: { r: 17, c: 1 } },
-        //AVANCES//
-        { s: { r: 15, c: 6 }, e: { r: 15, c: 12 } },
-        //ANTERIOR //
-        { s: { r: 16, c: 6 }, e: { r: 16, c: 7 } },
-        //ACTUAL //
-        { s: { r: 16, c: 8 }, e: { r: 16, c: 9 } },
-        //ACUMULADO //
-        { s: { r: 16, c: 10 }, e: { r: 16, c: 12 } },
-        //SALDO //
-        { s: { r: 15, c: 13 }, e: { r: 16, c: 15 } },
-        { s: { r: totalRowIndex - 2, c: 1 }, e: { r: totalRowIndex - 2, c: 4 } },
-        { s: { r: totalRowIndex - 1, c: 1 }, e: { r: totalRowIndex - 1, c: 4 } },
-        { s: { r: totalRowIndex - 2, c: 6 }, e: { r: totalRowIndex - 2, c: 8 } },
-        { s: { r: totalRowIndex - 1, c: 6 }, e: { r: totalRowIndex - 1, c: 8 } },
-        { s: { r: totalRowIndex - 2, c: 11 }, e: { r: totalRowIndex - 2, c: 13 } },
-        { s: { r: totalRowIndex - 1, c: 11 }, e: { r: totalRowIndex - 1, c: 13 } }*/
+      { s: { r: totalRowIndex - 6, c: 0 }, e: { r: totalRowIndex - 5, c: 7 } },
+      { s: { r: totalRowIndex - 8, c: 0 }, e: { r: totalRowIndex - 7, c: 7 } }
     ];
 
     const range = XLSX.utils.decode_range(worksheet['!ref']!);
@@ -1095,7 +661,7 @@ export class ExcelPreliquidacionService {
           "R9C5", //
           "R9C6", //
           "R9C7", //
-      
+
           "R10C14", // CUI
           "R10C15", // CUI
           "R10C16", // CUI
@@ -1107,7 +673,7 @@ export class ExcelPreliquidacionService {
           "R12C14", // CUI
           "R12C15", // CUI
           "R12C16", // CUI
- 
+
         ]);
         const isBorderedCell = (R: number, C: number): boolean =>
           borderedCells.has(`R${R}C${C}`);
