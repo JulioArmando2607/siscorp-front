@@ -65,15 +65,30 @@ export class ExcelPreliquidacionService {
       denominador && denominador !== 0 ? numerador / denominador : 0;
 
     analisis.forEach((item: any, index: number) => {
+      /*PRESUPUESTO				AVANCES							SALDO		
+				ANTERIOR		ACTUAL		ACUMULADO					
+UND.	MET	P.UNIT	PRESU	MET	VAL	MET	VAL	MET	VAL	%	MET	VAL	%
+ */
       worksheetData.push([
         item.codigo,
         item.descripcion,
-        item.unidad,
-        item.cantidad, item.costoUnitario, item.precioParcial, //6
-        item.metradoAnterior, item.valorAnterior,
-        item.metrado, item.totalCalculadoActual,
-        item.metradoAcumulado, item.acumulado, item.porcentajeAcumulado,
-        ((+item.cantidad) - ((+item.metradoAcumulado))),
+        item.unidad,//UND.
+        item.cantidad, //MET
+        item.costoUnitario,//P.UNIT 
+        item.precioParcial, //PRESU
+
+        item.metradoAnterior, 
+        item.valorAnterior,
+
+        item.metrado, 
+        item.totalCalculadoActual,
+
+        item.metradoAcumulado, 
+        item.acumulado, 
+
+        item.porcentajeAcumulado,
+
+        ((+item.cantidad) - ((+item.metradoAcumulado ))),
         ((+item.precioParcial) - ((+item.acumulado))),
         0
         /* */

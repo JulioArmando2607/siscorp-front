@@ -509,10 +509,13 @@ export class AnalizarAutorizacionGastoComponent {
     const data = { idAutorizacionGasto: this.idAutorizacionGasto };
 
     this.maestraService.getArchivosAutorizacionGasto(data).subscribe((res: any) => {
+      console.log(res)
       if (res?.data?.response?.length) {
         this.selectedFiles = res.data.response.map((archivo: any) => ({
           name: archivo.nombre,
-          extension: archivo.extension
+          extension: archivo.extension,
+          path: archivo.path,
+          
         }));
       }
     });
@@ -520,15 +523,19 @@ export class AnalizarAutorizacionGastoComponent {
 
  
   async descargarArchivo(dt) {
-
+    console.log(dt)
     const archivoPayload = {
       idPreliquidacion: 0,
       idArchivo: 0,
-      txtNombre: dt.nombre,
+      txtNombre: dt.name,
       txtPath: dt.path
     };
-    await this.archivoService.descargar(archivoPayload);
     
+    try {
+      await this.archivoService.descargar(archivoPayload);
+    } catch (error) {
+      console.error('Error al descargar archivo del servidor:', error);
+    }
   }
   
 

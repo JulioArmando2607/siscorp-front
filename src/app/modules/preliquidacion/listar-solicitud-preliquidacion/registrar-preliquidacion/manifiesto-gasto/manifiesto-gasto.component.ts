@@ -45,7 +45,7 @@ export class ManifiestoGastoComponent {
   titulo: string
   filterForm: UntypedFormGroup;
   //dataSource: MatTableDataSource<any> = new MatTableDataSource();
-//  dataSource: any[] = []
+  //  dataSource: any[] = []
   dataSource: MatTableDataSource<any> = new MatTableDataSource();
 
   displayedColumns: string[] = ['nr', 'fecha', 'clase', 'nrDocumento', 'razonSocial', 'concepto', 'importe', 'observaciones', 'acciones'];
@@ -87,9 +87,11 @@ export class ManifiestoGastoComponent {
     const datosFormulario = this.filterForm.getRawValue();
     const datosCompletos = {
       ...datosFormulario, ...this.data.proyecto,
+      codigoUnicoCmpr: this.data.proyecto.codigoUnico,
+      idAvanceFinanciero: this.data.proyecto.idAvanceFinanciero,
       idManifiestoGastoAvanceFinanciero: this.idManifiestoGastoAvanceFinanciero,
       idManifiestoGastoAvanceFinancieroDetalle: this.idManifiestoGastoAvanceFinancieroDetalle,
-      idPreliquidacion: this.idPreliquidacion
+      idPreliquidacion: this.idPreliquidacion, idProyecto: this.data.idProyecto
     };
     console.log(datosCompletos)
     const oRespL = await lastValueFrom(
@@ -103,15 +105,15 @@ export class ManifiestoGastoComponent {
 
   async getTablaManifiestoGasto() {
     const datos = {
-      idManifiestoGastoAvanceFinanciero: this.idManifiestoGastoAvanceFinanciero
-
+      idManifiestoGastoAvanceFinanciero: this.idManifiestoGastoAvanceFinanciero,
+      codigoUnicoCmpr: this.data.proyecto.codigoUnico
     };
     const oRespL = await lastValueFrom(
       this.maestraService.listarManifiestoGastoAvanceFinanciero(
         datos
       )
     );
-   // this.dataSource = oRespL.data
+    // this.dataSource = oRespL.data
     this.dataSource = new MatTableDataSource(oRespL.data);
 
     this.limpiar()
@@ -128,8 +130,8 @@ export class ManifiestoGastoComponent {
 
   getTotalCost() {
     return this.dataSource?.data
-    .reduce((sum, row) => sum + (Number(row.importe) || 0), 0) || 0;
- 
+      .reduce((sum, row) => sum + (Number(row.importe) || 0), 0) || 0;
+
   }
 
   async eliminarRegistro(row) {
@@ -169,7 +171,9 @@ export class ManifiestoGastoComponent {
   async listarManifiestoPreliquidacion(idControlAvanceFinancieroProyecto) {
     const data = {
       idPreliquidacion: this.idPreliquidacion,
-      idControlAvanceFinancieroProyecto: idControlAvanceFinancieroProyecto
+      codigoUnicoCmpr: this.data.proyecto.codigoUnico,
+      idAvanceFinanciero: this.data.proyecto.idAvanceFinanciero
+      //idControlAvanceFinancieroProyecto: idControlAvanceFinancieroProyecto
     }
     const oRespL = await lastValueFrom(
       this.maestraService.listarManifiestoPreliquidacion(

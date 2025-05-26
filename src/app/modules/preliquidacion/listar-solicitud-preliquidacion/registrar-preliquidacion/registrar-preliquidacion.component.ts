@@ -25,6 +25,7 @@ import { ArchivosService } from 'app/modules/maestras/archivos.service';
 import { PreliquidacionService } from 'app/modules/maestras/preliquidacion.service';
 import { Session } from 'app/core/auth/Session';
 import { ExcelPreliquidacionService } from 'app/modules/maestras/excel.preliquidacion.service';
+import { ObservarDialogComponent } from 'app/modules/autorizacion-gastos/observar-dialog/observar-dialog.component';
 
 @Component({
   selector: 'app-registrar-preliquidacion',
@@ -52,20 +53,25 @@ export class RegistrarPreliquidacionComponent {
 
   displayedColumns = [
     'codigo', 'descripcion', 'unidad', 'cantidad', 'costo_unitario',
-    'precio_parcial', 'metrado_anterior', 'valor_anterior', 'metrado', 'valor',
+    'precio_parcial', 'metrado_anterior', 'valor_anterior', 'metrado',
+    'valor',
     'total_calculado',
-    'porcentaje', 'acciones'
+    //'porcentaje',
+    // 'acciones'
   ];
 
   displayedColumnsEstadoFinaciero = [
-    'codigo', 'nombreControlAvanceFinanciero', 'montoAsignado', 'mesActual', 'ejecucionActual', 'acciones'
+    'codigo', 'nombreControlAvanceFinanciero', 'montoAsignado', 'mesActual', 'ejecucionActual', 'acumulado', 'porcentajeAcumulado', 'acciones'
   ];
+
   dataSource = new MatTableDataSource<any>();
   dataSourceEstadoFinaciero = new MatTableDataSource<any>();
 
   titulo: ''
   filterForm: FormGroup;
   selectedFiles: { idArchivo: number, name: string, file?: File, path?: string, server?: boolean }[] = [];
+  selectedFilesMain: { idArchivo: number, name: string, file?: File, path?: string, server?: boolean }[] = [];
+  selectedFilesExtra: { idArchivo: number, name: string, file?: File, path?: string, server?: boolean }[] = [];
 
   idProyecto: string;
   totalElements: any;
@@ -80,6 +86,7 @@ export class RegistrarPreliquidacionComponent {
   isResidente: boolean = false
   isPEP: boolean = false;
   nombreEstadoPreliquidacion: any;
+  observacionEstado: any
   constructor(
     private maestraService: MaestrasService,
     private cdr: ChangeDetectorRef,
@@ -89,8 +96,8 @@ export class RegistrarPreliquidacionComponent {
     private fb: FormBuilder,
     private location: Location,
     private archivoService: ArchivosService,
-    private preliquidacionService: PreliquidacionService
-
+    private preliquidacionService: PreliquidacionService,
+    private dialog: MatDialog
   ) {
 
 
@@ -157,7 +164,9 @@ export class RegistrarPreliquidacionComponent {
     if (oRespL) {
       this.cidEstadoPreliquidacion = oRespL.data.response.cidEstado
       this.nombreEstadoPreliquidacion = oRespL.data.response.nombreEstado
-      console.log(oRespL)
+
+      this.observacionEstado = oRespL.data.msgResultado
+      console.log(oRespL.msgResultado)
 
     }
   }
@@ -240,21 +249,24 @@ export class RegistrarPreliquidacionComponent {
   recalcularTotalmontos(row) {
     console.log(row)
     const metrado = Number(row.metrado);
-    const valor = Number(row.valor);
+    const costoUnitario = Number(row.costoUnitario);
     const parcial = Number(row.precioParcial);
 
-    if (!isNaN(metrado) && !isNaN(valor) && valor > 0) {
-      row.totalCalculadoActual = metrado * valor;
+    if (!isNaN(metrado) && !isNaN(costoUnitario) && costoUnitario > 0) {
+      row.totalCalculadoActual = metrado * costoUnitario;
+      row.totalAcumuladoCalculado = row.totalCalculadoActual + row.acumulado;
+      this.guardar(this.idProyecto, row.idPartida, row.idSubPartida, metrado, costoUnitario, row.totalCalculadoActual)
 
-      if (!isNaN(row.totalCalculadoActual) && !isNaN(parcial) && parcial > 0) {
-        row.porcentajeUso = (row.totalCalculadoActual / parcial) * 100;
-
-        this.guardar(this.idProyecto, row.idPartida, row.idSubPartida, metrado, valor, row.totalCalculadoActual)
-
-      }
+      /*
+            if (!isNaN(row.totalAcumuladoCalculado) && !isNaN(parcial) && parcial > 0) {
+              row.porcentajeUso = (row.totalAcumuladoCalculado / parcial) * 100;
+      
+              this.guardar(this.idProyecto, row.idPartida, row.idSubPartida, metrado, costoUnitario, row.totalAcumuladoCalculado)
+      
+            } */
 
     } else {
-      row.totalCalculadoActual = 0;
+      row.totalAcumuladoCalculado = 0;
     }
   }
   /* async guardar(idProyecto, idPartida, idSubPartida, metrado, valor, totalCalculado) {
@@ -355,6 +367,7 @@ export class RegistrarPreliquidacionComponent {
       //  height: '90%', // opcional
       data: {
         proyecto: data,
+        idProyecto: this.idProyecto,
         idPreliquidacion: this.idPreliquidacion,
         title: "",
         type: 'create'
@@ -370,15 +383,16 @@ export class RegistrarPreliquidacionComponent {
     });
   }
 
-  async onFileSelected(event: any): Promise<void> {
+  async onFileSelected(event: any, tipo: 'main' | 'extra'): Promise<void> {
     const files: FileList = event.target.files;
     const newFiles = Array.from(files);
 
-    // Agregar nuevos archivos evitando duplicados por nombre
+    const targetList = tipo === 'main' ? this.selectedFilesMain : this.selectedFilesExtra;
+
     newFiles.forEach(newFile => {
-      const exists = this.selectedFiles.some(f => f.name === newFile.name && !f.server);
+      const exists = targetList.some(f => f.name === newFile.name && !f.server);
       if (!exists) {
-        this.selectedFiles.push({
+        targetList.push({
           name: newFile.name,
           file: newFile,
           server: false,
@@ -387,26 +401,19 @@ export class RegistrarPreliquidacionComponent {
       }
     });
 
-    // Actualiza el formulario si es necesario
-    this.filterForm.patchValue({ archivo: this.selectedFiles });
-    this.filterForm.get('archivo')?.updateValueAndValidity();
+    // Actualiza el formulario solo para 'main'
+    if (tipo === 'main') {
+      this.filterForm.patchValue({ archivo: this.selectedFilesMain });
+      this.filterForm.get('archivo')?.updateValueAndValidity();
+    }
 
-    const detalle = {
-      idPreliquidacion: this.idPreliquidacion,
-    };
-
-    console.log('Detalle:', detalle);
-
+    const detalle = { idPreliquidacion: this.idPreliquidacion, tipoArchivo: tipo };
     const formData = new FormData();
-    formData.append(
-      'detalle',
-      new Blob([JSON.stringify(detalle)], { type: 'application/json' })
-    );
+    formData.append('detalle', new Blob([JSON.stringify(detalle)], { type: 'application/json' }));
 
-    // Adjunta solo los archivos nuevos
-    this.selectedFiles.forEach(fileObj => {
+    targetList.forEach(fileObj => {
       if (!fileObj.server && fileObj.file) {
-        formData.append('archivos', fileObj.file); // "archivos" debe coincidir con backend
+        formData.append('archivos', fileObj.file);
       }
     });
 
@@ -414,40 +421,49 @@ export class RegistrarPreliquidacionComponent {
       const response = await this.maestraService.guardarArchivosPreliquidacion(formData).toPromise();
       console.log('Respuesta:', response);
 
-      // Opcional: actualizar lista desde servidor
+      // Opcional: actualizar lista desde el servidor
       await this.listarArchivosPreliquidacion();
     } catch (error) {
       console.error('Error al subir archivos:', error);
     }
 
-    // Limpiar el input por si el usuario sube el mismo archivo otra vez
-    event.target.value = null;
+    event.target.value = null; // Limpia input
   }
 
+
   async listarArchivosPreliquidacion() {
-    this.selectedFiles = []
+    // Reinicia las listas
+    this.selectedFilesMain = [];
+    this.selectedFilesExtra = [];
+
     const data = {
       idPreliquidacion: this.idPreliquidacion
     };
+
     const response = await this.maestraService.listarArchivosPreliquidacion(data).toPromise();
 
-    if (response?.data.response) {
-      const archivosDesdeServidor = response.data.response.map(archivo => ({
+    if (response?.data) {
+      const archivosDesdeServidor = response.data.map(archivo => ({
         name: archivo.txtNombre,
         size: archivo.numSize,
         server: true,
         path: archivo.txtPath,
-        idArchivo: archivo.idArchivo
+        idArchivo: archivo.idArchivo,
+        tipoArchivo: archivo.tipoArchivo
       }));
 
-      // Puedes combinar con los archivos nuevos si es necesario
-      this.selectedFiles = [...this.selectedFiles, ...archivosDesdeServidor];
+      // Filtra por tipo y asigna
+      this.selectedFilesMain = archivosDesdeServidor.filter(f => f.tipoArchivo === 'main');
+      this.selectedFilesExtra = archivosDesdeServidor.filter(f => f.tipoArchivo === 'extra');
     }
   }
 
-  async removeFile(index: number): Promise<void> {
-    const file = this.selectedFiles[index];
-    console.log(file)
+
+  async removeFile(index: number, tipo: 'main' | 'extra'): Promise<void> {
+    const fileList = tipo === 'main' ? this.selectedFilesMain : this.selectedFilesExtra;
+    const file = fileList[index];
+    console.log(file);
+
     // Si es un archivo del servidor, llama al backend para eliminarlo
     if (file.server && file.path) {
       try {
@@ -460,28 +476,30 @@ export class RegistrarPreliquidacionComponent {
           path: file.path,
           idArchivo: file.idArchivo
         };
-
+        console.log(data)
         const resp = await this.maestraService.eliminarArchivoPreliquidacion(data).toPromise();
-
         console.log('Archivo eliminado del servidor:', resp);
       } catch (error) {
         console.error('Error al eliminar archivo del servidor:', error);
-        return; // Detiene eliminación local si falla en backend
+        return;
       }
     }
 
     // Eliminar del array local
-    this.selectedFiles.splice(index, 1);
+    fileList.splice(index, 1);
 
-    // Actualizar el form
-    this.filterForm.patchValue({ archivo: this.selectedFiles });
-    if (this.selectedFiles.length < 3) {
-      this.filterForm.get('archivo')?.setErrors({ minFiles: true });
-    } else {
-      this.filterForm.get('archivo')?.setErrors(null);
+    // Actualizar el formulario según tipo
+    if (tipo === 'main') {
+      this.filterForm.patchValue({ archivo: this.selectedFilesMain });
+      if (this.selectedFilesMain.length < 3) {
+        this.filterForm.get('archivo')?.setErrors({ minFiles: true });
+      } else {
+        this.filterForm.get('archivo')?.setErrors(null);
+      }
+      this.filterForm.get('archivo')?.updateValueAndValidity();
     }
-    this.filterForm.get('archivo')?.updateValueAndValidity();
   }
+
 
   salir() {
     localStorage.removeItem('idValorizacionAvanceObra');
@@ -489,9 +507,17 @@ export class RegistrarPreliquidacionComponent {
     this.location.back(); // Vuelve a la página anterior
   }
 
-  async descargarArchivo(index: number): Promise<void> {
-    const file = this.selectedFiles[index];
+  async descargarArchivo(index: number, tp): Promise<void> {
+    let file;
 
+    if (tp == 'main') {
+      file = this.selectedFilesMain[index];
+
+    } else if (tp == 'extra') {
+      file = this.selectedFilesExtra[index];
+
+    }
+    console.log(file)
     if (!file?.server || !file.path) {
       console.warn('Archivo inválido o no proviene del servidor');
       return;
@@ -549,19 +575,9 @@ export class RegistrarPreliquidacionComponent {
   async observar() {
     const confirmDelete = confirm(`¿Deseas observar Preliquidacion?`);
     if (!confirmDelete) return;
-    const data = {
-      idPreliquidacion: this.idPreliquidacion,
-      cidEstado: "003"
-    };
-    console.log(data)
-    try {
 
-      await this.preliquidacionService.cambiarEstadoPreliquidacion(data).toPromise();// this.preliquidacionService.(archivoPayload);
-      this.mostarEstadoActualPreliquidacion()
+    this.observarAutorizacionGasto()
 
-    } catch (error) {
-      console.error('Error al solicitar:', error);
-    }
   }
   async solicitarPep() {
     const confirmDelete = confirm(`¿Deseas solicitar al PEP?`);
@@ -611,10 +627,10 @@ export class RegistrarPreliquidacionComponent {
     );
     if (oRespL1.data.length > 0) {
       let idManifiestoGastoAvanceFinanciero = oRespL1.data[0].idManifiestoGastoAvanceFinanciero
- 
+
       const datos = {
         idManifiestoGastoAvanceFinanciero: idManifiestoGastoAvanceFinanciero
-  
+
       };
       const oRespL = await lastValueFrom(
         this.maestraService.listarManifiestoGastoAvanceFinanciero(
@@ -622,15 +638,15 @@ export class RegistrarPreliquidacionComponent {
         )
       );
 
-      this.excelService.exporManiefiestoGasto(oRespL.data) 
+      this.excelService.exporManiefiestoGasto(oRespL.data)
 
-     // this.dataSource = oRespL.data
-     // this.dataSource = new MatTableDataSource(oRespL.data);
- 
+      // this.dataSource = oRespL.data
+      // this.dataSource = new MatTableDataSource(oRespL.data);
 
-    } 
+
+    }
   }
- 
+
 
   private async obtenerManifiesto(idControl: number): Promise<any | null> {
     const parametros = {
@@ -647,9 +663,75 @@ export class RegistrarPreliquidacionComponent {
 
 
 
+  /* applyFilter(event: Event) {
+     const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+     this.dataSource.filter = filterValue;
+   }
+ */
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+
+    // Buscar los códigos de los padres que coinciden con el texto
+    const matchingParentCodes = this.dataSource.data
+      .filter(item => item.descripcion.toLowerCase().includes(filterValue))
+      .map(item => item.codigo);
+
+    this.dataSource.filterPredicate = (data: any, filter: string) => {
+      const descripcion = data.descripcion.toLowerCase();
+      const codigo = data.codigo;
+
+      // Mostrar si el texto coincide directamente
+      if (descripcion.includes(filter)) return true;
+
+      // Mostrar si es hijo de un código padre que coincide
+      return matchingParentCodes.some(parentCode => codigo.startsWith(parentCode));
+    };
+
     this.dataSource.filter = filterValue;
+  }
+
+  async observarAutorizacionGasto() {
+    const dialogRef = this.dialog.open(ObservarDialogComponent, {
+      width: '500px',
+      data: {
+        title: 'Observar Autorización de Gasto',
+        message: 'Escriba el motivo de la observación.',
+      },
+    });
+
+    const comentario = await dialogRef.afterClosed().toPromise();
+
+    if (comentario) {
+
+      const data = {
+        idPreliquidacion: this.idPreliquidacion,
+        cidEstado: "003",
+        observacion: comentario
+      };
+      console.log(data)
+      try {
+
+        await this.preliquidacionService.cambiarEstadoPreliquidacion(data).toPromise();// this.preliquidacionService.(archivoPayload);
+        this.mostarEstadoActualPreliquidacion()
+
+      } catch (error) {
+        console.error('Error al solicitar:', error);
+      }
+
+      /*   const data = {
+        idAutorizacionGasto: row.idAutorizacionGasto,
+        cidEstadoAG: "003",
+        observacion: comentario
+      };
+
+      //const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();
+      await this.preliquidacionService.cambiarEstadoPreliquidacion(data).toPromise();// this.preliquidacionService.(archivoPayload);
+      */
+      this.mostarEstadoActualPreliquidacion()
+      /*  if (response) {
+          // this.getFiltrarProyectos();
+        } */
+    }
   }
 
   validarusuario() {

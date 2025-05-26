@@ -1,7 +1,10 @@
 <!-- Dashboard Layout -->
 <div class="p-6">
   <div class="flex min-w-0 flex-auto flex-col">
-    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{{cidEstadoPreliquidacion}}:{{nombreEstadoPreliquidacion}}
+     <div style="display: flex; align-items: center; gap: 8px;">
+      <span>&nbsp; &nbsp; &nbsp; &nbsp; {{cidEstadoPreliquidacion}}-{{nombreEstadoPreliquidacion}}</span>
+      <span *ngIf="cidEstadoPreliquidacion == '003'">: {{observacionEstado}}</span>
+    </div>
     <div class="mb-4 flex justify-end">
       <button *ngIf=" cidEstadoPreliquidacion=='001' ||  cidEstadoPreliquidacion=='003'&& (isResidente)" mat-flat-button
         color="primary" (click)="solicitarPreliquidacionResidente()">
@@ -66,84 +69,104 @@
 
                 <ng-container matColumnDef="unidad">
                   <th mat-header-cell *matHeaderCellDef> UNIDAD </th>
-                  <td mat-cell *matCellDef="let row"> {{ row.unidad }} </td>
+                  <td mat-cell *matCellDef="let row"> <ng-container *ngIf="row.unidad">
+                      {{ row.unidad }}
+                    </ng-container> </td>
                 </ng-container>
                 <!-- MONTO TOTAL ASIGNADO cantidad	costo_unitario	precio_parcial	orden -->
                 <ng-container matColumnDef="cantidad">
                   <th mat-header-cell *matHeaderCellDef> METRADO </th>
-                  <td mat-cell *matCellDef="let row"> {{ row.cantidad | number:'1.2-2' }} </td>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="row.unidad">
+                      {{ row.cantidad }}
+                    </ng-container>
+                  </td>
                 </ng-container>
 
                 <!-- CANTIDAD TOTAL ASIGNADA -->
                 <ng-container matColumnDef="costo_unitario">
                   <th mat-header-cell *matHeaderCellDef> PRECIO UNITARIO </th>
-                  <td mat-cell *matCellDef="let row"> {{ row.costoUnitario }} </td>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="row.unidad">
+                      {{ row.costoUnitario }}
+                    </ng-container>
+                  </td>
+
                 </ng-container>
 
                 <ng-container matColumnDef="precio_parcial">
                   <th mat-header-cell *matHeaderCellDef> PRESUPUESTO</th>
-                  <td mat-cell *matCellDef="let row"> {{ row.precioParcial }} </td>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="row.unidad">
+                      {{ row.precioParcial }}
+                    </ng-container>
                 </ng-container>
 
                 <ng-container matColumnDef="metrado_anterior">
-                  <th mat-header-cell *matHeaderCellDef> ACUMULADO</th>
-                  <td mat-cell *matCellDef="let row"> {{ row.acumulado }} </td>
+                  <th mat-header-cell *matHeaderCellDef>METRADO ACUMULADO</th>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="row.unidad">
+                      {{ row.metradoAcumulado }}
+                    </ng-container>
                 </ng-container>
 
                 <ng-container matColumnDef="valor_anterior">
-                  <th mat-header-cell *matHeaderCellDef> VALOR EJECUCIÓN</th>
-                  <td mat-cell *matCellDef="let row"> {{ row.porcentajeAcumulado }} </td>
+                  <th mat-header-cell *matHeaderCellDef> VALOR ACUMULADO</th>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="row.unidad">
+                      {{ row.acumulado }}
+                    </ng-container>
                 </ng-container>
-<!-- (ngModelChange)="recalcularTotalmontos(row)"-->
+                <!-- (ngModelChange)="recalcularTotalmontos(row)"-->
                 <ng-container matColumnDef="metrado">
                   <th mat-header-cell *matHeaderCellDef> METRADO </th>
                   <td mat-cell *matCellDef="let row">
-                    <input *ngIf="row.orden > 0" matInput type="number" [(ngModel)]="row.metrado"
-                      [ngModelOptions]="{standalone: true}"
+                    <input *ngIf="row.unidad" matInput type="number" [(ngModel)]="row.metrado"
+                      (blur)="recalcularTotalmontos(row)" [ngModelOptions]="{standalone: true}"
                       class="w-full px-2 py-1 border rounded" />
                   </td>
                 </ng-container>
 
                 <ng-container matColumnDef="valor">
-                  <th mat-header-cell *matHeaderCellDef> VALOR </th>
+                  <th mat-header-cell *matHeaderCellDef> TOTAL CALCULADO ACTUAL </th>
                   <td mat-cell *matCellDef="let row">
-                    <input *ngIf="row.orden > 0" matInput type="number" [(ngModel)]="row.valor"
-                      [ngModelOptions]="{standalone: true}" (blur)="recalcularTotalmontos(row)"
-                      class="w-full px-2 py-1 border rounded" />
+                    <input *ngIf="row.unidad" matInput type="number" [(ngModel)]="row.totalCalculadoActual"
+                      [ngModelOptions]="{standalone: true}" disabled
+                      class="w-full px-2 py-1 border rounded" /><!--(blur)="recalcularTotalmontos(row)"-->
                   </td>
                 </ng-container>
 
 
                 <!-- TOTAL CALCULADO -->
                 <ng-container matColumnDef="total_calculado">
-                  <th mat-header-cell *matHeaderCellDef> TOTAL CALCULADO </th>
+                  <th mat-header-cell *matHeaderCellDef> TOTAL ACUMULADO CALCULADO </th>
                   <td mat-cell *matCellDef="let row">
-                    <input *ngIf="row.orden > 0" matInput type="number" [(ngModel)]="row.totalCalculadoActual"
+                    <input *ngIf="row.unidad" matInput type="number" [(ngModel)]="row.totalAcumuladoCalculado"
                       [ngModelOptions]="{standalone: true}" disabled
                       class="w-full px-2 py-1 border rounded bg-gray-100" />
                   </td>
                 </ng-container>
 
                 <!-- PORCENTAJE -->
-                <ng-container matColumnDef="porcentaje">
+                <!--   <ng-container matColumnDef="porcentaje">
                   <th mat-header-cell *matHeaderCellDef> % </th>
                   <td mat-cell *matCellDef="let row"
                     [ngStyle]="{ 'font-weight': 'bold', 'color': getTextColor(row.colorEstado) }">
                     {{ row.porcentajeUso | number:'1.2-2' }}
                   </td>
-                </ng-container>
+                </ng-container>-->
 
                 <!-- ACCIONES -->
-                <ng-container matColumnDef="acciones">
+                <!---<ng-container matColumnDef="acciones">
                   <th mat-header-cell *matHeaderCellDef> </th>
                   <td mat-cell *matCellDef="let row">
-                    <button *ngIf="row.orden>0" mat-icon-button color="warn" (click)="eliminar(row)"
-                      matTooltip="Eliminar Recurso">
+                    <button *ngIf="row.unidad" mat-icon-button color="warn" (click)="eliminar(row)"
+                      matTooltip="Eliminar Ingreso">
                       <mat-icon>delete</mat-icon>
                     </button>
 
                   </td>
-                </ng-container>
+                </ng-container>-->
 
                 <!-- Encabezados y filas -->
                 <tr mat-header-row *matHeaderRowDef="displayedColumns" class="mat-header"></tr>
@@ -199,6 +222,17 @@
                   <td mat-cell *matCellDef="let row"> {{ row.ejecucionPorcentaje }} </td>
                 </ng-container>
 
+
+                <ng-container matColumnDef="acumulado">
+                  <th mat-header-cell *matHeaderCellDef> ACUMULADO</th>
+                  <td mat-cell *matCellDef="let row"> {{ row.acumulado }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="porcentajeAcumulado">
+                  <th mat-header-cell *matHeaderCellDef> PORCENTAJE ACUMULADO (%) </th>
+                  <td mat-cell *matCellDef="let row"> {{ row.porcentajeAcumulado }} </td>
+                </ng-container>
+
                 <ng-container matColumnDef="acciones">
                   <th mat-header-cell *matHeaderCellDef> ACCIONES </th>
                   <td mat-cell *matCellDef="let row">
@@ -207,8 +241,8 @@
                       <mat-icon>add</mat-icon>
                     </button>
 
-                    <button *ngIf="row.montoAsignado>0" mat-icon-button color="accent" class="ml-2" (click)="exporManiefiestoGasto(row)"
-                      matTooltip="Descargar Manifiesto de Gasto">
+                    <button *ngIf="row.montoAsignado>0" mat-icon-button color="accent" class="ml-2"
+                      (click)="exporManiefiestoGasto(row)" matTooltip="Descargar Manifiesto de Gasto">
                       <mat-icon>download</mat-icon>
                     </button>
                   </td>
@@ -240,32 +274,61 @@
       <div class="flex min-w-0 flex-auto flex-col bg-card p-1">
         <!-- Filtro -->
         <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
-          <!-- Contenedor de archivos adjuntos -->
-          <div class="flex flex-col px-8 pb-4">
-            <div class="flex items-center gap-2 mb-2">
-              <mat-icon [svgIcon]="'heroicons_outline:paper-clip'"></mat-icon>
-              <span class="font-semibold text-sm">AGREGAR ARCHIVOS</span>
-              <button class="ml-0.5" mat-icon-button (click)="fileInput.click()" type="button">
-                <mat-icon>add</mat-icon>
-              </button>
+          <!-- Contenedor de columnas -->
+          <div class="flex flex-row gap-4 px-4">
+
+            <!-- Columna 1: Archivos principales -->
+            <div class="flex flex-col w-1/2">
+              <div class="flex items-center gap-2 mb-2">
+                <mat-icon [svgIcon]="'heroicons_outline:paper-clip'"></mat-icon>
+                <span class="font-semibold text-sm">
+                  AGREGAR ARCHIVOS
+                  <span style="color: red;">(** Material en cancha y comprobantes de pago)</span>
+                </span>
+                <button class="ml-0.5" mat-icon-button (click)="fileInput1.click()" type="button">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+
+              <input #fileInput1 type="file" (change)="onFileSelected($event, 'main')" multiple hidden />
+              <div *ngFor="let file of selectedFilesMain; let i = index"
+                class="flex items-center gap-2 text-sm text-gray-700 mb-1">
+                <span [matTooltip]="file.name" matTooltipPosition="above">{{ file.name }}</span>
+                <button mat-icon-button (click)="removeFile(i, 'main')">
+                  <mat-icon>close</mat-icon>
+                </button>
+                <button mat-icon-button (click)="descargarArchivo(i, 'main')">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </div>
             </div>
 
-            <!-- Input oculto con múltiples archivos -->
-            <input #fileInput type="file" (change)="onFileSelected($event)" multiple hidden />
-            <!-- Lista de archivos -->
-            <div *ngFor="let file of selectedFiles; let i = index"
-              class="flex items-center gap-2 text-sm text-gray-700 mb-1">
-              <!---<mat-icon [svgIcon]="'heroicons_outline:paper-clip'"></mat-icon>-->
-              <span [matTooltip]="file.name" matTooltipPosition="above">{{ file.name }} </span>
-              <button mat-icon-button (click)="removeFile(i)">
-                <mat-icon>close</mat-icon>
-              </button>
-              <button mat-icon-button (click)="descargarArchivo(i)">
-                <mat-icon>download</mat-icon>
-              </button>
+            <!-- Columna 2: Archivos adicionales -->
+            <div class="flex flex-col w-1/2">
+              <div class="flex items-center gap-2 mb-2">
+                <mat-icon [svgIcon]="'heroicons_outline:paper-clip'"></mat-icon>
+                <span class="font-semibold text-sm">AGREGAR ARCHIVOS ADICIONALES</span>
+                <button class="ml-0.5" mat-icon-button (click)="fileInput2.click()" type="button">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+
+              <input #fileInput2 type="file" (change)="onFileSelected($event, 'extra')" multiple hidden />
+              <div *ngFor="let file of selectedFilesExtra; let i = index"
+                class="flex items-center gap-2 text-sm text-gray-700 mb-1">
+                <span [matTooltip]="file.name" matTooltipPosition="above">{{ file.name }}</span>
+                <button mat-icon-button (click)="removeFile(i, 'extra')">
+                  <mat-icon>close</mat-icon>
+                </button>
+                <button mat-icon-button (click)="descargarArchivo(i, 'extra')">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </div>
             </div>
+
           </div>
         </div>
+
       </div>
     </mat-tab>
   </mat-tab-group>
