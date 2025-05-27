@@ -538,6 +538,12 @@ export class RegistrarPreliquidacionComponent {
   }
 
   async solicitarPreliquidacionResidente() {
+    if (this.selectedFilesMain.length !== 2) {
+      alert('Debes seleccionar Material en cancha y comprobantes de pago.');
+      return;
+
+    } else {
+ 
     const confirmDelete = confirm(`¿Deseas solicitar al supervisor?`);
     if (!confirmDelete) return;
     const data = {
@@ -554,6 +560,7 @@ export class RegistrarPreliquidacionComponent {
       console.error('Error al solicitar:', error);
     }
   }
+}
   async solicitarPreliquidacionSupervisor() {
     const confirmDelete = confirm(`¿Deseas solicitar al supervisor?`);
     if (!confirmDelete) return;
@@ -694,7 +701,7 @@ export class RegistrarPreliquidacionComponent {
     const dialogRef = this.dialog.open(ObservarDialogComponent, {
       width: '500px',
       data: {
-        title: 'Observar Autorización de Gasto',
+        title: 'Observar Preliquidacion',
         message: 'Escriba el motivo de la observación.',
       },
     });
@@ -739,7 +746,7 @@ export class RegistrarPreliquidacionComponent {
     this.isAdministrador = false;
     this.isSupervisor = false;
     this.isResidente = false;
-
+    this.isPEP = false
     // Validar Residente
     if (Session.identity.rol == 'UPS-RESIDENTE-PROYECTO') {
       this.isResidente = true;

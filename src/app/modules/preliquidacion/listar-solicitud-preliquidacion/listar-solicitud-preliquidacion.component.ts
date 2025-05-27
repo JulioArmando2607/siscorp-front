@@ -96,6 +96,7 @@ export class ListarSolicitudPreliquidacionComponent {
     private fb: FormBuilder,
     private _formBuilder: UntypedFormBuilder,
     private excelService: ExcelPreliquidacionService,
+    private mExcelService: ExcelService,
     private route: ActivatedRoute,
     private _router: Router,
     private location: Location, private dialog: MatDialog
@@ -562,7 +563,7 @@ export class ListarSolicitudPreliquidacionComponent {
         idProyecto: row.idProyecto
       }
       const oRespL = await lastValueFrom(
-        this.maestraService.listarAvanceFinancieroAsignado(
+        this.maestraService.ListarAvanceFinancieroAsignadoReporte(
           data
         )
       );
@@ -581,7 +582,15 @@ export class ListarSolicitudPreliquidacionComponent {
     this.excelService.exportToExcel(roresp.data, "DATOS GENERALES");*/
   }
 
+  async descargarPartidad(){
+    const roresp = await lastValueFrom(this.maestraService.partidasExcel(this.id))
+    this.mExcelService.exportPartidas(roresp.data, "PARTIDAS");
+  }
 
+  async descargarPreciosUnitarios(){
+    const roresp = await lastValueFrom(this.maestraService.partidasExcelRecursos(this.id))
+    this.mExcelService.exportPreciosUnitarios(roresp.data, "PRECIOS UNITARIOS");
+  }
 
 
 

@@ -272,19 +272,20 @@ UND.	MET	P.UNIT	PRESU	MET	VAL	MET	VAL	MET	VAL	%	MET	VAL	%
     return isNaN(num) ? 0 : num;
   }
   exportAnexo28(response): void {
+    console.log(response)
 
     console.log(Session.identity.name)
-    /*     const v001 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "001"); 
-        const v002 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "002");
-        const v003 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "003");
-        const v004 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "004");
+      const v001 = response.montoProyecto.find(item => item.cidControlMonitoreo === "001"); 
+        const v002 = response.montoProyecto.find(item => item.cidControlMonitoreo === "002");
+        const v003 = response.montoProyecto.find(item => item.cidControlMonitoreo === "003");
+      /*     const v004 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "004");
         const v005 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "005");
         const v006 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "006");
         const v007 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "007");
         const v008 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "008");
         const v009 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "009");
      */
-
+console.log(v001)
     const worksheetData: any[][] = [];
     // ---------- TÍTULO PRINCIPAL ----------
     worksheetData.push([]);
@@ -300,9 +301,9 @@ UND.	MET	P.UNIT	PRESU	MET	VAL	MET	VAL	MET	VAL	%	MET	VAL	%
 
     worksheetData.push(["", "", "", "", "", ""]);
     worksheetData.push([""]);
-    worksheetData.push(["", "", "MONTO DE CONVENIO", "", "", `S/. 0`, "", "", "Entidad"]);
-    worksheetData.push(["", "", "MONTO AMPLIACIÓN PRESUPUESTAL", "", "", `S/. 0`, "", "", ""]);
-    worksheetData.push(["", "", "MONTO TOTAL FINANCIADO", "", "", `S/. 0`, "", "", ""]);
+    worksheetData.push(["", "", "MONTO DE CONVENIO", "", "", `S/. ${v001.monto}`, "", "", "Entidad"]);
+    worksheetData.push(["", "", "MONTO AMPLIACIÓN PRESUPUESTAL", "", "", `S/. ${v002.monto}`, "", "", ""]);
+    worksheetData.push(["", "", "MONTO TOTAL FINANCIADO", "", "", `S/. ${v003.monto}`, "", "", ""]);
     worksheetData.push(["", "", "", "", "", "", "", "", "Número de Cuenta de Ahorros:"]);
 
     /*    worksheetData.push(["", "", "MONTO DE CONVENIO", "", "", `S/. ${v001.monto}`, "", "", "Entidad"]);
@@ -379,7 +380,7 @@ UND.	MET	P.UNIT	PRESU	MET	VAL	MET	VAL	MET	VAL	%	MET	VAL	%
         "cidControlAvanceFinanciero": "001"
     } */
 
-    response.forEach((rubro: any) => {
+    response.detalleAvance.forEach((rubro: any) => {
       worksheetData.push([
         rubro.codigo,
         rubro.nombreControlAvanceFinanciero,

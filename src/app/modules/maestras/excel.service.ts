@@ -23,6 +23,65 @@ export class ExcelService {
     saveAs(dataBlob, `${fileName}.xlsx`);
   }
 
+
+  exportPartidas(data: any[], fileName: string): void {
+
+    const formattedData = data.map(item => {
+      return {
+        'CODIGO ESPECIALIDAD': item.codigoEspecialidad,
+        'ESPECIALIDAD': item.nombreEspecialidad,
+        'CODIGO ITEM': item.codigoItem,
+        'DESCRIPCIÓN ITEM': item.descripcionItem,
+        'CODIGO SUBITEM': item.codigoSubItem,
+        'DESCRIPCION SUBITEM': item.descripcionSubitem,
+        'CODIGO PARTIDAS': item.codigoPartida,
+        'PARTIDAS': item.descripcionPartida,
+        'CODIGO SUBPARTIDA': item.codigoSubPartida,
+        'DESCRIPCION SUBPARTIDA': item.descripcionSubPartida,
+        'UND': item.unidadMedida,
+        'CANTIDAD': item.cantidad,
+        'COSTO UNITARIO': item.costoUnitario,
+        'PRECIO PARCIAL': item.precioParcial
+      };
+    });
+
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos');
+
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const dataBlob: Blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+    saveAs(dataBlob, `${fileName}.xlsx`);
+
+  }
+  exportPreciosUnitarios(data: any[], fileName: string): void {
+    const formattedData = data.map(item => {
+      return {
+        'CODIGO SUBPARTIDA': item.codigoSubPartida,
+        'DESCRIPCION SUBPARTIDA': item.descripcionSubPartida,
+        'RUBRO': item.nombreRubro,
+        'CODIGO': item.codigoRecurso,
+        'RECURSO': item.nombreRecurso,
+        'Unidad': item.unidadMedida,
+        'CUADRILLA': item.cuadrilla,
+        'CANTIDAD': item.cantidad,
+        'PRECIO': item.precioUnitario,
+        'PARCIAL': item.precioParcial
+      };
+    });
+
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos');
+
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const dataBlob: Blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+    saveAs(dataBlob, `${fileName}.xlsx`);
+  }
+
+
   exportToExcelAutorizaciondeGasto(data: any[], fileName: string): void {
     // Filtrar y transformar los datos con un índice secuencial
     const filteredData = data.map((item, index) => ({
@@ -384,7 +443,7 @@ export class ExcelService {
 
     saveAs(blob, 'ANEXO N° 24 CONTROL DE AUTORIZACIONES PARA ADQUISICIÓN DE INSUMOS.xlsx');
   }
-    toNumber(value: any): number {
+  toNumber(value: any): number {
     const num = Number(value);
     return isNaN(num) ? 0 : num;
   }
@@ -392,7 +451,7 @@ export class ExcelService {
     console.log(Session.identity.name)
     const v001 = response.data.response.listamontosValorFinanciadoAG.find(item => item.cidControlMonitoreo === "001");
 
-   // console.log(response.data.response.listamontosValorFinanciadoAG.);
+    // console.log(response.data.response.listamontosValorFinanciadoAG.);
 
     console.log(v001);
 
@@ -468,13 +527,13 @@ export class ExcelService {
       costoDirecto += +rubro.valorFinanciado; // suma convertido a número
       cdgastoAutorizadoActual += +rubro.gastoAutorizadoActual; // suma convertido a número
       gastoAutorizadoPorcentaje += +rubro.gastoAutorizadoPorcentaje; // suma convertido a número //Qquiero q sea dicivdo por la cantidad del arregle
-      gastoEfectuadoAcumulado+=+rubro.gastoEfectuadoAcumulado;
-      gastoEfectuadoPorcentaje+=+rubro.gastoEfectuadoPorcentaje;
+      gastoEfectuadoAcumulado += +rubro.gastoEfectuadoAcumulado;
+      gastoEfectuadoPorcentaje += +rubro.gastoEfectuadoPorcentaje;
     });
 
     // 2. Agrega fila resumen
     worksheetData.push([
-      "1.0", "COSTO DIRECTO", costoDirecto, cdgastoAutorizadoActual,  (gastoAutorizadoPorcentaje)/response.data.response.rubro.length,gastoEfectuadoAcumulado, (gastoEfectuadoPorcentaje)/response.data.response.rubro.length, ""
+      "1.0", "COSTO DIRECTO", costoDirecto, cdgastoAutorizadoActual, (gastoAutorizadoPorcentaje) / response.data.response.rubro.length, gastoEfectuadoAcumulado, (gastoEfectuadoPorcentaje) / response.data.response.rubro.length, ""
     ]);
 
     // 3. Agrega cada rubro detallado
@@ -496,28 +555,28 @@ export class ExcelService {
       "2.0", "GASTOS GENERALES", v004.monto, v004.actual, v004.porcentajeActual, v004.acumulado, v004.porcentajeAcumulado, ""
     ]);
     worksheetData.push([
-      "3.0", "GASTOS DE RESIDENTE", v005.monto,v005.actual, v005.porcentajeActual, v005.acumulado, v005.porcentajeAcumulado, ""
+      "3.0", "GASTOS DE RESIDENTE", v005.monto, v005.actual, v005.porcentajeActual, v005.acumulado, v005.porcentajeAcumulado, ""
     ]);
     worksheetData.push([
-      "4.0", "COSTOS FINANCIEROS", v006.monto,v006.actual, v006.porcentajeActual, v006.acumulado, v006.porcentajeAcumulado, ""
-    ]);
-
-    worksheetData.push([
-      "5.0", "GASTOS DE N.E.", v007.monto,v007.actual, v007.porcentajeActual, v007.acumulado, v007.porcentajeAcumulado, ""
+      "4.0", "COSTOS FINANCIEROS", v006.monto, v006.actual, v006.porcentajeActual, v006.acumulado, v006.porcentajeAcumulado, ""
     ]);
 
     worksheetData.push([
-      "6.0", "INTERESES", v008.monto,v008.actual, v008.porcentajeActual, v008.acumulado, v008.porcentajeAcumulado, ""
+      "5.0", "GASTOS DE N.E.", v007.monto, v007.actual, v007.porcentajeActual, v007.acumulado, v007.porcentajeAcumulado, ""
+    ]);
+
+    worksheetData.push([
+      "6.0", "INTERESES", v008.monto, v008.actual, v008.porcentajeActual, v008.acumulado, v008.porcentajeAcumulado, ""
     ]);
 
     let subtotalInversion1 = this.toNumber(costoDirecto) + this.toNumber(v004.monto) + this.toNumber(v005.monto) + this.toNumber(v006.monto) + this.toNumber(v007.monto) + this.toNumber(v008.monto);
     let subtotalInversion2 = this.toNumber(cdgastoAutorizadoActual) + this.toNumber(v004.actual) + this.toNumber(v005.actual) + this.toNumber(v006.actual) + this.toNumber(v007.actual) + this.toNumber(v008.actual);
-    let subtotalInversion3 = this.toNumber(gastoAutorizadoPorcentaje) + this.toNumber(v004.porcentajeActual )+ this.toNumber(v005.porcentajeActual )+ this.toNumber(v006.porcentajeActual )+ this.toNumber(v007.porcentajeActual )+ this.toNumber(v008.porcentajeActual);
-    let subtotalInversion4 = this.toNumber(gastoEfectuadoAcumulado )+ this.toNumber(v004.acumulado )+ this.toNumber(v005.acumulado )+ this.toNumber(v006.acumulado )+ this.toNumber(v007.acumulado )+ this.toNumber(v008.acumulado);
-    let subtotalInversion5 = this.toNumber(gastoEfectuadoPorcentaje )+ this.toNumber(v004.porcentajeAcumulado )+ this.toNumber(v005.porcentajeAcumulado )+ this.toNumber(v006.porcentajeAcumulado )+ this.toNumber(v007.porcentajeAcumulado) + this.toNumber(v008.porcentajeAcumulado);
+    let subtotalInversion3 = this.toNumber(gastoAutorizadoPorcentaje) + this.toNumber(v004.porcentajeActual) + this.toNumber(v005.porcentajeActual) + this.toNumber(v006.porcentajeActual) + this.toNumber(v007.porcentajeActual) + this.toNumber(v008.porcentajeActual);
+    let subtotalInversion4 = this.toNumber(gastoEfectuadoAcumulado) + this.toNumber(v004.acumulado) + this.toNumber(v005.acumulado) + this.toNumber(v006.acumulado) + this.toNumber(v007.acumulado) + this.toNumber(v008.acumulado);
+    let subtotalInversion5 = this.toNumber(gastoEfectuadoPorcentaje) + this.toNumber(v004.porcentajeAcumulado) + this.toNumber(v005.porcentajeAcumulado) + this.toNumber(v006.porcentajeAcumulado) + this.toNumber(v007.porcentajeAcumulado) + this.toNumber(v008.porcentajeAcumulado);
 
     worksheetData.push([
-      "SUB TOTAL INVERSION", "", subtotalInversion1,subtotalInversion2,subtotalInversion3, subtotalInversion4, subtotalInversion5, ""
+      "SUB TOTAL INVERSION", "", subtotalInversion1, subtotalInversion2, subtotalInversion3, subtotalInversion4, subtotalInversion5, ""
     ]);
 
     worksheetData.push([

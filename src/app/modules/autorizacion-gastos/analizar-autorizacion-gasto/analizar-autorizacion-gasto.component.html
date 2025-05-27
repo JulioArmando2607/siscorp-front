@@ -4,13 +4,18 @@
     <div class="text-2xl font-bold text-center flex-1">
       ANALIZAR AUTORIZACIÓN DE GASTO [{{idAutorizacionGasto}}] - {{ titulo }}
     </div>
+
     <div class="absolute right-0">
       <button mat-flat-button style="background-color: red; color: white;" (click)="salir()">
         <mat-icon>exit_to_app</mat-icon> Salir
       </button>
     </div>
-  </div>
 
+  </div>
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <span>&nbsp; &nbsp; &nbsp; &nbsp; {{cidEstadoAutorizacionGasto}}-{{estadoAutorizacionGasto}}:
+      {{observacionAutorizacionGasto}}</span>
+  </div>
   <!-- Filtro -->
   <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
     <div class="mb-4 flex justify-between">
@@ -19,38 +24,49 @@
         <input matInput (keyup)="aplicarFiltro($event)" placeholder="Escribe el nombre del recurso">
       </mat-form-field>
 
-      <button *ngIf="!isResidente && isSupervisor" mat-flat-button color="primary" (click)="aprobarAutorizacion()">
-        <mat-icon>check_circle</mat-icon>
-        <span class="ml-2">Aprobar Autorización</span>
-      </button>
-       
       <div class="flex flex-col px-8 pb-4">
         <div class="flex items-center gap-2 mb-2">
           <mat-icon [svgIcon]="'heroicons_outline:paper-clip'"></mat-icon>
-          <span class="font-semibold text-sm">SUSTENTO</span>      
+          <span class="font-semibold text-sm">SUSTENTO</span>
         </div>
         <!-- Lista de archivos -->
         <div *ngFor="let file of selectedFiles; let i = index"
           class="flex items-center gap-2 text-sm text-gray-700 mb-1">
           <span class="truncate w-52" [matTooltip]="file.name" matTooltipPosition="above">{{ file.name }} </span>
-          <button (click)="descargarArchivo(file)" >
+          <button (click)="descargarArchivo(file)">
             <mat-icon>download</mat-icon>
-             </button>
-      <!---    <button mat-icon-button (click)="removeFile(i)">
+          </button>
+          <!---    <button mat-icon-button (click)="removeFile(i)">
             <mat-icon>close</mat-icon>
           </button>-->
         </div>
       </div>
-      
-      <button *ngIf="isAdmin" mat-flat-button color="primary" (click)="aprobarAutorizacionAdmin()">
+      <!--APROBAR SUPERS--->
+      <button *ngIf="!isResidente && isSupervisor && (cidEstadoAutorizacionGasto == '002')" mat-flat-button
+        color="primary" (click)="aprobarAutorizacion()">
+        <mat-icon>check_circle</mat-icon>
+        <span class="ml-2">Aprobar Autorización</span>
+      </button>
+      <!--APROBAR PEP--->
+      <button *ngIf="isPEP && (cidEstadoAutorizacionGasto == '004')" mat-flat-button
+        color="primary" (click)="aprobarAutorizacionAdmin()">
         <mat-icon>check_circle</mat-icon>
         <span class="ml-2">Aprobar Autorización</span>
       </button>
 
-      <button *ngIf="isResidente && autorizacionGasto.cidEstado == '001'" mat-flat-button color="primary" (click)="solicitarAutorizacion()">
+      <!--SOLICCTAR RES PEP--->
+      <button *ngIf="isResidente && (cidEstadoAutorizacionGasto == '001')" mat-flat-button color="primary"
+        (click)="solicitarAutorizacion()">
         <mat-icon>check_circle</mat-icon>
         <span class="ml-2">Solicitar Autorización de Gasto</span>
       </button>
+
+      <button *ngIf="(isSupervisor || isPEP) && cidEstadoAutorizacionGasto !== '003' && cidEstadoAutorizacionGasto !== '005'"
+        mat-flat-button style="background-color: rgb(20, 19, 19); color: white;" (click)="observar()">
+        <mat-icon>feedback</mat-icon>
+        <span class="ml-2">Observar Preliquidacion</span>
+      </button>
+
     </div>
 
     <!-- Tabla -->
@@ -70,11 +86,11 @@
           </tr>
         </thead>
 
-      <!-- Column headers -->
-      <ng-container matColumnDef="recurso">
-        <th mat-header-cell *matHeaderCellDef> RECURSO </th>
-        <td mat-cell *matCellDef="let row"> {{ row.nombreRecurso }} </td>
-      </ng-container>
+        <!-- Column headers -->
+        <ng-container matColumnDef="recurso">
+          <th mat-header-cell *matHeaderCellDef> RECURSO </th>
+          <td mat-cell *matCellDef="let row"> {{ row.nombreRecurso }} </td>
+        </ng-container>
 
         <!-- UND -->
         <ng-container matColumnDef="und">
@@ -95,7 +111,7 @@
           <td mat-cell *matCellDef="let row"> {{ row.cantidadTotalAsignada }} </td>
 
         </ng-container>
- 
+
         <ng-container matColumnDef="cantidad_solicitada">
           <th mat-header-cell *matHeaderCellDef> CANTIDAD SOLICITADA ACUMULADO </th>
           <td mat-cell *matCellDef="let row"> {{ row.cantidadSolicitadaAcumulado }} </td>
@@ -105,7 +121,7 @@
           <th mat-header-cell *matHeaderCellDef> PARCIAL SEGUN COTIZACION ACUMULADO </th>
           <td mat-cell *matCellDef="let row"> {{ row.parcialCotizacionAcumulado }} </td>
         </ng-container>
- 
+
         <!-- MONTO RESTANTE -->
         <ng-container matColumnDef="monto_restante">
           <th mat-header-cell *matHeaderCellDef> MONTO TOTAL RESTANTE </th>
@@ -124,8 +140,8 @@
         <ng-container matColumnDef="cantidad">
           <th mat-header-cell *matHeaderCellDef> CANTIDAD </th>
           <td mat-cell *matCellDef="let row; let i = index">
-            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.cantidadActual" [ngModelOptions]="{standalone: true}"
-              class="w-full px-2 py-1 border rounded" />
+            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.cantidadActual"
+              [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded" />
           </td>
 
         </ng-container>
@@ -134,8 +150,9 @@
         <ng-container matColumnDef="precio_unitario">
           <th mat-header-cell *matHeaderCellDef> PRECIO UNITARIO </th>
           <td mat-cell *matCellDef="let row; let i = index">
-            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.precioActual" (blur)="recalcularTotal(i)"
-              [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded" />
+            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.precioActual"
+              (blur)="recalcularTotal(i)" [ngModelOptions]="{standalone: true}"
+              class="w-full px-2 py-1 border rounded" />
           </td>
 
         </ng-container>
@@ -188,9 +205,9 @@
     </div>
     <!-- Linear Totals Section -->
     <div class="linear-totals mt-4">
-      <div class="flex flex-wrap gap-4"> 
+      <div class="flex flex-wrap gap-4">
         <div>TOTAL CALCULADO: {{ calcularTotalCalculado() | number:'1.2-2' }}</div>
-       </div>
+      </div>
     </div>
   </div>
 
@@ -217,19 +234,17 @@
           <th mat-header-cell *matHeaderCellDef> ACTUAL (S/)
           </th>
           <td mat-cell *matCellDef="let row; let i = index">
-            <input [disabled]="isResidente" matInput type="number" 
-            [(ngModel)]="row.actual" 
-            [ngModelOptions]="{standalone: true}" 
-            class="w-full px-2 py-1 border rounded" 
-            (blur)="recalcularTotalmontos(row)"/>
-          </td> 
+            <input [disabled]="isResidente" matInput type="number" [(ngModel)]="row.actual"
+              [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded"
+              (blur)="recalcularTotalmontos(row)" />
+          </td>
         </ng-container>
- 
+
         <!-- MONTO TOTAL ASIGNADO -->
         <ng-container matColumnDef="porcentaje_actual">
           <th mat-header-cell *matHeaderCellDef>(%)
           </th>
-          <td mat-cell *matCellDef="let row"> 
+          <td mat-cell *matCellDef="let row">
             <input matInput type="number" [value]="row.porcentajeActual" disabled
               class="w-full px-2 py-1 border rounded bg-gray-100" />
           </td>
@@ -254,11 +269,11 @@
         </ng-container>
 
         <ng-container matColumnDef="restante">
-          <th mat-header-cell *matHeaderCellDef>  RESTANTE </th>
+          <th mat-header-cell *matHeaderCellDef> RESTANTE </th>
           <td mat-cell *matCellDef="let row">
             <input matInput type="number" [value]="row.restante" disabled
               class="w-full px-2 py-1 border rounded bg-gray-100" />
-          </td> 
+          </td>
         </ng-container>
 
         <!-- ACCIONES -->
@@ -269,10 +284,10 @@
               <mat-icon>delete</mat-icon>
             </button>
           </td>
-        </ng-container> 
+        </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns2" class="mat-header"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns2"></tr>
-      </table> 
+      </table>
     </div>
 
   </div>

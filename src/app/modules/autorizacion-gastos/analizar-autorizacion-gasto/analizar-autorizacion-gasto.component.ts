@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, ViewE
 import { FormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -18,6 +19,7 @@ import { Session } from 'app/core/auth/Session';
 import { ArchivosService } from 'app/modules/maestras/archivos.service';
 import { MaestrasService } from 'app/modules/maestras/maestras.service';
 import { lastValueFrom } from 'rxjs';
+import { ObservarDialogComponent } from '../observar-dialog/observar-dialog.component';
 
 @Component({
   selector: 'app-analizar-autorizacion-gasto',
@@ -52,6 +54,7 @@ export class AnalizarAutorizacionGastoComponent {
   isSupervisor: boolean = false;
   isResidente: boolean = false;
   isAdmin: boolean = false;
+  isPEP: boolean = false;
   autorizacionGasto: any;
   dataSource: MatTableDataSource<any>;
   proyectos: any[]
@@ -63,7 +66,7 @@ export class AnalizarAutorizacionGastoComponent {
   displayedColumns = [
     'recurso', 'und', 'monto_total_asignada', 'cantidad_total_asignada',
     'cantidad_solicitada', 'parcial_segun_cotizacion',
-    'cantidad_restante','monto_restante', 'cantidad', 'precio_unitario',
+    'cantidad_restante', 'monto_restante', 'cantidad', 'precio_unitario',
     'total_calculado',
     // 'monto_utilizado', 
     'porcentaje', 'acciones'
@@ -75,6 +78,9 @@ export class AnalizarAutorizacionGastoComponent {
   ];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  cidEstadoAutorizacionGasto: any;
+  observacionAutorizacionGasto: any;
+  estadoAutorizacionGasto: any;
 
   // Variables de paginación
   constructor(
@@ -84,13 +90,16 @@ export class AnalizarAutorizacionGastoComponent {
     private archivoService: ArchivosService,
     private _formBuilder: UntypedFormBuilder,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private dialog: MatDialog
+
   ) {
     this.validarusuario()
   }
   async ngOnInit() {
     this.id = this.route.snapshot.paramMap.get('id'); // ID del proyecto
     this.idAutorizacionGasto = this.route.snapshot.paramMap.get('ag'); // ID de autorización de gasto
+    this.getMmostrarEstadoActualAutorizaciongasto(this.idAutorizacionGasto)
     this.cargarRubrosAdicionales()
     this.getArchivosAutorizacionGasto()
 
@@ -211,7 +220,7 @@ export class AnalizarAutorizacionGastoComponent {
       const data = {
         idAutorizacionGasto: this.idAutorizacionGasto,
         cidEstadoAG: "002",
-        observacion: "Solicitar Autorización de Gasto desde el Residente"
+        observacion: "Solicitado Autorización de Gasto desde el Residente"
       }
       const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();
       if (response) {
@@ -300,36 +309,15 @@ export class AnalizarAutorizacionGastoComponent {
 
   recalcularTotal(index: number): void {
     const row = this.dataSource.filteredData[index];
-  
+
     console.log(row);
-  
+
     if (row.cantidadActual !== 0 && row.precioActual !== 0) {
       row.totalCalculadoActual = row.cantidadActual * row.precioActual;
       this.dataSource._updateChangeSubscription();
       this.guardarActulizar(row);
     }
   }
-
- /* recalcularTotal(index: number): void {
-    const row = this.dataSource.filteredData[index]; // <- CAMBIADO AQUÍ
-
-    console.log(row);
-    row.total = (row.cantidad || 0) * (row.precio || 0);
-    this.dataSource._updateChangeSubscription();
-
-    const data = {
-      cantidad: row.cantidad,
-      precio: row.precio,
-      total: row.total,
-      idRecurso: row.idRecurso,
-      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
-      idHistorialPrecio: row.idHistorialPrecio,
-      montoRestante: row.montoRestante,
-      cantidadRestante: row.cantidadRestante
-    };
-    this.guardarActulizar(data);
-
-  } */
 
   guardarActulizar(data) {
     console.log(data)
@@ -351,7 +339,6 @@ export class AnalizarAutorizacionGastoComponent {
     }
   }
 
-
   aplicarFiltro(event: Event) {
     const filtroValor = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filtroValor.trim().toLowerCase();
@@ -364,11 +351,11 @@ export class AnalizarAutorizacionGastoComponent {
       const data = {
         idAutorizacionGasto: this.idAutorizacionGasto,
         cidEstadoAG: "004", // Estado de aprobación
-        observacion: "Autorización de Gasto Aprobada"
+        observacion: "Autorización de gasto aprobada por el supervisor y solicitada al PEP."
       };
 
       const response = await lastValueFrom(
-        this.maestraService.solicitarAutorizacionGastoResidente(data)
+        this.maestraService.solicitarAutorizacionGasto(data)
       );
 
       if (response) {
@@ -450,24 +437,27 @@ export class AnalizarAutorizacionGastoComponent {
 
 
   validarusuario() {
+    // Reiniciamos todos los roles
+    this.isAdmin = false;
+    this.isSupervisor = false;
+    this.isResidente = false;
+    this.isPEP = false
+    // Validar Residente
     if (Session.identity.rol == 'UPS-RESIDENTE-PROYECTO') {
-      this.isSupervisor = false;
       this.isResidente = true;
-      this.isAdmin = false;
     }
 
-    if (Session.identity.rol == 'UPS-SUPERVISOR-PROYECTO') {
-      this.isResidente = false
-      this.isSupervisor = true
-      this.isAdmin = false;
+    // Validar Supervisor
+    else if (Session.identity.rol == 'UPS-SUPERVISOR-PROYECTO') {
+      this.isSupervisor = true;
     }
 
-    if (
-      Session.identity.rol !== 'UPS-RESIDENTE-PROYECTO' &&
-      Session.identity.rol !== 'UPS-SUPERVISOR-PROYECTO'
-    ) {
-      this.isSupervisor = false;
-      this.isResidente = false;
+    else if (Session.identity.rol == 'UPS-PEP-PROYECTO') {
+      this.isPEP = true;
+    }
+
+    // Si no es ninguno de los anteriores, es Administrador (o cualquier otro rol general)
+    else {
       this.isAdmin = true;
     }
   }
@@ -515,13 +505,13 @@ export class AnalizarAutorizacionGastoComponent {
           name: archivo.nombre,
           extension: archivo.extension,
           path: archivo.path,
-          
+
         }));
       }
     });
   }
 
- 
+
   async descargarArchivo(dt) {
     console.log(dt)
     const archivoPayload = {
@@ -530,14 +520,75 @@ export class AnalizarAutorizacionGastoComponent {
       txtNombre: dt.name,
       txtPath: dt.path
     };
-    
+
     try {
       await this.archivoService.descargar(archivoPayload);
     } catch (error) {
       console.error('Error al descargar archivo del servidor:', error);
     }
   }
-  
 
 
+  async getMmostrarEstadoActualAutorizaciongasto(idAutorizacionGasto) {
+    const data = {
+      idAutorizacionGasto: idAutorizacionGasto
+    }
+    const oRespL = await lastValueFrom(
+      this.maestraService.getMmostrarEstadoActualAutorizaciongasto(
+        data
+      )
+    );
+    if (oRespL) {
+      this.cidEstadoAutorizacionGasto = oRespL.data.cidEstado
+      this.observacionAutorizacionGasto = oRespL.data.observacion
+      this.estadoAutorizacionGasto = oRespL.data.estado
+    }
+    console.log(oRespL)
+  }
+
+
+
+  async observar() {
+    const confirmDelete = confirm(`¿Deseas observar Preliquidacion?`);
+    if (!confirmDelete) return;
+
+    this.observarAutorizacionGasto()
+
+  }
+
+  async observarAutorizacionGasto() {
+    const dialogRef = this.dialog.open(ObservarDialogComponent, {
+      width: '500px',
+      data: {
+        title: 'Observar Autorización de Gasto',
+        message: 'Escriba el motivo de la observación.',
+      },
+    });
+
+    const comentario = await dialogRef.afterClosed().toPromise();
+
+    if (comentario) {
+      const data = {
+        idAutorizacionGasto: this.idAutorizacionGasto,
+        cidEstadoAG: "003", // Estado de aprobación
+        observacion: comentario
+      };
+
+      console.log(data)
+      try {
+
+        const response = await lastValueFrom(
+          this.maestraService.solicitarAutorizacionGasto(data)
+        );
+
+        if (response) {
+          this.salir();
+        }
+      } catch (error) {
+        console.error('Error al solicitar:', error);
+      }
+
+ 
+    }
+  }
 }

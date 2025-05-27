@@ -68,8 +68,17 @@
         <!-- Contenedor de botones flotantes -->
         <div class="botones-flotantes">
 
-            <!-- Botón -->
-            <!-- Botón mejorado -->
+            <button mat-flat-button color="primary" (click)="descargarPartidad()">
+                <mat-icon class="icon-size-5" >download</mat-icon>
+                <span class="ml-2">PARTIDAS</span>
+            </button>
+            
+            <button mat-flat-button color="primary" (click)="descargarPreciosUnitarios()">
+                <mat-icon class="icon-size-5" >download</mat-icon>
+                <span class="ml-2">PRECIOS UNITARIOS</span>
+            </button> 
+
+            <!-- Botón mejorado  -->
             <button *ngIf="isResidente" mat-flat-button style="background-color: #0056b3; color: white;"
                 (click)="registrarSolicitudPreliquidacion()">
                 <mat-icon>add</mat-icon>

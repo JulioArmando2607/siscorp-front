@@ -121,9 +121,16 @@
                 <ng-container matColumnDef="metrado">
                   <th mat-header-cell *matHeaderCellDef> METRADO </th>
                   <td mat-cell *matCellDef="let row">
-                    <input *ngIf="row.unidad" matInput type="number" [(ngModel)]="row.metrado"
-                      (blur)="recalcularTotalmontos(row)" [ngModelOptions]="{standalone: true}"
-                      class="w-full px-2 py-1 border rounded" />
+                    <input
+                      *ngIf="row.unidad"
+                      matInput
+                      type="number"
+                      [(ngModel)]="row.metrado"
+                      [disabled]="cidEstadoPreliquidacion === '005'"
+                      (blur)="recalcularTotalmontos(row)"
+                      [ngModelOptions]="{standalone: true}"
+                      class="w-full px-2 py-1 border rounded"
+                    />
                   </td>
                 </ng-container>
 

@@ -415,7 +415,7 @@ export class RegistarAutorizacionGastoTablaComponent {
       const detalle = {
         idAutorizacionGasto: idAutorizacionGasto,
         cidEstadoAG: "002",
-        observacion: "Solicitar Autorización de Gasto desde el Residente"
+        observacion: "Solicitado Autorización de Gasto desde el Residente"
       };
 
       console.log(detalle)

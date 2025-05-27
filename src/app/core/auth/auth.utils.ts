@@ -179,6 +179,14 @@ export class AuthUtils {
 
         return date;
     }
-
+    
+    static getTokenExpiration(token: string): number {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp;
+        } catch {
+            return 0;
+        }
+    }
     
 }

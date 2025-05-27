@@ -543,6 +543,15 @@ export class ListarSolicitudAutorizacionGastoComponent {
       this.excelService.exportAnexo25(oRespL)
     }
   }
+  async descargarPartidad(){
+    const roresp = await lastValueFrom(this.maestraService.partidasExcel(this.id))
+    this.excelService.exportPartidas(roresp.data, "PARTIDAS");
+  }
+
+  async descargarPreciosUnitarios(){
+    const roresp = await lastValueFrom(this.maestraService.partidasExcelRecursos(this.id))
+    this.excelService.exportPreciosUnitarios(roresp.data, "PRECIOS UNITARIOS");
+  }
 
 
 

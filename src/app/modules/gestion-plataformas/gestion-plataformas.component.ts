@@ -421,5 +421,14 @@ export class GestionPlataformasComponent implements OnInit {
       }
     });
   }
+  async descargarPartidad(row){
+    const roresp = await lastValueFrom(this.maestraService.partidasExcel(row.idProyecto))
+    this.excelService.exportPartidas(roresp.data, "PARTIDAS");
+  }
+
+  async descargarPreciosUnitarios(row){
+    const roresp = await lastValueFrom(this.maestraService.partidasExcelRecursos(row.idProyecto))
+    this.excelService.exportPreciosUnitarios(roresp.data, "PRECIOS UNITARIOS");
+  }
 }
 

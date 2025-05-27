@@ -206,8 +206,16 @@
             </button>
 
             <button *ngIf="isBotonesGestion" mat-icon-button color="accent" (click)="agregarGastosAdicionales(row)"
-              matTooltip="Agregar Gastos adicionales">
+              matTooltip="Control y monitoreo del movimiento financiero">
               <mat-icon>settings</mat-icon>
+            </button>
+            <button mat-icon-button color="accent" (click)="descargarPartidad(row)" matTooltip="Descargar Partidas">
+              <mat-icon>download</mat-icon>
+            </button>
+
+            <button mat-icon-button color="primary" (click)="descargarPreciosUnitarios(row)"
+              matTooltip="Descargar Precios Unitarios">
+              <mat-icon>download</mat-icon>
             </button>
           </div>
         </mat-cell>
