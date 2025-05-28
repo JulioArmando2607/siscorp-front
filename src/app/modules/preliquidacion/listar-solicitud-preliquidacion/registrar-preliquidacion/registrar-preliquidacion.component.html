@@ -1,7 +1,7 @@
 <!-- Dashboard Layout -->
 <div class="p-6">
   <div class="flex min-w-0 flex-auto flex-col">
-     <div style="display: flex; align-items: center; gap: 8px;">
+    <div style="display: flex; align-items: center; gap: 8px;">
       <span>&nbsp; &nbsp; &nbsp; &nbsp; {{cidEstadoPreliquidacion}}-{{nombreEstadoPreliquidacion}}</span>
       <span *ngIf="cidEstadoPreliquidacion == '003'">: {{observacionEstado}}</span>
     </div>
@@ -121,16 +121,9 @@
                 <ng-container matColumnDef="metrado">
                   <th mat-header-cell *matHeaderCellDef> METRADO </th>
                   <td mat-cell *matCellDef="let row">
-                    <input
-                      *ngIf="row.unidad"
-                      matInput
-                      type="number"
-                      [(ngModel)]="row.metrado"
-                      [disabled]="cidEstadoPreliquidacion === '005'"
-                      (blur)="recalcularTotalmontos(row)"
-                      [ngModelOptions]="{standalone: true}"
-                      class="w-full px-2 py-1 border rounded"
-                    />
+                    <input *ngIf="row.unidad" matInput type="number" [(ngModel)]="row.metrado"
+                      [disabled]="cidEstadoPreliquidacion === '005'" (blur)="recalcularTotalmontos(row)"
+                      [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1 border rounded" />
                   </td>
                 </ng-container>
 
@@ -196,7 +189,7 @@
 
     </mat-tab>
     <mat-tab label="ANEXO 28: AVANCE FINANCIERO"
-      [disabled]="idPreliquidacion == 0"><!-- poder pulsar el tab si this.idPreliquidacion es diferente a 0-->
+      [disabled]="idPreliquidacion == '0'"><!-- poder pulsar el tab si this.idPreliquidacion es diferente a 0-->
       <div class="tab-content">
         <div class="flex min-w-0 flex-auto flex-col bg-card p-1">
           <div class="mt-6 border p-4 rounded-lg shadow-lg relative">
@@ -211,47 +204,79 @@
                 <!-- UND  -->
                 <ng-container matColumnDef="nombreControlAvanceFinanciero">
                   <th mat-header-cell *matHeaderCellDef> DESCRIPCION </th>
-                  <td mat-cell *matCellDef="let row"> {{ row.nombreControlAvanceFinanciero }} </td>
+                  <td mat-cell *matCellDef="let row">{{ row.nombreControlAvanceFinanciero }}
+                    <!---   <ng-container *ngIf="(row.codigoUnico?.substring(3)?.length || 0) > 3">
+                      {{ row.nombreControlAvanceFinanciero }}
+                    </ng-container>-->
+                    <!--{{ row.nombreControlAvanceFinanciero }} </td>--->
                 </ng-container>
 
                 <ng-container matColumnDef="montoAsignado">
                   <th mat-header-cell *matHeaderCellDef> VALOR FINANCIADO (S/.) </th>
-                  <td mat-cell *matCellDef="let row"> {{ row.montoAsignado }} </td>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="row.imputm=='1'">
+                      {{ row.montoAsignado }}
+                    </ng-container>
+
+                  </td>
+
                 </ng-container>
 
                 <ng-container matColumnDef="mesActual">
                   <th mat-header-cell *matHeaderCellDef> MES ACTUAL (S/.) </th>
-                  <td mat-cell *matCellDef="let row"> {{ row.avanceActual }} </td>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="row.imputm=='1'">
+                      {{ row.avanceActual }}
+                    </ng-container>
+                  </td>
                 </ng-container>
 
                 <ng-container matColumnDef="ejecucionActual">
                   <th mat-header-cell *matHeaderCellDef> EJECUCION (%) </th>
-                  <td mat-cell *matCellDef="let row"> {{ row.ejecucionPorcentaje }} </td>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="row.imputm=='1'">
+                      {{ row.ejecucionPorcentaje }}
+                    </ng-container>
+
+                  </td>
                 </ng-container>
 
 
                 <ng-container matColumnDef="acumulado">
                   <th mat-header-cell *matHeaderCellDef> ACUMULADO</th>
-                  <td mat-cell *matCellDef="let row"> {{ row.acumulado }} </td>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="row.imputm=='1'">
+                      {{ row.acumulado }}
+                    </ng-container>
+
+                  </td>
                 </ng-container>
 
                 <ng-container matColumnDef="porcentajeAcumulado">
                   <th mat-header-cell *matHeaderCellDef> PORCENTAJE ACUMULADO (%) </th>
-                  <td mat-cell *matCellDef="let row"> {{ row.porcentajeAcumulado }} </td>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="row.imputm=='1'">
+                      {{ row.porcentajeAcumulado }}
+                    </ng-container>
+                  </td>
                 </ng-container>
 
                 <ng-container matColumnDef="acciones">
                   <th mat-header-cell *matHeaderCellDef> ACCIONES </th>
                   <td mat-cell *matCellDef="let row">
-                    <button *ngIf="row.montoAsignado>0" mat-icon-button color="primary"
-                      (click)="agregarManiefiestoGastos(row)" matTooltip="AGREGAR MANIFIESTO DE GASTO">
-                      <mat-icon>add</mat-icon>
-                    </button>
+                    <ng-container *ngIf="row.imputm=='1'">
+                      <button *ngIf="row.montoAsignado>0" mat-icon-button color="primary"
+                        (click)="agregarManiefiestoGastos(row)" matTooltip="AGREGAR MANIFIESTO DE GASTO">
+                        <mat-icon>add</mat-icon>
+                      </button>
+  
+                      <button *ngIf="row.montoAsignado>0" mat-icon-button color="accent" class="ml-2"
+                        (click)="exporManiefiestoGasto(row)" matTooltip="Descargar Manifiesto de Gasto">
+                        <mat-icon>download</mat-icon>
+                      </button>
+                    </ng-container>
 
-                    <button *ngIf="row.montoAsignado>0" mat-icon-button color="accent" class="ml-2"
-                      (click)="exporManiefiestoGasto(row)" matTooltip="Descargar Manifiesto de Gasto">
-                      <mat-icon>download</mat-icon>
-                    </button>
+                 
                   </td>
                 </ng-container>
 

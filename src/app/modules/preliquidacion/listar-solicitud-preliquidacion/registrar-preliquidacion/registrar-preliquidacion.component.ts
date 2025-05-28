@@ -321,6 +321,7 @@ export class RegistrarPreliquidacionComponent {
     console.log(data);
 
     const response = await this.maestraService.setRegistrarAvanceObra(data).toPromise();
+    console.log(response);
 
     // Actualizar localStorage y propiedades
     const { idValorizacionObra, idPreliquidacion } = response.data.response;

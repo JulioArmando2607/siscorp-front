@@ -63,7 +63,7 @@ export class ExcelService {
         'RUBRO': item.nombreRubro,
         'CODIGO': item.codigoRecurso,
         'RECURSO': item.nombreRecurso,
-        'Unidad': item.unidadMedida,
+        'Unidad': item.unidad,
         'CUADRILLA': item.cuadrilla,
         'CANTIDAD': item.cantidad,
         'PRECIO': item.precioUnitario,
