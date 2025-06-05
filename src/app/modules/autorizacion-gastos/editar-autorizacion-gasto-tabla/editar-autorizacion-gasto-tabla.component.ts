@@ -18,14 +18,16 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { ExcelService } from 'app/modules/maestras/excel.service';
 import { MaestrasService } from 'app/modules/maestras/maestras.service';
 import { BehaviorSubject, lastValueFrom, map, Observable, startWith, switchMap } from 'rxjs';
+import { Session } from 'app/core/auth/Session';
+
 @Component({
   selector: 'app-editar-autorizacion-gasto-tabla',
   imports: [
-    
+
     CommonModule,
-    MatTableModule,  
-    MatSortModule,  
-    MatPaginatorModule, 
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -90,7 +92,7 @@ export class EditarAutorizacionGastoTablaComponent {
   recursosSubject: any;
   totalElements = 0;
   pageSize = 10;
-  pageIndex = 0; 
+  pageIndex = 0;
   rubrosAdicionales: MatTableDataSource<any>;
 
   constructor(
@@ -106,10 +108,11 @@ export class EditarAutorizacionGastoTablaComponent {
 
   }
   async ngOnInit() {
+    this.validarusuario()
     this.filterForm = this.fb.group({
       estado: [0],
-      partidaControl: ["", Validators.required], 
-      recursoControl: ["", Validators.required], 
+      partidaControl: ["", Validators.required],
+      recursoControl: ["", Validators.required],
       cantidad: ["", [Validators.required, Validators.min(1)]],  // ✅ Mayor a 0
       precio: ["", [Validators.required, Validators.min(0.01)]]  // ✅ Mayor a 0.01
     });
@@ -143,6 +146,9 @@ export class EditarAutorizacionGastoTablaComponent {
         return this.filtrarRecursos(value);
       })
     ).subscribe(filtered => this.recursosFiltradas = new BehaviorSubject(filtered));
+
+    this.getMmostrarEstadoActualAutorizaciongasto(this.idAutorizacionGasto)
+    this.getArchivosAutorizacionGasto()
   }
 
   async verProyecto(id) {
@@ -259,7 +265,7 @@ export class EditarAutorizacionGastoTablaComponent {
       recurso.nombreRecurso.toLowerCase().includes(filterValue)
     );
   }
-  
+
   onRecursoSelected(event: any) {
     const selectedRecurso = this.recursos.find(recursos => recursos.idRecurso === event.option.value);
     if (selectedRecurso) {
@@ -285,32 +291,32 @@ export class EditarAutorizacionGastoTablaComponent {
     }
   }
 
-/*  async setRegistrarAutorizacionGasto(row) {
-    const data = {
-      idProyecto: this.id,
-      idAutorizacionGasto: this.idAutorizacionGasto,
-      idRecurso: row.idRecurso,
-      cantidad: row.cantidad,
-      precio: row.precio,
-      precioCantidad: row.total,
-      idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
-      idHistorialPrecio: row.idHistorialPrecio,
-      montoRestante: row.montoAsignado - (row.montoUtilizado + row.total),
-      cantidadRestante: row.cantidadAsignado - (row.cantidadRestante + row.cantidad),
-      codigoRecurso: row.codigoRecurso,
-
-    }
-
-    const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
-    // this.idAutorizacionGasto = response.data.response
-    console.log(response.data.response);
-    if (response) {
-      this.getFiltraRecursosAturorizacionGasto(true)
-    }
-
-  }
- */
+  /*  async setRegistrarAutorizacionGasto(row) {
+      const data = {
+        idProyecto: this.id,
+        idAutorizacionGasto: this.idAutorizacionGasto,
+        idRecurso: row.idRecurso,
+        cantidad: row.cantidad,
+        precio: row.precio,
+        precioCantidad: row.total,
+        idAutorizacionGastoRecurso: row.idAutorizacionGastoRecurso,
+        idHistorialPrecio: row.idHistorialPrecio,
+        montoRestante: row.montoAsignado - (row.montoUtilizado + row.total),
+        cantidadRestante: row.cantidadAsignado - (row.cantidadRestante + row.cantidad),
+        codigoRecurso: row.codigoRecurso,
   
+      }
+  
+      const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
+      // this.idAutorizacionGasto = response.data.response
+      console.log(response.data.response);
+      if (response) {
+        this.getFiltraRecursosAturorizacionGasto(true)
+      }
+  
+    }
+   */
+
   async setRegistrarAutorizacionGasto(row) {
 
     const data = {
@@ -329,9 +335,9 @@ export class EditarAutorizacionGastoTablaComponent {
 
     const response = await this.maestraService.setRegistrarAutorizacionGastoTabla(data).toPromise();
     //this.idAutorizacionGasto = response.data.response
-  //  localStorage.setItem('idAutorizacionGasto', response.data.response);
+    //  localStorage.setItem('idAutorizacionGasto', response.data.response);
     //const idAutorizacionGasto = localStorage.getItem('idAutorizacionGasto');
-  /// this.idAutorizacionGasto = idAutorizacionGasto
+    /// this.idAutorizacionGasto = idAutorizacionGasto
     console.log(response.data.response);
     if (response) {
       this.getFiltraRecursosAturorizacionGasto(true);        // Recargar datos con nueva paginación
@@ -342,7 +348,7 @@ export class EditarAutorizacionGastoTablaComponent {
   validarRecursoSeleccionado(): boolean {
     return this.proyectos.some(proyecto => proyecto.idRecurso === this.idRecursoSeleccionado);
   }
- 
+
   async eliminar(row) {
     const confirmado = await this.dataModal(522, 'Eliminar recurso', 'Deseas eliminar este recurso?', "warning");
     if (confirmado) {
@@ -360,22 +366,23 @@ export class EditarAutorizacionGastoTablaComponent {
   salir() {
     this.location.back(); // Vuelve a la página anterior
   }
+  /*
+    async solicitarAutorizacion() {
+      const confirmado = await this.dataModal(600, 'Solicitar Autorización de Gasto', '¿Deseas solicitar la autorización de gasto?', 'approve');
+      if (confirmado) {
+        const data = {
+          idAutorizacionGasto: this.idAutorizacionGasto,
+          cidEstadoAG: "002",
+          observacion: "Solicitar Autorización de Gasto desde el Residente"
+        }
+        const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();
+        if (response) {
+          this.salir()
+          // this.get()
+        }
+      }
+    }*/
 
-  async solicitarAutorizacion() {
-    const confirmado = await this.dataModal(600, 'Solicitar Autorización de Gasto', '¿Deseas solicitar la autorización de gasto?', 'approve');
-    if (confirmado) {
-      const data = {
-        idAutorizacionGasto: this.idAutorizacionGasto,
-        cidEstadoAG: "002",
-        observacion: "Solicitar Autorización de Gasto desde el Residente"
-      }
-      const response = await this.maestraService.solicitarAutorizacionGastoResidente(data).toPromise();
-      if (response) {
-        this.salir()
-        // this.get()
-      }
-    }
-  }
   dataModal(codigo: number, title: string, message: string, type: 'success' | 'warning' | 'error' | 'approve' | 'reject'): Promise<boolean> {
     return new Promise((resolve) => {
       let confirmLabel = 'Aceptar';
@@ -469,18 +476,18 @@ export class EditarAutorizacionGastoTablaComponent {
     this.guardarActulizar(row);
   }
 */
-  
+
   recalcularTotal(index: number): void {
-    const row = this.dataSource.filteredData[index];  
+    const row = this.dataSource.filteredData[index];
     console.log(row);
-  
+
     if (row.cantidadActual !== 0 && row.precioActual !== 0) {
       row.totalCalculadoActual = row.cantidadActual * row.precioActual;
       this.dataSource._updateChangeSubscription();
       this.guardarActulizar(row);
     }
   }
-  
+
 
   guardarActulizar(data) {
     console.log(data)
@@ -565,12 +572,184 @@ export class EditarAutorizacionGastoTablaComponent {
     };
 
     this.maestraService.getRubrosAdicionalesAG(data).subscribe((res: any) => {
-      this.rubrosAdicionales = res.data.filter((item: any) => 
+      this.rubrosAdicionales = res.data.filter((item: any) =>
         item.cidControlMonitoreo !== "001" &&
         item.cidControlMonitoreo !== "002" &&
         item.cidControlMonitoreo !== "003"
       );
     });
   }
- 
+
+  cidEstadoAutorizacionGasto: any;
+  observacionAutorizacionGasto: any;
+  estadoAutorizacionGasto: any;
+  isResidente: boolean = false;
+
+  async getMmostrarEstadoActualAutorizaciongasto(idAutorizacionGasto) {
+    const data = {
+      idAutorizacionGasto: idAutorizacionGasto
+    }
+    const oRespL = await lastValueFrom(
+      this.maestraService.getMmostrarEstadoActualAutorizaciongasto(
+        data
+      )
+    );
+    if (oRespL) {
+      this.cidEstadoAutorizacionGasto = oRespL.data.cidEstado
+      this.observacionAutorizacionGasto = oRespL.data.observacion
+      this.estadoAutorizacionGasto = oRespL.data.estado
+    }
+    console.log(oRespL)
+  }
+  isSupervisor: boolean = false;
+  isAdmin: boolean = false;
+  isPEP: boolean = false;
+  validarusuario() {
+    // Reiniciamos todos los roles
+    this.isAdmin = false;
+    this.isSupervisor = false;
+    this.isResidente = false;
+    this.isPEP = false
+    // Validar Residente
+    if (Session.identity.rol == 'UPS-RESIDENTE-PROYECTO') {
+      this.isResidente = true;
+    }
+
+    // Validar Supervisor
+    else if (Session.identity.rol == 'UPS-SUPERVISOR-PROYECTO') {
+      this.isSupervisor = true;
+    }
+
+    else if (Session.identity.rol == 'UPS-PEP-PROYECTO') {
+      this.isPEP = true;
+    }
+
+    // Si no es ninguno de los anteriores, es Administrador (o cualquier otro rol general)
+    else {
+      this.isAdmin = true;
+    }
+  }
+
+
+
+  async removeFile(index: number): Promise<void> {
+    const allFiles = this.getAllFilesToShow();
+    const fileToRemove = allFiles[index];
+    console.log(fileToRemove)
+
+    console.log(fileToRemove.idAutorizacionGastoArchivo)
+    if (fileToRemove.isRemote) {
+      try {
+        const confirmDelete = confirm(`¿Deseas eliminar el archivo "${fileToRemove.name}" del servidor?`);
+        if (!confirmDelete) return;
+
+        const data = {
+          idAutorizacionGastoArchivo: fileToRemove.idAutorizacionGastoArchivo
+        };
+        console.log(data)
+        const resp = await this.maestraService.eliminarArchivoAg(data).toPromise();
+        console.log('Archivo eliminado del servidor:', resp);
+      } catch (error) {
+        console.error('Error al eliminar archivo del servidor:', error);
+        return;
+      }
+
+      this.getArchivosAutorizacionGasto()
+    } else {
+      const localIndex = this.selectedFileObjects.findIndex(f => f.name === fileToRemove.name);
+      if (localIndex > -1) {
+        this.selectedFileObjects.splice(localIndex, 1);
+      }
+
+      this.filterForm.patchValue({ archivo: this.selectedFileObjects });
+
+      if (this.selectedFileObjects.length < 3) {
+        this.filterForm.get('archivo')?.setErrors({ minFiles: true });
+      } else {
+        this.filterForm.get('archivo')?.setErrors(null);
+      }
+
+      this.filterForm.get('archivo')?.updateValueAndValidity();
+    }
+  }
+
+  async solicitarAutorizacion() {
+    if (this.selectedFileObjects.length <= 0) {
+      await this.dataModal(400, 'Agregar Archivo', 'Agrega un archivo de sustentación de autorización de gasto.', 'warning');
+      return;
+    }
+
+    const confirmado = await this.dataModal(600, 'Solicitar Autorización de Gasto', '¿Deseas solicitar la autorización de gasto?', 'approve');
+
+    if (confirmado) {
+      const detalle = {
+        idAutorizacionGasto: this.idAutorizacionGasto,
+        cidEstadoAG: "002",
+        observacion: "Solicitado Autorización de Gasto desde el Residente"
+      };
+
+      const formData = new FormData();
+      formData.append('detalle', new Blob([JSON.stringify(detalle)], { type: 'application/json' }));
+
+      for (let file of this.selectedFileObjects) {
+        formData.append('archivos', file); // Nombre esperado por el backend
+      }
+
+      const response = await this.maestraService.solicitarAutorizacionGastoResidente(formData).toPromise();
+
+      if (response) {
+        await this.dataModal(response.data.codResultado, 'Solicitar Autorización de Gasto', response.data.msgResultado, 'success');
+        this.salir();
+      }
+    }
+  }
+
+
+  /*   selectedFiles: { name: string; extension: string }[] = [];
+    selectedFiles: File[] = []; */
+  selectedFileObjects: File[] = []; // Archivos subidos por input
+  remoteFiles: { name: string; extension: string; path: string; idAutorizacionGastoArchivo }[] = []; // Archivos del backend
+
+  onFileSelected(event: any): void {
+    const files: FileList = event.target.files;
+    const newFiles = Array.from(files);
+
+    newFiles.forEach(newFile => {
+      if (!this.selectedFileObjects.some(f => f.name === newFile.name)) {
+        this.selectedFileObjects.push(newFile);
+      }
+    });
+
+    this.filterForm.patchValue({ archivo: this.selectedFileObjects });
+    this.filterForm.get('archivo')?.updateValueAndValidity();
+  }
+
+  getArchivosAutorizacionGasto() {
+    const data = { idAutorizacionGasto: this.idAutorizacionGasto };
+
+    this.maestraService.getArchivosAutorizacionGasto(data).subscribe((res: any) => {
+      console.log(res)
+      if (res?.data?.response?.length) {
+        this.remoteFiles = res.data.response.map((archivo: any) => ({
+          name: archivo.nombre,
+          extension: archivo.extension,
+          path: archivo.path,
+          idAutorizacionGastoArchivo: archivo.idAutorizacionGastoArchivo
+        }));
+      }
+    });
+  }
+getAllFilesToShow() {
+  return [
+    ...this.remoteFiles.map(f => ({ ...f, isRemote: true })), // conservamos el id original
+    ...this.selectedFileObjects.map(f => ({
+      name: f.name,
+      extension: '',
+      isRemote: false,
+      idAutorizacionGastoArchivo: null, // explícitamente null para archivos nuevos
+    })),
+  ];
+}
+
+
 }

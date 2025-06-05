@@ -152,7 +152,7 @@
                   <th mat-header-cell *matHeaderCellDef> % </th>
                   <td mat-cell *matCellDef="let row"
                     [ngStyle]="{ 'font-weight': 'bold', 'color': getTextColor(row.colorEstado) }">
-                    {{ row.porcentajeUso | number:'1.2-2' }}
+                    {{ row.porcentajeUso  }}
                   </td>
                 </ng-container>-->
 
@@ -177,7 +177,7 @@
             <!-- Linear Totals Section -->
             <div class="linear-totals mt-4">
               <div class="flex flex-wrap gap-4">
-                <!-- <div>TOTAL CALCULADO: {{ calcularTotalCalculado() | number:'1.2-2' }}</div>-->
+                <!-- <div>TOTAL CALCULADO: {{ calcularTotalCalculado()}}</div>-->
               </div>
             </div>
           </div>
@@ -292,7 +292,7 @@
           <!-- Linear Totals Section -->
           <div class="linear-totals mt-4">
             <div class="flex flex-wrap gap-4">
-              <div>TOTAL CALCULADO: {{ calcularTotalCalculado() | number:'1.2-2' }}</div>
+              <div>TOTAL CALCULADO: {{ calcularTotalCalculado() }}</div>
             </div>
           </div>
 

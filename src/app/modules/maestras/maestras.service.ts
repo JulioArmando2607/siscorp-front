@@ -182,7 +182,7 @@ export class MaestrasService {
     const url = `${this.getUrlAutorizacionGasto()}descargarArchivoSeleccionado`;
     return this.http.post(url, data, { responseType: 'blob' });
   }
- 
+
   getMmostrarEstadoActualAutorizaciongasto(data): Observable<any> {
     return this.http.post(`${this.getUrlAutorizacionGasto()}mostrar-estado-actual-autorizaciongasto`, data);
   }
@@ -203,11 +203,11 @@ export class MaestrasService {
   listarAvanceFinancieroAsignado(data): Observable<any> {
     return this.http.post(`${this.getUrlPreliquidacion()}listar-avance-financiero-asignado`, data);
   }
-  
+
   ListarAvanceFinancieroAsignadoReporte(data): Observable<any> {
     return this.http.post(`${this.getUrlPreliquidacion()}listar-avance-financiero-asignado-reporte`, data);
   }
- 
+
   RegManifiestoGastoAvanceFinanciero(data): Observable<any> {
     return this.http.post(`${this.getUrlPreliquidacion()}registrar-manifiesto-gasto-avance-financiero`, data);
   }
@@ -244,7 +244,7 @@ export class MaestrasService {
   eliminarArchivoPreliquidacion(data): Observable<any> {
     return this.http.post(`${this.getUrlPreliquidacion()}eliminar-archivo-preliquidacion`, data);
   }
-  
+
   partidasExcel(idProyecto): Observable<any> {
     return this.http.get(`${this.getUrlPartidas()}partidas-excel/${idProyecto}`);
   }
@@ -252,7 +252,11 @@ export class MaestrasService {
   partidasExcelRecursos(idProyecto): Observable<any> {
     return this.http.get(`${this.getUrlPartidas()}partidas-excel-recursos/${idProyecto}`);
   }
-  
+  eliminarArchivoAg(data): Observable<any> {
+    return this.http.post(`${this.getUrlAutorizacionGasto()}eliminar-archivo-ag`, data);
+  }
+
+
 }
 
 export function Headers(isJson = true): HttpHeaders {

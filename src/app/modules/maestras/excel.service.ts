@@ -328,16 +328,20 @@ export class ExcelService {
         safeDivide(item.parcialCotizacionAcumulado, item.cantidadSolicitadaAcumulado),
         //item.montoUtilizadoAcumulado/item.cantidadUtilizadoAcumulado, 
         item.parcialCotizacionAcumulado,
-
-        item.cantidadActual, item.precioActual, item.cantidadActual * item.precioActual,
-        item.cantidadActual + item.cantidadSolicitadaAcumulado, item.precioActual + item.parcialCotizacionAcumulado,
-        item.cantidadTotalRestante, item.montoTotalRestante
+        item.cantidadActual, 
+        item.precioActual,//SOLICITUD DE AUTORIZ. N° ... ACTUAL. S/
+        item.cantidadActual * item.precioActual,//SOLICITUD DE AUTORIZ. N° ... ACTUAL PARC. S/
+        item.cantidadActual + item.cantidadSolicitadaAcumulado, //ACUMULADO ACTUAL CANT. SOLIC. S/
+        //item.precioActual + item.parcialCotizacionAcumulado,//ACUMULADO ACTUAL PARC. S/
+        (item.cantidadActual * item.precioActual ) + item.parcialCotizacionAcumulado,
+        item.cantidadTotalRestante, //SALDO CANT. S/
+        item.montoTotalRestante//SALDO PARC. S/
       ]);
       totalMontoAsignado += item.montoTotalAsignado;
       totalMontoAcumulado += item.parcialCotizacionAcumulado;
       totalCUSolicitado += item.precioActual;
       totalParcialCotizado += item.cantidadActual * item.precioActual;
-      totalPrecioMontoActual += item.precioActual + item.parcialCotizacionAcumulado;
+      totalPrecioMontoActual += (item.cantidadActual * item.precioActual ) + item.parcialCotizacionAcumulado;// item.precioActual + item.parcialCotizacionAcumulado;
       totalSaldo += item.montoTotalRestante;
     });
 

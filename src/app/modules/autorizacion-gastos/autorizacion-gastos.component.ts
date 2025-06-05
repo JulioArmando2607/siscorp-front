@@ -275,6 +275,7 @@ export class AutorizacionGastosComponent {
   }
 
   registrarAutorizacionGastos(proyecto) {
+    localStorage.removeItem('idAutorizacionGasto');
     console.log('Ver detalles de:', proyecto);
     this._router.navigate(['autorizacion-gastos/listar-solicitud-autorizacion-gasto/', proyecto.idProyecto]);
   }
