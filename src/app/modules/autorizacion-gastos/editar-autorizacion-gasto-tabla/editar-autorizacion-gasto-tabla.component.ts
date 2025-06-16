@@ -649,12 +649,13 @@ export class EditarAutorizacionGastoTablaComponent {
         console.log(data)
         const resp = await this.maestraService.eliminarArchivoAg(data).toPromise();
         console.log('Archivo eliminado del servidor:', resp);
+        this.getArchivosAutorizacionGasto()
+
       } catch (error) {
         console.error('Error al eliminar archivo del servidor:', error);
         return;
       }
 
-      this.getArchivosAutorizacionGasto()
     } else {
       const localIndex = this.selectedFileObjects.findIndex(f => f.name === fileToRemove.name);
       if (localIndex > -1) {
@@ -739,17 +740,17 @@ export class EditarAutorizacionGastoTablaComponent {
       }
     });
   }
-getAllFilesToShow() {
-  return [
-    ...this.remoteFiles.map(f => ({ ...f, isRemote: true })), // conservamos el id original
-    ...this.selectedFileObjects.map(f => ({
-      name: f.name,
-      extension: '',
-      isRemote: false,
-      idAutorizacionGastoArchivo: null, // explícitamente null para archivos nuevos
-    })),
-  ];
-}
+  getAllFilesToShow() {
+    return [
+      ...this.remoteFiles.map(f => ({ ...f, isRemote: true })), // conservamos el id original
+      ...this.selectedFileObjects.map(f => ({
+        name: f.name,
+        extension: '',
+        isRemote: false,
+        idAutorizacionGastoArchivo: null, // explícitamente null para archivos nuevos
+      })),
+    ];
+  }
 
 
 }
